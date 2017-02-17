@@ -1,0 +1,1 @@
+json.array! @fax_requests, partial: 'fax_requests/fax_request', as: :fax_request

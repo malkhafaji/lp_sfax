@@ -1,0 +1,41 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Fax Requests</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Recipient name</th>
+      <th>Recipient number</th>
+      <th>File path</th>
+      <th>Client receipt date</th>
+      <th>Status</th>
+      <th>Message</th>
+      <th>Send confirm date</th>
+      <th>Vendor confirm date</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @fax_requests.each do |fax_request| %>
+      <tr>
+        <td><%= fax_request.recipient_name %></td>
+        <td><%= fax_request.recipient_number %></td>
+        <td><%= fax_request.file_path %></td>
+        <td><%= fax_request.client_receipt_date %></td>
+        <td><%= fax_request.status %></td>
+        <td><%= fax_request.message %></td>
+        <td><%= fax_request.send_confirm_date %></td>
+        <td><%= fax_request.vendor_confirm_date %></td>
+        <td><%= link_to 'Show', fax_request %></td>
+        <td><%= link_to 'Edit', edit_fax_request_path(fax_request) %></td>
+        <td><%= link_to 'Destroy', fax_request, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Fax Request', new_fax_request_path %>

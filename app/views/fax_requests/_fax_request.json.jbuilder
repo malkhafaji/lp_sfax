@@ -1,0 +1,2 @@
+json.extract! fax_request, :id, :recipient_name, :recipient_number, :file_path, :client_receipt_date, :status, :message, :send_confirm_date, :vendor_confirm_date, :created_at, :updated_at
+json.url fax_request_url(fax_request, format: :json)
