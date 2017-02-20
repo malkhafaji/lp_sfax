@@ -1,4 +1,5 @@
 require './app/controllers/concerns/doxifer.rb'
+
 class FaxRequestsController < ApplicationController
   before_action :set_fax_request, only: [:show, :edit, :update, :destroy]
 
@@ -12,10 +13,14 @@ class FaxRequestsController < ApplicationController
   require 'time'
   require 'json'
 
+
+
 # Inserting the parameters
   def fax_params
     params.require(:fax_request).permit(:recipient_name,:recipient_number,:file_path,:client_receipt_date,:status,:message,:send_confirm_date,:vendor_confirm_date)
   end
+
+
 
 #1. validate in the model
 
@@ -25,13 +30,14 @@ class FaxRequestsController < ApplicationController
     fax_request.send_confirm_date = Time.now
     fax_request.save!
     response = send_fax(fax_params)
+    update_fax_request(fax_request,response)
 
-    fax_request.update_attributes(status: response["isSuccess"], message: response["message"] )
     # fax_params["vendor_confirm_date"] = hash[""],
     # if (!fax_request.save)
     #  return json: fax_request.errors and return
     # end
   end
+
 #3. sending fax
   #3-1 Getting TOKEN
     def get_token
@@ -43,39 +49,68 @@ class FaxRequestsController < ApplicationController
     end
 
 #3-2 sending fax
+  def send_fax (fax_params)
+    tid = nil
+    conn = Faraday.new(:url => FAX_SERVER_URL, :ssl => { :ca_file => 'C:/Ruby200/cacert.pem' }  ) do |faraday|
+      faraday.request :multipart
+      faraday.request  :url_encoded
+      faraday.response :logger
+      faraday.adapter Faraday.default_adapter
+    end
+    token = get_token()
+    parts = ["sendfax?",
+    "token=#{CGI.escape(token)}",
+    "ApiKey=#{CGI.escape(APIKEY)}",
+    "RecipientFax=#{fax_params["recipient_number"]}",
+    "RecipientName=#{fax_params["recipient_name"]}",
+    "OptionalParams=&"]
+    path = "/api/" + parts.join("&")
 
-def send_fax(fax_params)
-  tid = nil
-  conn = Faraday.new(:url => FAX_SERVER_URL, :ssl => { :ca_file => 'C:/Ruby200/cacert.pem' }  ) do |faraday|
-    faraday.request :multipart
-    faraday.request  :url_encoded
-    faraday.response :logger
-    faraday.adapter Faraday.default_adapter
+    response = conn.post path do |req|
+      req.body = {}
+      req.body['file_name'] = Faraday::UploadIO.new( "#{fax_params["file_path"]}" , file_specification[0] , file_specification[1])
+    end
+    return JSON.parse(response.body)
   end
 
-  token = get_token()
-  parts = ["sendfax?",
-  "token=#{CGI.escape(token)}",
-  "ApiKey=#{CGI.escape(APIKEY)}",
-  "RecipientFax=#{fax_params["recipient_number"]}",
-  "RecipientName=#{fax_params["recipient_name"]}",
-  "OptionalParams=&"]
-  path = "/api/" + parts.join("&")
+  def file_specification
+    file_name = File.basename ("#{fax_params["file_path"]}").downcase    # this is hardcode path We need to change the path to  ("#{fax_params['file_path']}")
+    file_extension = File.extname (file_name).downcase
 
-  response = conn.post path do |req|
-    req.body = {}
-    req.body['file_name'] = Faraday::UploadIO.new('/home/mhwadah/test22.txt',"application/notepad","test22.txt")
 
-    pp response
+
+
+    if file_extension  == ".pdf"
+      return ["application/PDF",file_name]
+    elsif file_extension == ".txt"
+      return "application/TXT",file_name
+    elsif file_extension == ".doc"
+      return "application/DOC",file_name
+    elsif file_extension == ".docx"
+      return "application/DOCX",file_name
+    elsif file_extension == ".tif"
+      return "application/TIF",file_name
+    else
+      return false
+    end
   end
-  return JSON.parse(response.body)
 
 
-end
 
-#4. update fax_request
-  def update_fax_request
-    fax_request.update_all(status: response[body][isSuccess], message: response[body][message], queue_id: response[body][SendFaxQueueId], fax_vendor_confirm_date: response[body][fax_vender_confirm_date])
+
+#4. update fax_request: "Fri, 17 Feb 2017 16:41:30 GMT"
+
+  def update_fax_request(fax_request,response)
+
+    fax_request.update_attributes(
+                                  status: response["isSuccess"],
+                                  message: response["message"],
+                                  SendFaxQueueId: response["SendFaxQueueId"]
+                                  )
+
+    # fax_request.update_all(, fax_vendor_confirm_date: response[body][fax_vender_confirm_date])
+    # pp response.body
+    # pp fax_request
   end
 
 #5. create response_json
