@@ -10,7 +10,6 @@ class Doxipher
     @iv = 'x49e*wJVXr8BrALE'
 	end
 
-
 	def encrypt( plain = nil, &block )
 		if @base64
 			Base64.encode64( cipher( plain, false, &block ))

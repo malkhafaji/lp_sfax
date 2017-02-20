@@ -13,14 +13,10 @@ class FaxRequestsController < ApplicationController
   require 'time'
   require 'json'
 
-
-
 # Inserting the parameters
   def fax_params
     params.require(:fax_request).permit(:recipient_name,:recipient_number,:file_path,:client_receipt_date,:status,:message,:send_confirm_date,:vendor_confirm_date)
   end
-
-
 
 #1. validate in the model
 
@@ -29,6 +25,7 @@ class FaxRequestsController < ApplicationController
     fax_request = FaxRequest.new(fax_params)
     fax_request.send_confirm_date = Time.now
     fax_request.save!
+
     response = send_fax(fax_params)
     update_fax_request(fax_request,response)
 
@@ -68,20 +65,18 @@ class FaxRequestsController < ApplicationController
 
     response = conn.post path do |req|
       req.body = {}
-      req.body['file_name'] = Faraday::UploadIO.new( "#{fax_params["file_path"]}" , file_specification[0] , file_specification[1])
+      req.body['file_name'] = Faraday::UploadIO.new( "#{fax_params["file_path"]}" , file_specification[0] , file_specification[1] )
     end
     return JSON.parse(response.body)
+    pp response
   end
 
   def file_specification
     file_name = File.basename ("#{fax_params["file_path"]}").downcase    # this is hardcode path We need to change the path to  ("#{fax_params['file_path']}")
     file_extension = File.extname (file_name).downcase
 
-
-
-
     if file_extension  == ".pdf"
-      return ["application/PDF",file_name]
+      return "application/PDF",file_name
     elsif file_extension == ".txt"
       return "application/TXT",file_name
     elsif file_extension == ".doc"
@@ -94,9 +89,6 @@ class FaxRequestsController < ApplicationController
       return false
     end
   end
-
-
-
 
 #4. update fax_request: "Fri, 17 Feb 2017 16:41:30 GMT"
 
@@ -124,28 +116,11 @@ class FaxRequestsController < ApplicationController
     render json: response_json
   end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   def index
     @fax_requests = FaxRequest.all
   end
 
   def show
-
 
   end
 
