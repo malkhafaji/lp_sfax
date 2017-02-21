@@ -29,4 +29,4 @@ production:
   
 staging:
  <<: *default
- database: db/staging.sqlite3
+ database: db/development.sqlite3
