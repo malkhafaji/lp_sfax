@@ -26,7 +26,12 @@ test:
 production:
   <<: *default
   database: db/production.sqlite3
-  
+
 staging:
- <<: *default
- database: db/development.sqlite3
+ adapter: mysql2
+ encoding: utf8
+ reconnect: true
+ database: staging
+ username: root
+ password: <%= SECRET["DB_PASS"] %>
+ socket: /var/run/mysqld/mysqld.sock
