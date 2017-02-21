@@ -4,6 +4,9 @@
 #   Ensure the SQLite 3 gem is defined in your Gemfile
 #   gem 'sqlite3'
 #
+
+
+
 default: &default
   adapter: sqlite3
   pool: 5
@@ -23,3 +26,7 @@ test:
 production:
   <<: *default
   database: db/production.sqlite3
+  
+staging:
+ <<: *default
+ database: db/staging.sqlite3
