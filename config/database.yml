@@ -6,9 +6,7 @@
 #
 
 
-staging:
- <<: *default
- database: db/staging.sqlite3
+
 default: &default
   adapter: sqlite3
   pool: 5
@@ -28,3 +26,7 @@ test:
 production:
   <<: *default
   database: db/production.sqlite3
+  
+staging:
+ <<: *default
+ database: db/staging.sqlite3
