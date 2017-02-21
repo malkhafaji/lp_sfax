@@ -1,4 +1,10 @@
 Rails.application.routes.draw do
-  resources :fax_requests
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+
+  resources :fax_requests do
+    collection do
+      get 'fax_req'
+    end
+  end
+  root 'fax_requests#fax_req'
+
 end

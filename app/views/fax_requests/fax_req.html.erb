@@ -1,0 +1,35 @@
+<%= form_for(fax_request) do |f| %>
+
+  <% if fax_request.errors.any? %>
+    <div id="error_explanation">
+        <h2><%= pluralize(fax_request.errors.count, "error") %> prohibited this fax_request from being saved:</h2>
+
+      <ul>
+        <% fax_request.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= f.label :recipient_name %>
+  <%= f.text_field :recipient_name %>
+  <%= f.label :recipient_number %>
+  <%= f.text_field :recipient_number %>
+  <%= f.label :file_path %>
+  <!-- We  need to takeout the file path and change it to the original file field and path  -->
+  <%= f.hidden_field :file_path,:value => '/home/mhwadah/test22.txt' %><br>
+  <%= f.hidden_field :client_receipt_date %>
+  <%= f.hidden_field :status %>
+  <%= f.hidden_field :message %>
+  <%= f.hidden_field :send_confirm_date %>
+  <%= f.hidden_field :vendor_confirm_date %>
+  <br>
+
+  <div class="actions">
+  <%= f.submit 'Send fax' %>
+  </div>
+
+<% end %>
+
+<%= link_to 'Back', fax_requests_path %>
