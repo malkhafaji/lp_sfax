@@ -5,7 +5,7 @@ require 'time'
 require 'json'
 
 class FaxRequestsController < ApplicationController
-  before_action :set_fax_request, only: [:show,:update]
+  before_action :set_fax_request, only: [:update]
 
 # The requirements to connect with Sfax
   USERNAME = "ealzubaidi"
@@ -97,8 +97,8 @@ class FaxRequestsController < ApplicationController
     @fax_requests = FaxRequest.all
   end
 
-  def show
-  end
+  # def show
+  # end
 
   private
     def set_fax_request
