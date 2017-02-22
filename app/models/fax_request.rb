@@ -25,4 +25,5 @@ class FaxRequest < ApplicationRecord
                           :message => "Attached file can not be empty"
 
 
-end
+ end
+
