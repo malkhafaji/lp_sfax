@@ -1,1 +1,0 @@
-json.partial! "fax_requests/fax_request", fax_request: @fax_request

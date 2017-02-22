@@ -12,7 +12,4 @@ module Fax
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
   end
-
-  secrets_file = "/home/deploy/.rails_secrets.yml"
-SECRET = File.exists?(secrets_file) ? YAML.load_file(secrets_file) : {}
 end
