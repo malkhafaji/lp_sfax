@@ -5,7 +5,7 @@ require 'time'
 require 'json'
 
 class FaxRequestsController < ApplicationController
-  before_action :set_fax_request, only: [:show, :edit, :update, :destroy]
+  before_action :set_fax_request, only: [:update]
 
 # The requirements to connect with Sfax
   USERNAME = "ealzubaidi"
@@ -15,20 +15,16 @@ class FaxRequestsController < ApplicationController
   FAX_SERVER_URL = "https://api.sfaxme.com"
 
 
-# The required parameters
-  def fax_params
-    params.require(:fax_request).permit(:recipient_name,:recipient_number,:file_path,:client_receipt_date,:status,:message,:send_confirm_date,:vendor_confirm_date)
-  end
-  #
-
 # Create new,save and update fax request
   def create
-    fax_request = FaxRequest.new(fax_params)
-    fax_request.client_receipt_date = Time.now
-    fax_request.save!
+    @fax_request = FaxRequest.new(fax_params)
+    @fax_request.client_receipt_date = Time.now
+    @fax_request.save(fax_params)
     response = send_fax(fax_params)
-    update_fax_request(fax_request,response)
+    update_fax_request(@fax_request,response)
+    redirect_to fax_requests_path,notice: response[0]["message"]
   end
+
 
 # Getting TOKEN
     def get_token
@@ -62,8 +58,7 @@ class FaxRequestsController < ApplicationController
       req.body = {}
       req.body['file_name'] = Faraday::UploadIO.new( "#{fax_params["file_path"]}" , file_specification[0] , file_specification[1] )
     end
-
-    return JSON.parse(response.body)
+    return [JSON.parse(response.body),response]
   end
 
 # Getting the File Name , the File Extension and validate the document type
@@ -89,50 +84,29 @@ class FaxRequestsController < ApplicationController
 # Update Fax parameters with recipit parameters
   def update_fax_request(fax_request,response)
     fax_request.update_attributes(
-                                  status: response["isSuccess"],
-                                  message: response["message"],
-                                  SendFaxQueueId: response["SendFaxQueueId"]
+                                  :status => response[0]["isSuccess"],
+                                  :message => response[0]["message"],
+                                  :SendFaxQueueId => response[0]["SendFaxQueueId"],
+                                  :send_confirm_date => response[1]['date'],
                                   )
   end
 
-
-  def new
-    @fax_request = FaxRequest.new
-  end
-
+# indexing the data
   def index
+    @fax_request = FaxRequest.new
     @fax_requests = FaxRequest.all
   end
 
-  def show
-  end
-
-  def edit
-  end
-
-  def update
-    respond_to do |format|
-      if @fax_request.update(fax_request_params)
-        format.html { redirect_to @fax_request, notice: 'Fax request was successfully updated.' }
-        format.json { render :show, status: :ok, location: @fax_request }
-      else
-        format.html { render :edit }
-        format.json { render json: @fax_request.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  def destroy
-    @fax_request.destroy
-    respond_to do |format|
-      format.html { redirect_to fax_requests_url, notice: 'Fax request was successfully destroyed.' }
-      format.json { head :no_content }
-    end
-  end
+  # def show
+  # end
 
   private
     def set_fax_request
       @fax_request = FaxRequest.find(params[:id])
+    end
+    # The required parameters
+    def fax_params
+      params.require(:fax_request).permit(:recipient_name,:recipient_number,:file_path,:client_receipt_date,:status,:message,:send_confirm_date,:vendor_confirm_date)
     end
 
 end
