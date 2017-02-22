@@ -1,3 +1,4 @@
+<div class=container>
 <%= form_for(fax_request) do |f| %>
 
   <% if fax_request.errors.any? %>
@@ -28,8 +29,9 @@
 
   <div class="actions">
   <%= f.submit 'Send fax' %>
-  </div>
+ 
 
 <% end %>
 
 <%= link_to 'Back', fax_requests_path %>
+<div>

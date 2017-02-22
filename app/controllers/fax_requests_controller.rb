@@ -102,7 +102,17 @@ class FaxRequestsController < ApplicationController
 
   def index
     @fax_requests = FaxRequest.all
-  end
+     end
+
+    #@transactions = Transaction.where(account_id: params[:account_id])
+ 
+   
+   
+     
+ 
+
+
+
 
   def show
   end
