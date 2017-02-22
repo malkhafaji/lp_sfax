@@ -7,7 +7,6 @@
       <% end %>
 <% end %>
 
-
 <p id="notice" style="float:right;font-size: 25px"><%= notice %></p>
 
 <div style ="float:left">
@@ -42,6 +41,7 @@
       <th>Message</th>
       <th>Send confirm date</th>
       <th>Vendor confirm date</th>
+      <th colspan="3"></th>
     </tr>
   </thead>
 
@@ -56,11 +56,6 @@
         <td><%= fax_request.message %></td>
         <td><%= fax_request.send_confirm_date.in_time_zone('Central Time (US & Canada)')%></td>
         <td><%= fax_request.vendor_confirm_date%></td>
-        <!-- <td><%= link_to 'Show', fax_request %></td> -->
-        <td><%= fax_request.send_confirm_date%></td>
-        <td><%= fax_request.vendor_confirm_date %></td>
-        <td><%= fax_request.send_confirm_date%></td>
-        <td><%= fax_request.vendor_confirm_date %></td>
       </tr>
     <% end %>
   </tbody>

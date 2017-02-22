@@ -95,7 +95,7 @@ class FaxRequestsController < ApplicationController
   def index
     @fax_request = FaxRequest.new
     @fax_requests = FaxRequest.all
-     end
+  end
 
   # def show
   # end
