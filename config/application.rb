@@ -2,8 +2,6 @@ require_relative 'boot'
 
 require 'rails/all'
 
-secrets_file = "/home/deploy/.rails_secrets.yml"
-SECRET = File.exists?(secrets_file) ? YAML.load_file(secrets_file) : {}
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
