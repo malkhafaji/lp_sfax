@@ -9,17 +9,6 @@
   </head>
 
   <body>
-    <% if @fax_request.errors.any? %>
-      <div id="error_explanation">
-          <h2><%= pluralize(fax_request.errors.count, "error") %> prohibited this fax_request from being saved:</h2>
-
-        <ul>
-          <% @fax_request.errors.full_messages.each do |message| %>
-            <li><%= message %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
     <%= yield %>
   </body>
 </html>
