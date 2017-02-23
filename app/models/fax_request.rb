@@ -24,6 +24,13 @@ class FaxRequest < ApplicationRecord
   #   validates_presence_of :file_path,
   #                         :message => "Attached file can not be empty"
   #
-
- end
+     def self.to_csv
+        CSV.generate do |csv|
+             csv << column_names
+             all.each do |fax_request|
+                 csv << fax_request.attributes.values_at(*column_names)
+       end
+     end
+    end
+  end
 
