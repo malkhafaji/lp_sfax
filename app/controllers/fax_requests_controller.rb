@@ -35,6 +35,7 @@ class FaxRequestsController < ApplicationController
     fax_request.recipient_number = recipient_number
     fax_request.recipient_name = recipient_name
     fax_request.file_path = file_path
+    fax_request.save!
     tid = nil
 
     conn = Faraday.new(:url => FAX_SERVER_URL, :ssl => { :ca_file => 'C:/Ruby200/cacert.pem' }  ) do |faraday|
@@ -58,11 +59,12 @@ class FaxRequestsController < ApplicationController
       req.body['file_name'] = Faraday::UploadIO.new("#{file_path}",file_specification(file_path)[0],file_specification(file_path)[1])
     end
 
+    response_result = JSON.parse(response.body)
     fax_request.update_attributes(
-                                  :status =>            JSON.parse(response.body)["isSuccess"],
-                                  :message =>           JSON.parse(response.body)["message"],
-                                  :SendFaxQueueId =>    JSON.parse(response.body)["SendFaxQueueId"],
-                                  :send_confirm_date => JSON.parse(response.body)['date'],
+                                  :status =>            response_result["isSuccess"],
+                                  :message =>           response_result["message"],
+                                  :SendFaxQueueId =>    response_result["SendFaxQueueId"],
+                                  :send_confirm_date => response['date']
                                   )
     render json: fax_request
   end
