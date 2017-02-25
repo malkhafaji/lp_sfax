@@ -1,6 +1,6 @@
 class FaxRequest < ApplicationRecord
 
-  # 
+
   # # Validate the recipient number to be only integers ,11 digit length and can not be empty
   # #----------------------------------------------------------------------------------------
   #   validates   :recipient_number,
@@ -23,14 +23,19 @@ class FaxRequest < ApplicationRecord
   # #-----------------------------------------------------------------------------------------
   #   validates_presence_of :file_path,
   #                         :message => "Attached file can not be empty"
-  #
-     def self.to_csv
-        CSV.generate do |csv|
-             csv << column_names
-             all.each do |fax_request|
-                 csv << fax_request.attributes.values_at(*column_names)
-       end
-     end
-    end
-  end
 
+
+  # Each Fax Request Has ONLY one response
+    has_one :fax_response   ,dependent: :destroy
+
+  # Generating the CSV file
+    def self.to_csv
+      CSV.generate do |csv|
+        csv << column_names
+        all.each do |fax_request|
+          csv << fax_request.attributes.values_at(*column_names)
+        end
+      end
+    end
+
+end
