@@ -108,6 +108,6 @@ class FaxRequestsController < ApplicationController
 
   # The required parameters
     def fax_params
-      params.require(:@fax_request).permit(:recipient_name,:recipient_number,:file_path,:client_receipt_date,:status,:message,:send_confirm_date,:vendor_confirm_date)
+      params.require(:fax_request).permit(:recipient_name,:recipient_number,:file_path,:client_receipt_date,:status,:message,:send_confirm_date,:vendor_confirm_date)
     end
 end
