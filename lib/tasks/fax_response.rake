@@ -6,30 +6,32 @@ ENCRYPTIONKEY = "gZ!LaHKAmmuXd7AMamtPqIepQ7RMsbJ3"
 FAX_SERVER_URL = "https://api.sfaxme.com"
 FAXID = "4C459BEB9C2744409D2823403B2F8746"
 
+desc "Getting the fax response "
 task :fax_response => :environment do
 
   fax_response = FaxResponse.new
   response = send_fax_status
+  parse_response = response["RecipientFaxStatusItems"][0]
   fax_response.update_attributes(
-                                  send_fax_queue_id:   response["RecipientFaxStatusItems"][0]['SendFaxQueueId'],
-                                  is_success:          response["RecipientFaxStatusItems"][0]['IsSuccess'],
-                                  result_code:         response["RecipientFaxStatusItems"][0]['ResultCode'],
-                                  error_code:          response["RecipientFaxStatusItems"][0]['ErrorCode'],
-                                  result_message:      response["RecipientFaxStatusItems"][0]['ResultMessage'],
-                                  recipient_name:      response["RecipientFaxStatusItems"][0]['RecipientName'],
-                                  recipient_fax:       response["RecipientFaxStatusItems"][0]['RecipientFax'],
-                                  tracking_code:       response["RecipientFaxStatusItems"][0]['TrackingCode'],
-                                  fax_date_utc:        response["RecipientFaxStatusItems"][0]['FaxDateUtc'],
-                                  fax_id:              response["RecipientFaxStatusItems"][0]['FaxId'],
-                                  pages:               response["RecipientFaxStatusItems"][0]['Pages'],
-                                  attempts:            response["RecipientFaxStatusItems"][0]['Attempts'],
-                                  sender_fax:          response["RecipientFaxStatusItems"][0]['SenderFax'],
-                                  barcode_items:       response["RecipientFaxStatusItems"][0]['BarcodeItems'],
-                                  fax_success:         response["RecipientFaxStatusItems"][0]['FaxSuccess'],
-                                  out_bound_fax_id:    response["RecipientFaxStatusItems"][0]['OutBoundFaxId'],
-                                  fax_pages:           response["RecipientFaxStatusItems"][0]['FaxPages'],
-                                  fax_date_iso:        response["RecipientFaxStatusItems"][0]['FaxDateIso'],
-                                  watermark_id:        response["RecipientFaxStatusItems"][0]['WatermarkId'],
+                                  send_fax_queue_id:   parse_response['SendFaxQueueId'],
+                                  is_success:          parse_response['IsSuccess'],
+                                  result_code:         parse_response['ResultCode'],
+                                  error_code:          parse_response['ErrorCode'],
+                                  result_message:      parse_response['ResultMessage'],
+                                  recipient_name:      parse_response['RecipientName'],
+                                  recipient_fax:       parse_response['RecipientFax'],
+                                  tracking_code:       parse_response['TrackingCode'],
+                                  fax_date_utc:        parse_response['FaxDateUtc'],
+                                  fax_id:              parse_response['FaxId'],
+                                  pages:               parse_response['Pages'],
+                                  attempts:            parse_response['Attempts'],
+                                  sender_fax:          parse_response['SenderFax'],
+                                  barcode_items:       parse_response['BarcodeItems'],
+                                  fax_success:         parse_response['FaxSuccess'],
+                                  out_bound_fax_id:    parse_response['OutBoundFaxId'],
+                                  fax_pages:           parse_response['FaxPages'],
+                                  fax_date_iso:        parse_response['FaxDateIso'],
+                                  watermark_id:        parse_response['WatermarkId'],
                                   message:             response["message"],
                                   fax_request_id:      response["isSuccess"]
                                   )
