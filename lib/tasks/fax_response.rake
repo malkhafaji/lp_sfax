@@ -57,7 +57,7 @@ end
      response = conn.get path do |req|
        req.body = {}
      end
-     return resopnse = JSON.parse(response.body)
+     return JSON.parse(response.body)
    end
 
 # getting token
