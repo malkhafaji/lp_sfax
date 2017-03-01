@@ -15,6 +15,8 @@ class FaxRequestsController < ApplicationController
   ENCRYPTIONKEY = "gZ!LaHKAmmuXd7AMamtPqIepQ7RMsbJ3"
   FAX_SERVER_URL = "https://api.sfaxme.com"
 
+
+
   # Getting TOKEN
   def get_token
     timestr = Time.now.utc.iso8601()
@@ -23,6 +25,7 @@ class FaxRequestsController < ApplicationController
     cipher = dox.encrypt(raw)
     return cipher
   end
+
 
 
   # Sending fax
@@ -100,6 +103,7 @@ class FaxRequestsController < ApplicationController
       respond_to do |format|
         format.html
         format.csv { send_data @fax_requests.to_csv }
+
       end
   end
 

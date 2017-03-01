@@ -26,7 +26,7 @@ class FaxRequest < ApplicationRecord
 
 
   # Each Fax Request Has ONLY one response
-    has_one :fax_response   ,dependent: :destroy
+    has_one :fax_response 
 
   # Generating the CSV file
     def self.to_csv
