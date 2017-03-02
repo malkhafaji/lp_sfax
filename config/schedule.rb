@@ -1,3 +1,3 @@
 every '*/5 9-17,0 * * *' do
-  rake fax_response
+  rake check_fax_response
 end

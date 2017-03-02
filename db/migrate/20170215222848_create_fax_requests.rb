@@ -8,9 +8,10 @@ class CreateFaxRequests < ActiveRecord::Migration[5.0]
       t.string :status
       t.string :SendFaxQueueId
       t.string :message
+      t.integer :max_fax_response_check_tries
       t.datetime :send_confirm_date
       t.datetime   :vendor_confirm_date
-
+      t.references :fax_response, foreign_key: true
       t.timestamps
     end
   end
