@@ -31,7 +31,7 @@ class FaxRequestsController < ApplicationController
   # Sending fax
   def send_fax
     recipient_number = params["recipient_number"]
-    file_path = params["file_path"]
+    file_path = file_path("test.txt")
     recipient_name = params["recipient_name"]
     fax_request =FaxRequest.new
     fax_request.client_receipt_date = Time.now
@@ -103,8 +103,10 @@ class FaxRequestsController < ApplicationController
       respond_to do |format|
         format.html
         format.csv { send_data @fax_requests.to_csv }
-
-      end
+     end
+  end
+  def file_path(file_name)
+    "#{Rails.root}/public/send_doc/#{file_name}"
   end
 
   private
