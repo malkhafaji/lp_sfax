@@ -99,6 +99,12 @@ class FaxRequestsController < ApplicationController
 
   # indexing the data
   def index
+
+    @number_of_pages = 50/10#FaxRequest.all.count/25 # page will be 25 record
+    @total_records = FaxRequest.all.count
+
+
+
     @fax_requests = FaxRequest.all
       respond_to do |format|
         format.html

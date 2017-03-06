@@ -1,0 +1,2 @@
+class FaxRecord < ApplicationRecord
+end

@@ -1,0 +1,162 @@
+<%= form_for(fax_record) do |f| %>
+  <% if fax_record.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(fax_record.errors.count, "error") %> prohibited this fax_record from being saved:</h2>
+
+      <ul>
+      <% fax_record.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :recipient_name %>
+    <%= f.text_field :recipient_name %>
+  </div>
+
+  <div class="field">
+    <%= f.label :recipient_number %>
+    <%= f.text_field :recipient_number %>
+  </div>
+
+  <div class="field">
+    <%= f.label :file_path %>
+    <%= f.text_field :file_path %>
+  </div>
+
+  <div class="field">
+    <%= f.label :client_receipt_date %>
+    <%= f.date_select :client_receipt_date %>
+  </div>
+
+  <div class="field">
+    <%= f.label :status %>
+    <%= f.text_field :status %>
+  </div>
+
+  <div class="field">
+    <%= f.label :SendFaxQueueId %>
+    <%= f.text_field :SendFaxQueueId %>
+  </div>
+
+  <div class="field">
+    <%= f.label :message %>
+    <%= f.text_field :message %>
+  </div>
+
+  <div class="field">
+    <%= f.label :max_fax_response_check_tries %>
+    <%= f.number_field :max_fax_response_check_tries %>
+  </div>
+
+  <div class="field">
+    <%= f.label :send_confirm_date %>
+    <%= f.date_select :send_confirm_date %>
+  </div>
+
+  <div class="field">
+    <%= f.label :vendor_confirm_date %>
+    <%= f.date_select :vendor_confirm_date %>
+  </div>
+
+  <div class="field">
+    <%= f.label :send_fax_queue_id %>
+    <%= f.text_field :send_fax_queue_id %>
+  </div>
+
+  <div class="field">
+    <%= f.label :is_success %>
+    <%= f.text_field :is_success %>
+  </div>
+
+  <div class="field">
+    <%= f.label :result_code %>
+    <%= f.number_field :result_code %>
+  </div>
+
+  <div class="field">
+    <%= f.label :error_code %>
+    <%= f.number_field :error_code %>
+  </div>
+
+  <div class="field">
+    <%= f.label :result_message %>
+    <%= f.text_field :result_message %>
+  </div>
+
+  <div class="field">
+    <%= f.label :recipient_fax %>
+    <%= f.text_field :recipient_fax %>
+  </div>
+
+  <div class="field">
+    <%= f.label :tracking_code %>
+    <%= f.text_field :tracking_code %>
+  </div>
+
+  <div class="field">
+    <%= f.label :fax_date_utc %>
+    <%= f.date_select :fax_date_utc %>
+  </div>
+
+  <div class="field">
+    <%= f.label :fax_id %>
+    <%= f.text_field :fax_id %>
+  </div>
+
+  <div class="field">
+    <%= f.label :pages %>
+    <%= f.number_field :pages %>
+  </div>
+
+  <div class="field">
+    <%= f.label :attempts %>
+    <%= f.number_field :attempts %>
+  </div>
+
+  <div class="field">
+    <%= f.label :sender_fax %>
+    <%= f.text_field :sender_fax %>
+  </div>
+
+  <div class="field">
+    <%= f.label :barcode_items %>
+    <%= f.text_field :barcode_items %>
+  </div>
+
+  <div class="field">
+    <%= f.label :fax_success %>
+    <%= f.number_field :fax_success %>
+  </div>
+
+  <div class="field">
+    <%= f.label :out_bound_fax_id %>
+    <%= f.text_field :out_bound_fax_id %>
+  </div>
+
+  <div class="field">
+    <%= f.label :fax_pages %>
+    <%= f.number_field :fax_pages %>
+  </div>
+
+  <div class="field">
+    <%= f.label :fax_date_iso %>
+    <%= f.date_select :fax_date_iso %>
+  </div>
+
+  <div class="field">
+    <%= f.label :watermark_id %>
+    <%= f.text_field :watermark_id %>
+  </div>
+
+  <div class="field">
+    <%= f.label :message %>
+    <%= f.text_field :message %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

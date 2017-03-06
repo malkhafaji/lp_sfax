@@ -1,0 +1,83 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Fax Records</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Recipient name</th>
+      <th>Recipient number</th>
+      <th>File path</th>
+      <th>Client receipt date</th>
+      <th>Status</th>
+      <th>Sendfaxqueueid</th>
+      <th>Message</th>
+      <th>Max fax response check tries</th>
+      <th>Send confirm date</th>
+      <th>Vendor confirm date</th>
+      <th>Send fax queue</th>
+      <th>Is success</th>
+      <th>Result code</th>
+      <th>Error code</th>
+      <th>Result message</th>
+      <th>Recipient fax</th>
+      <th>Tracking code</th>
+      <th>Fax date utc</th>
+      <th>Fax</th>
+      <th>Pages</th>
+      <th>Attempts</th>
+      <th>Sender fax</th>
+      <th>Barcode items</th>
+      <th>Fax success</th>
+      <th>Out bound fax</th>
+      <th>Fax pages</th>
+      <th>Fax date iso</th>
+      <th>Watermark</th>
+      <th>Message</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @fax_records.each do |fax_record| %>
+      <tr>
+        <td><%= fax_record.recipient_name %></td>
+        <td><%= fax_record.recipient_number %></td>
+        <td><%= fax_record.file_path %></td>
+        <td><%= fax_record.client_receipt_date %></td>
+        <td><%= fax_record.status %></td>
+        <td><%= fax_record.SendFaxQueueId %></td>
+        <td><%= fax_record.message %></td>
+        <td><%= fax_record.max_fax_response_check_tries %></td>
+        <td><%= fax_record.send_confirm_date %></td>
+        <td><%= fax_record.vendor_confirm_date %></td>
+        <td><%= fax_record.send_fax_queue_id %></td>
+        <td><%= fax_record.is_success %></td>
+        <td><%= fax_record.result_code %></td>
+        <td><%= fax_record.error_code %></td>
+        <td><%= fax_record.result_message %></td>
+        <td><%= fax_record.recipient_fax %></td>
+        <td><%= fax_record.tracking_code %></td>
+        <td><%= fax_record.fax_date_utc %></td>
+        <td><%= fax_record.fax_id %></td>
+        <td><%= fax_record.pages %></td>
+        <td><%= fax_record.attempts %></td>
+        <td><%= fax_record.sender_fax %></td>
+        <td><%= fax_record.barcode_items %></td>
+        <td><%= fax_record.fax_success %></td>
+        <td><%= fax_record.out_bound_fax_id %></td>
+        <td><%= fax_record.fax_pages %></td>
+        <td><%= fax_record.fax_date_iso %></td>
+        <td><%= fax_record.watermark_id %></td>
+        <td><%= fax_record.message %></td>
+        <td><%= link_to 'Show', fax_record %></td>
+        <td><%= link_to 'Edit', edit_fax_record_path(fax_record) %></td>
+        <td><%= link_to 'Destroy', fax_record, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Fax Record', new_fax_record_path %>

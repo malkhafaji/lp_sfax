@@ -10,7 +10,40 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170224070941) do
+ActiveRecord::Schema.define(version: 20170306215845) do
+
+  create_table "fax_records", force: :cascade do |t|
+    t.string   "recipient_name"
+    t.string   "recipient_number"
+    t.string   "file_path"
+    t.string   "status"
+    t.string   "SendFaxQueueId"
+    t.string   "message"
+    t.string   "send_fax_queue_id"
+    t.string   "is_success"
+    t.string   "result_message"
+    t.string   "recipient_fax"
+    t.string   "tracking_code"
+    t.string   "fax_id"
+    t.string   "watermark_id"
+    t.string   "sender_fax"
+    t.string   "barcode_items"
+    t.string   "out_bound_fax_id"
+    t.integer  "pages"
+    t.integer  "result_code"
+    t.integer  "error_code"
+    t.integer  "attempts"
+    t.integer  "fax_success"
+    t.integer  "max_fax_response_check_tries"
+    t.integer  "fax_pages"
+    t.date     "fax_date_utc"
+    t.date     "vendor_confirm_date"
+    t.date     "client_receipt_date"
+    t.date     "send_confirm_date"
+    t.date     "fax_date_iso"
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
 
   create_table "fax_requests", force: :cascade do |t|
     t.string   "recipient_name",               null: false

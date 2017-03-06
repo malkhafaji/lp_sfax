@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
 
+  resources :fax_records
     resources :fax_requests do
   	  collection do
   	    post 'send_fax'

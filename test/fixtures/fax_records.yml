@@ -1,0 +1,63 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  recipient_name: MyString
+  recipient_number: MyString
+  file_path: MyString
+  client_receipt_date: 2017-03-06
+  status: MyString
+  SendFaxQueueId: MyString
+  message: MyString
+  max_fax_response_check_tries: 1
+  send_confirm_date: 2017-03-06
+  vendor_confirm_date: 2017-03-06
+  send_fax_queue_id: MyString
+  is_success: MyString
+  result_code: 1
+  error_code: 1
+  result_message: MyString
+  recipient_fax: MyString
+  tracking_code: MyString
+  fax_date_utc: 2017-03-06
+  fax_id: MyString
+  pages: 1
+  attempts: 1
+  sender_fax: MyString
+  barcode_items: MyString
+  fax_success: 1
+  out_bound_fax_id: MyString
+  fax_pages: 1
+  fax_date_iso: 2017-03-06
+  watermark_id: MyString
+  message: MyString
+
+two:
+  recipient_name: MyString
+  recipient_number: MyString
+  file_path: MyString
+  client_receipt_date: 2017-03-06
+  status: MyString
+  SendFaxQueueId: MyString
+  message: MyString
+  max_fax_response_check_tries: 1
+  send_confirm_date: 2017-03-06
+  vendor_confirm_date: 2017-03-06
+  send_fax_queue_id: MyString
+  is_success: MyString
+  result_code: 1
+  error_code: 1
+  result_message: MyString
+  recipient_fax: MyString
+  tracking_code: MyString
+  fax_date_utc: 2017-03-06
+  fax_id: MyString
+  pages: 1
+  attempts: 1
+  sender_fax: MyString
+  barcode_items: MyString
+  fax_success: 1
+  out_bound_fax_id: MyString
+  fax_pages: 1
+  fax_date_iso: 2017-03-06
+  watermark_id: MyString
+  message: MyString
