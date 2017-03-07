@@ -83,7 +83,10 @@ class FaxRecordsController < ApplicationController
 
 # indexing the data fax request
   def index
-    @fax_records = FaxRecord.all
+    @per_page = 20
+    #@fax_records = FaxRecord.all
+    @total_record, @fax_records = FaxRecord.paginated_fax_record(page: " #{params[:page].present? ? params[:page] : '1'}", per_page:  @per_page)
+    @current_page = (params[:page].present? ? params[:page] : '1').to_i
     respond_to do |format|
       format.html
       format.csv { send_data @fax_records.to_csv }

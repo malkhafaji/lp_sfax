@@ -19,6 +19,16 @@ class FaxRecord < ApplicationRecord
 #                         :message => "Attached file can not be empty"
 
 # Generating the CSV file
+def self.paginated_fax_record(params)
+   fax_list = FaxRecord.all
+   per_page  = params[:per_page].to_i
+   page   = params[:page].to_i
+   offset  = per_page * (page - 1)
+   result = []
+   fax_record_batch = fax_list.offset(offset).limit(per_page) unless offset > fax_list.size
+   return result = [fax_list.size, fax_record_batch]
+end
+
   def self.to_csv
     CSV.generate do |csv|
       csv << column_names
