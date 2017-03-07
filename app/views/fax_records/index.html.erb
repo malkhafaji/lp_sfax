@@ -1,8 +1,9 @@
 <p id="notice"><%= notice %></p>
-
-<h1>Fax Records</h1>
-
-<table>
+<p>
+   Download File:
+   <%= link_to "fax_record.csv" , fax_records_path(format: "csv"), class: 'btn btn-default' %>
+</p>
+<table class="table table-striped", id= 'fax_record'>
   <thead>
     <tr>
       <th>Recipient name</th>
@@ -77,7 +78,3 @@
     <% end %>
   </tbody>
 </table>
-
-<br>
-
-<%= link_to 'New Fax Record', new_fax_record_path %>

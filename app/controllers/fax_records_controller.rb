@@ -1,74 +1,105 @@
 class FaxRecordsController < ApplicationController
+  skip_before_filter  :verify_authenticity_token
   before_action :set_fax_record, only: [:show, :edit, :update, :destroy]
+  require './app/controllers/concerns/doxifer.rb'
+  require 'faraday'
+  require 'pp'
+  require 'time'
+  require 'json'
 
-  # GET /fax_records
-  # GET /fax_records.json
+# The requirements to connect with Vendor
+  USERNAME = "ealzubaidi"
+  APIKEY = "817C7FD99D6146B89BEA88BA5B1E48DE"
+  VECTOR = "x49e*wJVXr8BrALE"
+  ENCRYPTIONKEY = "gZ!LaHKAmmuXd7AMamtPqIepQ7RMsbJ3"
+  FAX_SERVER_URL = "https://api.sfaxme.com"
+
+# Getting TOKEN
+  def get_token
+    timestr = Time.now.utc.iso8601()
+    raw = "Username=#{USERNAME}&ApiKey=#{APIKEY}&GenDT=#{timestr}"
+    dox = Doxipher.new(ENCRYPTIONKEY, {:base64=>true})
+    cipher = dox.encrypt(raw)
+    return cipher
+  end
+
+# Sending fax Fax Request
+  def send_fax
+    recipient_number = params["recipient_number"]
+    file_path = params["file_path"]
+    recipient_name = params["recipient_name"]
+    fax_record =FaxRecord.new
+    fax_record.client_receipt_date = Time.now
+    fax_record.recipient_number = recipient_number
+    fax_record.recipient_name = recipient_name
+    fax_record.file_path = file_path
+    fax_record.save!
+    tid = nil
+    conn = Faraday.new(:url => FAX_SERVER_URL, :ssl => { :ca_file => 'C:/Ruby200/cacert.pem' }  ) do |faraday|
+      faraday.request :multipart
+      faraday.request  :url_encoded
+      faraday.response :logger
+      faraday.adapter Faraday.default_adapter
+    end
+    token = get_token()
+    parts = ["sendfax?",
+    "token=#{CGI.escape(token)}",
+    "ApiKey=#{CGI.escape(APIKEY)}",
+    "RecipientFax=#{recipient_number}",
+    "RecipientName=#{recipient_name}",
+    "OptionalParams=&"]
+    path = "/api/" + parts.join("&")
+    response = conn.post path do |req|
+      req.body = {}
+      req.body['file_name'] = Faraday::UploadIO.new("#{file_path}",file_specification(file_path)[0],file_specification(file_path)[1])
+    end
+    response_result = JSON.parse(response.body)
+    fax_record.update_attributes(
+      :status =>            response_result["isSuccess"],
+      :message =>           response_result["message"],
+      :SendFaxQueueId =>    response_result["SendFaxQueueId"],
+      :send_confirm_date => response['date'])
+    render json: fax_record
+  end
+
+# Getting the File Name , the File Extension and validate the document type
+  def file_specification(file_path)
+    file_name = File.basename ("#{file_path}").downcase
+    file_extension = File.extname (file_name).downcase
+    if file_extension  == ".pdf"
+      return "application/PDF",file_name
+    elsif file_extension == ".txt"
+      return "application/TXT",file_name
+    elsif file_extension == ".doc"
+      return "application/DOC",file_name
+    elsif file_extension == ".docx"
+      return "application/DOCX",file_name
+    elsif file_extension == ".tif"
+      return "application/TIF",file_name
+    else
+      return false
+    end
+  end
+
+# indexing the data fax request
   def index
     @fax_records = FaxRecord.all
-  end
-
-  # GET /fax_records/1
-  # GET /fax_records/1.json
-  def show
-  end
-
-  # GET /fax_records/new
-  def new
-    @fax_record = FaxRecord.new
-  end
-
-  # GET /fax_records/1/edit
-  def edit
-  end
-
-  # POST /fax_records
-  # POST /fax_records.json
-  def create
-    @fax_record = FaxRecord.new(fax_record_params)
-
     respond_to do |format|
-      if @fax_record.save
-        format.html { redirect_to @fax_record, notice: 'Fax record was successfully created.' }
-        format.json { render :show, status: :created, location: @fax_record }
-      else
-        format.html { render :new }
-        format.json { render json: @fax_record.errors, status: :unprocessable_entity }
-      end
+      format.html
+      format.csv { send_data @fax_records.to_csv }
     end
   end
 
-  # PATCH/PUT /fax_records/1
-  # PATCH/PUT /fax_records/1.json
-  def update
-    respond_to do |format|
-      if @fax_record.update(fax_record_params)
-        format.html { redirect_to @fax_record, notice: 'Fax record was successfully updated.' }
-        format.json { render :show, status: :ok, location: @fax_record }
-      else
-        format.html { render :edit }
-        format.json { render json: @fax_record.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  # DELETE /fax_records/1
-  # DELETE /fax_records/1.json
-  def destroy
-    @fax_record.destroy
-    respond_to do |format|
-      format.html { redirect_to fax_records_url, notice: 'Fax record was successfully destroyed.' }
-      format.json { head :no_content }
-    end
-  end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_fax_record
-      @fax_record = FaxRecord.find(params[:id])
-    end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def fax_record_params
-      params.require(:fax_record).permit(:recipient_name, :recipient_number, :file_path, :client_receipt_date, :status, :SendFaxQueueId, :message, :max_fax_response_check_tries, :send_confirm_date, :vendor_confirm_date, :send_fax_queue_id, :is_success, :result_code, :error_code, :result_message, :recipient_fax, :tracking_code, :fax_date_utc, :fax_id, :pages, :attempts, :sender_fax, :barcode_items, :fax_success, :out_bound_fax_id, :fax_pages, :fax_date_iso, :watermark_id, :message)
-    end
+# Use callbacks to share common setup or constraints between actions.
+  def set_fax_record
+    @fax_record = FaxRecord.find(params[:id])
+  end
+
+# Never trust parameters from the scary internet, only allow the white list through.
+  def fax_record_params
+    params.require(:fax_record).permit(:recipient_name, :recipient_number, :file_path, :client_receipt_date, :status, :SendFaxQueueId, :message, :max_fax_response_check_tries, :send_confirm_date, :vendor_confirm_date, :send_fax_queue_id, :is_success, :result_code, :error_code, :result_message, :recipient_fax, :tracking_code, :fax_date_utc, :fax_id, :pages, :attempts, :sender_fax, :barcode_items, :fax_success, :out_bound_fax_id, :fax_pages, :fax_date_iso, :watermark_id, :message)
+  end
 end
