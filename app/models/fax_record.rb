@@ -20,13 +20,18 @@ class FaxRecord < ApplicationRecord
 
 # Generating the CSV file
 def self.paginated_fax_record(params)
-   fax_list = FaxRecord.all
-   per_page  = params[:per_page].to_i
-   page   = params[:page].to_i
-   offset  = per_page * (page - 1)
-   result = []
-   fax_record_batch = fax_list.offset(offset).limit(per_page) unless offset > fax_list.size
-   return result = [fax_list.size, fax_record_batch]
+  fax_list = FaxRecord.all
+  per_page  = params[:per_page].to_i
+  page   = params[:page].to_i
+  total_pages = fax_list.size/per_page + (fax_list.size % per_page > 0 ? 1 :0)
+  if (params[:page].to_i < 1) || (params[:page].to_i > total_pages)
+     return result = [0, {},0]
+  else
+    offset  = per_page * (page - 1)
+    result = []
+    fax_record_batch = fax_list.offset(offset).limit(per_page) unless offset > fax_list.size
+    return result = [fax_list.size, fax_record_batch, total_pages]
+  end
 end
 
   def self.to_csv
