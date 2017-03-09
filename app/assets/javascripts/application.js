@@ -15,5 +15,5 @@
 //= require turbolinks
 //= require_tree .
 $(document).ready(function(){
-    $('#fax_request').DataTable();
+    $('#fax_record').DataTable();
 });

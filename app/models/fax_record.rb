@@ -25,20 +25,19 @@ def self.paginated_fax_record(params)
   page   = params[:page].to_i
   total_pages = fax_list.size/per_page + (fax_list.size % per_page > 0 ? 1 :0)
   if (params[:page].to_i < 1) || (params[:page].to_i > total_pages)
-     return result = [0, {},0]
+     return [0, {},0]
   else
     offset  = per_page * (page - 1)
-    result = []
     fax_record_batch = fax_list.offset(offset).limit(per_page) unless offset > fax_list.size
-    return result = [fax_list.size, fax_record_batch, total_pages]
+    return [fax_list.size, fax_record_batch, total_pages]
   end
 end
 
   def self.to_csv
     CSV.generate do |csv|
       csv << column_names
-      all.each do |fax_request|
-        csv << fax_request.attributes.values_at(*column_names)
+      all.each do |fax_record|
+        csv << fax_record.attributes.values_at(*column_names)
       end
     end
   end
