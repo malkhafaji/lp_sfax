@@ -81,14 +81,42 @@ class FaxRecordsController < ApplicationController
     end
   end
 
-# indexing the data fax request
+
+# Render the index page with all the records OR Render the records that specified in the search criteria
   def index
-    @fax_records = FaxRecord.all
-    respond_to do |format|
-      format.html
-      format.csv { send_data @fax_records.to_csv }
+
+    if request.post?
+      search_value = params[:search_value]
+      filter_result = FaxRecord.filtered_fax_records(search_value)
+
+      if search_value.nil? || search_value.empty?
+        flash.now.alert = "Search value should not be empty !"
+        @fax_records = FaxRecord.all
+        render :index
+
+      elsif  !filter_result.present? || filter_result.empty?
+        flash.now.alert = "No results matching the search value ( #{search_value} )"
+        @fax_records = FaxRecord.all
+        render :index
+
+      elsif !search_value.nil? && !search_value.empty? && !filter_result.nil? && !filter_result.empty?
+        @fax_records = filter_result
+        session[:fax_records_ids] = @fax_records.pluck(:id)
+        flash.now.notice = "Results matching the value ( #{search_value} )"
+        respond_to do |format|
+          format.html
+          format.csv { send_data @fax_records.to_csv }
+          format.xls { send_data @fax_records.to_csv(col_sep: "\t") }
+        end
+      end
+
+    else
+      @fax_records = FaxRecord.all
+      render :index
     end
   end
+
+
 
 
   private
@@ -100,6 +128,6 @@ class FaxRecordsController < ApplicationController
 
 # Never trust parameters from the scary internet, only allow the white list through.
   def fax_record_params
-    params.require(:fax_record).permit(:recipient_name, :recipient_number, :file_path, :client_receipt_date, :status, :SendFaxQueueId, :message, :max_fax_response_check_tries, :send_confirm_date, :vendor_confirm_date, :send_fax_queue_id, :is_success, :result_code, :error_code, :result_message, :recipient_fax, :tracking_code, :fax_date_utc, :fax_id, :pages, :attempts, :sender_fax, :barcode_items, :fax_success, :out_bound_fax_id, :fax_pages, :fax_date_iso, :watermark_id, :message)
+    params.require(:fax_record).permit(:search_value,:recipient_name, :recipient_number, :file_path, :client_receipt_date, :status, :SendFaxQueueId, :message, :max_fax_response_check_tries, :send_confirm_date, :vendor_confirm_date, :send_fax_queue_id, :is_success, :result_code, :error_code, :result_message, :recipient_fax, :tracking_code, :fax_date_utc, :fax_id, :pages, :attempts, :sender_fax, :barcode_items, :fax_success, :out_bound_fax_id, :fax_pages, :fax_date_iso, :watermark_id, :message)
   end
 end

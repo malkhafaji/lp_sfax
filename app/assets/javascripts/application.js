@@ -14,6 +14,9 @@
 //= require jquery_ujs
 //= require turbolinks
 //= require_tree .
-$(document).ready(function(){
-    $('#fax_request').DataTable();
+
+
+
+$(document).ready(function() {
+  $('#flash_message').hide().delay(10).fadeIn(1000).delay(2000).fadeOut(1000)
 });

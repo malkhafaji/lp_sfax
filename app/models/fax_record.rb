@@ -19,11 +19,20 @@ class FaxRecord < ApplicationRecord
 #                         :message => "Attached file can not be empty"
 
 # Generating the CSV file
-  def self.to_csv
-    CSV.generate do |csv|
+
+
+#filter the fax record to retrieve a specific records
+  def self.filtered_fax_records(string)
+    result_of_filtering_fax_record = FaxRecord.where(["recipient_name LIKE ? or recipient_number LIKE ?", (string),(string)])
+    return result_of_filtering_fax_record
+  end
+
+
+  def self.to_csv(options = {})
+    CSV.generate(options) do |csv|
       csv << column_names
-      all.each do |fax_request|
-        csv << fax_request.attributes.values_at(*column_names)
+      filter_result.each do |i|
+        csv << i.attributes.values_at(*column_names)
       end
     end
   end

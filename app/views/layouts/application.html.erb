@@ -6,6 +6,24 @@
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
   </head>
   <body>
-      <%= yield %>
+<div style="margin:50px 0 0 500px;position:absolute;float:center">
+
+  <% if alert.present? %>
+    <div class="alert alert-danger" id="flash_message" style="text-align: center;font-size:25px;font-weight: bold; background-color:#ad5b5b;color:white">
+      <%= alert %>
+    </div>
+  <% end %>
+  <% if notice.present? %>
+    <div class="alert alert-danger" id="flash_message" style="text-align: center;font-size:25px;font-weight: bold; background-color:#9ae2bd;color:black">
+      <%= notice %>
+    </div>
+  <% end %>
+
+</div>
+
+  <div class="container-fluid"style="margin-top:30px;position:absolute" >
+
+  <%= yield %>
+  </div>
   </body>
 </html>

@@ -40,7 +40,7 @@
 # Checking which fax sent and which not and if not send it
 desc "check_fax_response "
   task :check_fax_response => :environment do
-    fax_requests_queue_ids = FaxRecord.where("fax_date_utc is null and SendFaxQueueId is not null ").pluck(:SendFaxQueueId) #FaxRequest.where("fax_response_id is null and SendFaxQueueId is not null and (ma x_fax_response_check_tries is null OR max_fax_response_check_tries < #{MAX_FAX_RESPONSE_CHECK_TRIES})").pluck(:SendFaxQueueId)
+    fax_requests_queue_ids = FaxRecord.where("fax_date_utc is null and SendFaxQueueId is not null  and (max_fax_response_check_tries is null OR max_fax_response_check_tries < #{MAX_FAX_RESPONSE_CHECK_TRIES})").pluck(:SendFaxQueueId) #FaxRequest.where("fax_response_id is null and SendFaxQueueId is not null and (ma x_fax_response_check_tries is null OR max_fax_response_check_tries < #{MAX_FAX_RESPONSE_CHECK_TRIES})").pluck(:SendFaxQueueId)
     fax_requests_queue_ids.each do |fax_requests_queue_id|
       begin
         fax_response(fax_requests_queue_id)
