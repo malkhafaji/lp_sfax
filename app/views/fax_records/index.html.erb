@@ -1,3 +1,4 @@
+<div class="container">
 <p id="notice"><%= notice %></p>
 <p>
    Download File:
@@ -78,3 +79,10 @@
     <% end %>
   </tbody>
 </table>
+  <% unless @current_page < 2 %>
+    <%= link_to "Previous page", fax_records_path(page: @current_page - 1),class:"btn btn-danger"%>
+  <%end%>
+  <% unless @current_page >= @total_pages %>
+    <%= link_to "Next page", fax_records_path(page: @current_page + 1),class:"btn btn-info"%>
+  <%end%>
+</div>
