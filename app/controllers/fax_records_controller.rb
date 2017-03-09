@@ -8,26 +8,26 @@ class FaxRecordsController < ApplicationController
   require 'json'
 
 # The requirements to connect with Vendor
-  USERNAME = "ealzubaidi"
-  APIKEY = "817C7FD99D6146B89BEA88BA5B1E48DE"
-  VECTOR = "x49e*wJVXr8BrALE"
-  ENCRYPTIONKEY = "gZ!LaHKAmmuXd7AMamtPqIepQ7RMsbJ3"
-  FAX_SERVER_URL = "https://api.sfaxme.com"
+  USERNAME = 'ealzubaidi'
+  APIKEY = '817C7FD99D6146B89BEA88BA5B1E48DE'
+  VECTOR = 'x49e*wJVXr8BrALE'
+  ENCRYPTIONKEY = 'gZ!LaHKAmmuXd7AMamtPqIepQ7RMsbJ3'
+  FAX_SERVER_URL = 'https://api.sfaxme.com'
 
 # Getting TOKEN
   def get_token
     timestr = Time.now.utc.iso8601()
-    raw = "Username=#{USERNAME}&ApiKey=#{APIKEY}&GenDT=#{timestr}"
-    dox = Doxipher.new(ENCRYPTIONKEY, {:base64=>true})
+    raw = 'Username=#{USERNAME}&ApiKey=#{APIKEY}&GenDT=#{timestr}'
+    dox = Doxipher.new(ENCRYPTIONKEY, {base64: true})
     cipher = dox.encrypt(raw)
     return cipher
   end
 
 # Sending fax Fax Request
   def send_fax
-    recipient_number = params["recipient_number"]
-    file_path = params["file_path"]
-    recipient_name = params["recipient_name"]
+    recipient_number = params['recipient_number']
+    file_path = params['file_path']
+    recipient_name = params['recipient_name']
     fax_record =FaxRecord.new
     fax_record.client_receipt_date = Time.now
     fax_record.recipient_number = recipient_number
@@ -35,7 +35,7 @@ class FaxRecordsController < ApplicationController
     fax_record.file_path = file_path
     fax_record.save!
     tid = nil
-    conn = Faraday.new(:url => FAX_SERVER_URL, :ssl => { :ca_file => 'C:/Ruby200/cacert.pem' }  ) do |faraday|
+    conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
       faraday.request :multipart
       faraday.request  :url_encoded
       faraday.response :logger
@@ -51,14 +51,14 @@ class FaxRecordsController < ApplicationController
     path = "/api/" + parts.join("&")
     response = conn.post path do |req|
       req.body = {}
-      req.body['file_name'] = Faraday::UploadIO.new("#{file_path}",file_specification(file_path)[0],file_specification(file_path)[1])
+      req.body['file_name'] = Faraday::UploadIO.new("#{file_path}", file_specification(file_path)[0], file_specification(file_path)[1])
     end
     response_result = JSON.parse(response.body)
     fax_record.update_attributes(
-      :status =>            response_result["isSuccess"],
-      :message =>           response_result["message"],
-      :SendFaxQueueId =>    response_result["SendFaxQueueId"],
-      :send_confirm_date => response['date'])
+      status:            response_result["isSuccess"],
+      message:           response_result["message"],
+      SendFaxQueueId:    response_result["SendFaxQueueId"],
+      send_confirm_date: response['date'])
     render json: fax_record
   end
 
@@ -67,15 +67,15 @@ class FaxRecordsController < ApplicationController
     file_name = File.basename ("#{file_path}").downcase
     file_extension = File.extname (file_name).downcase
     if file_extension  == ".pdf"
-      return "application/PDF",file_name
+      return "application/PDF", file_name
     elsif file_extension == ".txt"
-      return "application/TXT",file_name
+      return "application/TXT", file_name
     elsif file_extension == ".doc"
-      return "application/DOC",file_name
+      return "application/DOC", file_name
     elsif file_extension == ".docx"
-      return "application/DOCX",file_name
+      return "application/DOCX", file_name
     elsif file_extension == ".tif"
-      return "application/TIF",file_name
+      return "application/TIF", file_name
     else
       return false
     end
@@ -84,21 +84,17 @@ class FaxRecordsController < ApplicationController
 
 # Render the index page with all the records OR Render the records that specified in the search criteria
   def index
-
     if request.post?
       search_value = params[:search_value]
       filter_result = FaxRecord.filtered_fax_records(search_value)
-
       if search_value.nil? || search_value.empty?
         flash.now.alert = "Search value should not be empty !"
         @fax_records = FaxRecord.all
         render :index
-
       elsif  !filter_result.present? || filter_result.empty?
         flash.now.alert = "No results matching the search value ( #{search_value} )"
         @fax_records = FaxRecord.all
         render :index
-
       elsif !search_value.nil? && !search_value.empty? && !filter_result.nil? && !filter_result.empty?
         @fax_records = filter_result
         session[:fax_records_ids] = @fax_records.pluck(:id)
@@ -109,14 +105,11 @@ class FaxRecordsController < ApplicationController
           format.xls { send_data @fax_records.to_csv(col_sep: "\t") }
         end
       end
-
     else
       @fax_records = FaxRecord.all
       render :index
     end
   end
-
-
 
 
   private
@@ -128,6 +121,6 @@ class FaxRecordsController < ApplicationController
 
 # Never trust parameters from the scary internet, only allow the white list through.
   def fax_record_params
-    params.require(:fax_record).permit(:search_value,:recipient_name, :recipient_number, :file_path, :client_receipt_date, :status, :SendFaxQueueId, :message, :max_fax_response_check_tries, :send_confirm_date, :vendor_confirm_date, :send_fax_queue_id, :is_success, :result_code, :error_code, :result_message, :recipient_fax, :tracking_code, :fax_date_utc, :fax_id, :pages, :attempts, :sender_fax, :barcode_items, :fax_success, :out_bound_fax_id, :fax_pages, :fax_date_iso, :watermark_id, :message)
+    params.require(:fax_record).permit(:recipient_name, :recipient_number, :file_path, :client_receipt_date, :status, :SendFaxQueueId, :message, :max_fax_response_check_tries, :send_confirm_date, :vendor_confirm_date, :send_fax_queue_id, :is_success, :result_code, :error_code, :result_message, :recipient_fax, :tracking_code, :fax_date_utc, :fax_id, :pages, :attempts, :sender_fax, :barcode_items, :fax_success, :out_bound_fax_id, :fax_pages, :fax_date_iso, :watermark_id, :message)
   end
 end
