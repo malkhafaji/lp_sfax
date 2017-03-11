@@ -81,47 +81,52 @@ class FaxRecordsController < ApplicationController
     end
   end
 
-# Exporting either all fax records OR the records results from filter (filtered_fax_records)
-  def export
-    if (session[:search_value].nil?)
-      fax_records = FaxRecord.all
-    else
-      fax_records = FaxRecord.filtered_fax_records(session[:search_value])
-    end
-    respond_to do |format|
-      format.html
-      format.csv { send_data fax_records.to_csv}
-      format.xls { send_data fax_records.to_csv(col_sep: "\t") }
-    end
-  end
 
-# Render Index page with all fax records OR the records results from filter (filtered_fax_records) with pagenation
-  def index
-    @search_value = params[:search_value]
-    filter_fax_records = FaxRecord.filtered_fax_records(@search_value)
-    session[:search_value] = @search_value
+# Render the index page with all the records OR Render the records that specified in the search criteria
+def index
+  @search_value = params[:search_value]
+  filter_result = FaxRecord.filtered_fax_records(@search_value)
 
-    if @search_value && @search_value.empty?
+  if request.post?
+    if @search_value.nil? || @search_value.empty?
       flash.now.alert = "Search value should not be empty !"
       @fax_records = FaxRecord.all
-    elsif  !@search_value.blank? && !filter_fax_records.present?
-      flash.now.alert = "No results matching the search value (#{@search_value})"
+      render :index
+    elsif  !filter_result.present? || filter_result.empty?
+      flash.now.alert = "No results matching the search value ( #{@search_value} )"
       @fax_records = FaxRecord.all
-    else
-      if !filter_fax_records.present?
-        @fax_records = FaxRecord.all
-      else
-        @fax_records = filter_fax_records
-      end
+      render :index
+    elsif !@search_value.nil? && !@search_value.empty? && !filter_result.nil? && !filter_result.empty?
+      @fax_records = filter_result
+      session[:fax_records_ids] = @fax_records.pluck(:id)
+      flash.now.notice = "Results matching the value ( #{@search_value} )"
+      # respond_to do |format|
+      #   format.html
+      #   format.csv { send_data @fax_records.to_csv }
+      #   format.xls { send_data @fax_records.to_csv(col_sep: "\t") }
+      # end
     end
-
+  else
     @per_page = 10
     @current_page = (params[:page].present? ? params[:page] : '1').to_i
-    @total_record, @fax_records, @total_pages = FaxRecord.paginated_fax_record(page: @current_page, per_page:  @per_page, fax_list: @fax_records)
-    respond_to do |format|
-      format.html
+    @total_record, @fax_records, @total_pages = FaxRecord.paginated_fax_record(page: @current_page, per_page:  @per_page)
     end
-  end
+      respond_to do |format|
+      format.html
+      format.csv { send_data @fax_records.to_csv }
+    end
+end
+  #
+  # def export
+  #
+  #   filter_record = params[:record_filter]
+  #   @filter_result  = FaxRecord.filtered_fax_records(filter_record)
+  # respond_to do |format|
+  #   format.html
+  #   format.xls { send_data @filter_result.to_csv(col_sep: "\t") }
+  # end
+
+  # end
 
 
 

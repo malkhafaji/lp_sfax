@@ -1,91 +1,66 @@
+<div class="container" >
+  <%= render 'form'%>
+  <p>
+     <h4>Export the results as:
+       <%= link_to "CSV file" , export_fax_records_path(format: "csv"), method: :post, class: 'btn btn-default' %>
+       <%= link_to "Excel file", export_fax_records_path(format: "xls"), method: :post, class: 'btn btn-default' %>
+  </h4>
+  </p>
 
-<%= render 'form'%>
-
-<div class="container">
-
-<p>
-   <h4>Export the results as:
-   <%= link_to "CSV file" , fax_records_path(format: "csv"), class: 'btn btn-default' %>
-    <%= link_to "Excel file", fax_records_path(format: "xls"), class: 'btn btn-default' %>
-</h4>
-</p>
-
-<table class="table table-striped", id= 'fax_record' >
-  <thead>
-    <tr>
-      <th>Recipient name</th>
-      <th>Recipient number</th>
-      <th>File path</th>
-      <th>Client receipt date</th>
-      <th>Status</th>
-      <th>Sendfaxqueueid</th>
-      <th>Message</th>
-      <th>Max fax response check tries</th>
-      <th>Send confirm date</th>
-      <th>Vendor confirm date</th>
-      <th>Send fax queue</th>
-      <th>Is success</th>
-      <th>Result code</th>
-      <th>Error code</th>
-      <th>Result message</th>
-      <th>Recipient fax</th>
-      <th>Tracking code</th>
-      <th>Fax date utc</th>
-      <th>Fax</th>
-      <th>Pages</th>
-      <th>Attempts</th>
-      <th>Sender fax</th>
-      <th>Barcode items</th>
-      <th>Fax success</th>
-      <th>Out bound fax</th>
-      <th>Fax pages</th>
-      <th>Fax date iso</th>
-      <th>Watermark</th>
-      <th>Message</th>
-      <th colspan="3"></th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @fax_records.each do |fax_record| %>
+  <table class="table table-striped", id= 'fax_record' >
+    <thead>
       <tr>
-        <td><%= fax_record.recipient_name %></td>
-        <td><%= fax_record.recipient_number %></td>
-        <td><%= fax_record.file_path %></td>
-        <td><%= fax_record.client_receipt_date %></td>
-        <td><%= fax_record.status %></td>
-        <td><%= fax_record.SendFaxQueueId %></td>
-        <td><%= fax_record.message %></td>
-        <td><%= fax_record.max_fax_response_check_tries %></td>
-        <td><%= fax_record.send_confirm_date %></td>
-        <td><%= fax_record.vendor_confirm_date %></td>
-        <td><%= fax_record.send_fax_queue_id %></td>
-        <td><%= fax_record.is_success %></td>
-        <td><%= fax_record.result_code %></td>
-        <td><%= fax_record.error_code %></td>
-        <td><%= fax_record.result_message %></td>
-        <td><%= fax_record.recipient_fax %></td>
-        <td><%= fax_record.tracking_code %></td>
-        <td><%= fax_record.fax_date_utc %></td>
-        <td><%= fax_record.fax_id %></td>
-        <td><%= fax_record.pages %></td>
-        <td><%= fax_record.attempts %></td>
-        <td><%= fax_record.sender_fax %></td>
-        <td><%= fax_record.barcode_items %></td>
-        <td><%= fax_record.fax_success %></td>
-        <td><%= fax_record.out_bound_fax_id %></td>
-        <td><%= fax_record.fax_pages %></td>
-        <td><%= fax_record.fax_date_iso %></td>
-        <td><%= fax_record.watermark_id %></td>
-        <td><%= fax_record.message %></td>
+        <th>Fax ID</th>
+        <th>Recipient name</th>
+        <th>Recipient number</th>
+        <th>File path</th>
+        <th>Barcode items</th>
+        <th>Result message</th>
+        <th>Message</th>
+        <th>Attempts</th>
+        <th>Pages</th>
+        <th>Sender fax</th>
+        <th>Recipient fax</th>
+        <th>Is success</th>
+        <th>Client receipt date</th>
+        <th>Vendor confirm date</th>
+        <th>Status</th>
+        <th>Max fax response check tries</th>
+        <th>Send confirm date</th>
+        <th colspan="3"></th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
 
-<% unless @current_page < 2 %>
-   <%= link_to "Previous page", fax_records_path(page: @current_page - 1),class:"btn btn-danger"%>
- <%end%>
- <% unless @current_page >= @total_pages %>
-   <%= link_to "Next page", fax_records_path(page: @current_page + 1),class:"btn btn-info"%>
- <%end%>
+    <tbody>
+      <% @fax_records.each do |fax_record| %>
+        <tr>
+          <td><%= fax_record.id %></td>
+          <td><%= fax_record.recipient_name %></td>
+          <td><%= fax_record.recipient_number %></td>
+          <td><%= fax_record.file_path %></td>
+          <td><%= fax_record.barcode_items %></td>
+          <td><%= fax_record.result_message %></td>
+          <td><%= fax_record.message %></td>
+          <td><%= fax_record.attempts %></td>
+          <td><%= fax_record.pages %></td>
+          <td><%= fax_record.sender_fax %></td>
+          <td><%= fax_record.recipient_fax %></td>
+          <td><%= fax_record.is_success %></td>
+          <td><%= fax_record.client_receipt_date %></td>
+          <td><%= fax_record.vendor_confirm_date %></td>
+          <td><%= fax_record.status %></td>
+          <td><%= fax_record.max_fax_response_check_tries %></td>
+          <td><%= fax_record.send_confirm_date %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% unless @current_page.nil?%>
+    <% unless @current_page < 2 %>
+       <%= link_to "Previous page", fax_records_path(page: @current_page - 1, search_value: @search_value),class:"btn btn-danger"%>
+     <%end%>
+     <% unless @current_page >= @total_pages %>
+       <%= link_to "Next page", fax_records_path(page: @current_page + 1, search_value: @search_value),class:"btn btn-info"%>
+     <%end%>
+  <%end%>
+</div>
