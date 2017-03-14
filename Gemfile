@@ -11,7 +11,6 @@ gem 'capistrano-rails'
 gem 'capistrano-bundler'
 gem 'capistrano-rvm'
 gem 'ci_reporter'
-gem 'listen', '~> 3.1', '>= 3.1.5'
 gem 'faraday'
 gem 'rails', '~> 5.0.1'
 gem 'sqlite3'
@@ -25,6 +24,7 @@ gem 'jbuilder', '~> 2.5'
 
 group :development, :test do
   gem 'byebug', platform: :mri
+  gem 'rspec-rails', '~> 3.5'
 end
 
 group :development do
