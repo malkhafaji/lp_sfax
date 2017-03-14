@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:x="urn:schemas-microsoft-com:office:excel"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:html="http://www.w3.org/TR/REC-html40">
+  <Worksheet ss:Name="Sheet1">
+    <Table>
+      <Row>
+        <Cell><Data ss:Type="String">recipient_name</Data></Cell>
+        <Cell><Data ss:Type="String">recipient_number</Data></Cell>
+        <Cell><Data ss:Type="String">file_path</Data></Cell>
+        <Cell><Data ss:Type="String">client_receipt_date</Data></Cell>
+        <Cell><Data ss:Type="String">Status</Data></Cell>
+        <Cell><Data ss:Type="String">Message</Data></Cell>
+        <Cell><Data ss:Type="String">Send confirm date</Data></Cell>
+        <Cell><Data ss:Type="String">Vendor confirm date</Data></Cell>
+
+      </Row>
+
+      <%fax_records_id = session[:fax_records_ids]%>
+      <%fax_records= FaxRecord.where(id: fax_records_id)%>
+      <%fax_records.each do |fax_record| %>
+      <Row>
+        <Cell><Data ss:Type="String"><%=fax_record['recipient_name'] %></Data></Cell>
+        <Cell><Data ss:Type="String"><%=fax_record['recipient_number']%></Data></Cell>
+        <Cell><Data ss:Type="String"><%=fax_record['file_path'] %></Data></Cell>
+        <Cell><Data ss:Type="Date"><%=fax_record['client_receipt_date']%></Data></Cell>
+        <Cell><Data ss:Type="String"><%=fax_record['status'] %></Data></Cell>
+        <Cell><Data ss:Type="String"><%=fax_record['message'] %></Data></Cell>
+        <Cell><Data ss:Type="String"><%=fax_record['send_confirm_date'] %></Data></Cell>
+        <Cell><Data ss:Type="String"><%=fax_record['vendor_confirm_date'] %></Data></Cell>
+
+
+      </Row>
+    <% end %>
+    </Table>
+  </Worksheet>
+</Workbook>
