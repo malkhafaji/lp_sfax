@@ -78,7 +78,8 @@
   end
 
 # search and find all faxes without Queue_id (not sent yet) and send them by call from the initializer (when the server start)
-  def sending_faxes_without_queue_id
+def sending_faxes_without_queue_id
+  begin
     faxes_without_queue_id = FaxRecord.where("SendFaxQueueId is null")
     faxes_without_queue_id.each do |fax_without_queue_id|
       begin
@@ -87,4 +88,6 @@
         pp "error requesting sending for fax #{fax_without_queue_id}"
       end
     end
+  rescue
   end
+end
