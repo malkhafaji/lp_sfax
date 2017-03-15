@@ -58,8 +58,30 @@ class FaxRecordsController < ApplicationController
       format.html
     end
   end
+   
 
 
+ 
+
+
+
+
+ def aws_response(file)
+  allresponses = [] 
+  for page in 1..100 do                            
+  url="http://localhost:3000/api/v1/documents/1"        
+  response = HTTParty.get(url)        
+  responsebody = JSON.parse(response.body)
+  allresponses.concat(responsebody)        
+ end                
+  return allresponses []    
+ end
+
+
+
+  #def file_path(file_name)
+    #"#{Rails.root}/public/send_doc/#{file_name}"
+  #end
 
   private
 
