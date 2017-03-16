@@ -8,7 +8,7 @@ class FaxRecord < ApplicationRecord
     validates_presence_of :recipient_name,message: "Recipitent Name should not be empty"
 
   # Validate the Uploaded file to not be empty
-    validates_presence_of :file_path, message: "Attached file should not be empty"
+    #validates_presence_of :file_path, message: "Attached file should not be empty"
 
   # Filtering the fax records according to the entered search value
   def self.filtered_fax_records(search_value)

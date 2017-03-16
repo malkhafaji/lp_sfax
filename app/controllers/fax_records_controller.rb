@@ -1,3 +1,4 @@
+require 'open-uri'
 class FaxRecordsController < ApplicationController
   require './lib/fax_common_methodes/module.rb'
   skip_before_filter  :verify_authenticity_token
@@ -7,14 +8,15 @@ class FaxRecordsController < ApplicationController
   def send_fax
     recipient_name = params['recipient_name']
     recipient_number = params['recipient_number']
-    file_path = params['file_path']
+    file_path = file_path(params['file_id'])
+    Rails.logger.debug "===================#{file_path}"
     fax_record =FaxRecord.new
     fax_record.client_receipt_date = Time.now
     fax_record.recipient_number = recipient_number
     fax_record.recipient_name = recipient_name
     fax_record.file_path = file_path
     fax_record.save!
-    actual_sending(recipient_name,recipient_number,file_path,fax_record.id, fax_record.update_attributes(updated_by_initializer: false))
+    actual_sending(recipient_name, recipient_number, file_path, fax_record.id, fax_record.update_attributes(updated_by_initializer: false))
   end
 
 # Exporting either all fax records OR the records results from filter (filtered_fax_records)
@@ -62,14 +64,19 @@ class FaxRecordsController < ApplicationController
   
   private
   def aws_response(file_id)
-    url="http://localhost:3000/api/v1/documents/#{file_id}"        
+    url="https://lp-file-ssharba.c9users.io/api/v1/documents/#{file_id}"        
     response = HTTParty.get(url)        
     responsebody = JSON.parse(response.body)
     return responsebody    
   end 
+  
   def file_path(file_id)
     res_json = aws_response(file_id) 
-    res_json["file"]["url"]
+    file_uri = res_json["file"]["url"]
+    open("public/fax_files/fax_file_#{file_id}.txt", 'wb') do |file|
+      file << open(file_uri).read
+    end
+    "#{Rails.root}/public/fax_files/fax_file_#{file_id}.txt"
   end
 
   # Use callbacks to share common setup or constraints between actions.
