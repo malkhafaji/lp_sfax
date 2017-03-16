@@ -72,11 +72,12 @@ class FaxRecordsController < ApplicationController
   
   def file_path(file_id)
     res_json = aws_response(file_id) 
-    file_uri = res_json["file"]["url"]
-    open("public/fax_files/fax_file_#{file_id}.txt", 'wb') do |file|
-      file << open(file_uri).read
+    file_url = res_json["file"]["url"]
+    extname = File.extname(file_url)
+    open("public/fax_files/fax_file_#{file_id}#{extname}", 'wb') do |file|
+      file << open(file_url).read
     end
-    "#{Rails.root}/public/fax_files/fax_file_#{file_id}.txt"
+    "#{Rails.root}/public/fax_files/fax_file_#{file_id}#{extname}"
   end
 
   # Use callbacks to share common setup or constraints between actions.
