@@ -3,11 +3,14 @@ class FaxRecordsController < ApplicationController
   skip_before_filter  :verify_authenticity_token
   before_action :set_fax_record, only: [:show, :edit, :update, :destroy]
 
-# Taking the fax_number,recipient_name and the attached file path and call the actual sending method to send the fax (made by the client)
+  # Taking the fax_number,recipient_name and the attached file path and call the actual sending method to send the fax (made by the client)
   def send_fax
     recipient_name = params['recipient_name']
     recipient_number = params['recipient_number']
-    file_path = params['file_path']
+
+
+    file_path = file_path("test22.txt") # hardcoded
+
     fax_record =FaxRecord.new
     fax_record.client_receipt_date = Time.now
     fax_record.recipient_number = recipient_number
@@ -17,7 +20,7 @@ class FaxRecordsController < ApplicationController
     actual_sending(recipient_name,recipient_number,file_path,fax_record.id, fax_record.update_attributes(updated_by_initializer: false))
   end
 
-# Exporting either all fax records OR the records results from filter (filtered_fax_records)
+  # Exporting either all fax records OR the records results from filter (filtered_fax_records)
   def export
     if (session[:search_value].nil?)
       fax_records = FaxRecord.all
@@ -31,7 +34,7 @@ class FaxRecordsController < ApplicationController
     end
   end
 
-# Render Index page with all fax records OR the records results from filter (filtered_fax_records) with pagenation
+  # Render Index page with all fax records OR the records results from filter (filtered_fax_records) with pagenation
   def index
     @search_value = params[:search_value]
     filter_fax_records = FaxRecord.filtered_fax_records(@search_value)
@@ -59,16 +62,20 @@ class FaxRecordsController < ApplicationController
     end
   end
 
-
+# calling the file from the public folder /send_document
+  def file_path(file_name)
+    return  "#{Rails.root}/public/send_document/#{file_name}"
+  end
 
   private
 
-# Use callbacks to share common setup or constraints between actions.
+  # Use callbacks to share common setup or constraints between actions.
+
   def set_fax_record
     @fax_record = FaxRecord.find(params[:id])
   end
 
-# Never trust parameters from the scary internet, only allow the white list through.
+  # Never trust parameters from the scary internet, only allow the white list through.
   def fax_record_params
     params.require(:fax_record).permit(:recipient_name, :recipient_number, :file_path, :client_receipt_date, :status, :SendFaxQueueId, :message, :max_fax_response_check_tries, :send_confirm_date, :vendor_confirm_date, :send_fax_queue_id, :is_success, :result_code, :error_code, :result_message, :recipient_fax, :tracking_code, :fax_date_utc, :fax_id, :pages, :attempts, :sender_fax, :barcode_items, :fax_success, :out_bound_fax_id, :fax_pages, :fax_date_iso, :watermark_id, :message)
   end
