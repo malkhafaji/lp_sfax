@@ -9,7 +9,6 @@ class FaxRecordsController < ApplicationController
     recipient_name = params['recipient_name']
     recipient_number = params['recipient_number']
     file_path = file_path(params['file_id'])
-    Rails.logger.debug "===================#{file_path}"
     fax_record =FaxRecord.new
     fax_record.client_receipt_date = Time.now
     fax_record.recipient_number = recipient_number
@@ -73,11 +72,9 @@ class FaxRecordsController < ApplicationController
   def file_path(file_id)
     res_json = aws_response(file_id) 
     file_url = res_json["file"]["url"]
-    extname = File.extname(file_url)
-    open("public/fax_files/fax_file_#{file_id}#{extname}", 'wb') do |file|
-      file << open(file_url).read
-    end
-    "#{Rails.root}/public/fax_files/fax_file_#{file_id}#{extname}"
+    file_name = File.basename(file_url)
+    system("wget #{file_url} -P #{Rails.root}/tmp/fax_files/fax_file_#{file_id}")
+    "#{Rails.root}/tmp/fax_files/fax_file_#{file_id}/#{file_name}"
   end
 
   # Use callbacks to share common setup or constraints between actions.
