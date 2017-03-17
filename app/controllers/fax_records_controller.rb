@@ -1,6 +1,6 @@
 require 'open-uri'
+include WebServices
 class FaxRecordsController < ApplicationController
-  require './lib/fax_common_methodes/module.rb'
   skip_before_filter  :verify_authenticity_token
   before_action :set_fax_record, only: [:show, :edit, :update, :destroy]
 
@@ -62,21 +62,6 @@ class FaxRecordsController < ApplicationController
   
   
   private
-  def aws_response(file_id)
-    url="https://lp-file-ssharba.c9users.io/api/v1/documents/#{file_id}"        
-    response = HTTParty.get(url)        
-    responsebody = JSON.parse(response.body)
-    return responsebody    
-  end 
-  
-  def file_path(file_id)
-    res_json = aws_response(file_id) 
-    file_url = res_json["file"]["url"]
-    file_name = File.basename(file_url)
-    system("wget #{file_url} -P #{Rails.root}/tmp/fax_files/fax_file_#{file_id}")
-    "#{Rails.root}/tmp/fax_files/fax_file_#{file_id}/#{file_name}"
-  end
-
   # Use callbacks to share common setup or constraints between actions.
   def set_fax_record
     @fax_record = FaxRecord.find(params[:id])
