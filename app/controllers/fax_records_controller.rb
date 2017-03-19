@@ -1,5 +1,6 @@
+require 'open-uri'
+include WebServices
 class FaxRecordsController < ApplicationController
-  require './lib/fax_common_methodes/module.rb'
   skip_before_filter  :verify_authenticity_token
   before_action :set_fax_record, only: [:show, :edit, :update, :destroy]
 
@@ -7,17 +8,14 @@ class FaxRecordsController < ApplicationController
   def send_fax
     recipient_name = params['recipient_name']
     recipient_number = params['recipient_number']
-
-
-    file_path = file_path("test22.txt") # hardcoded
-
+    file_path = file_path(params['file_id'])
     fax_record =FaxRecord.new
     fax_record.client_receipt_date = Time.now
     fax_record.recipient_number = recipient_number
     fax_record.recipient_name = recipient_name
     fax_record.file_path = file_path
     fax_record.save!
-    actual_sending(recipient_name,recipient_number,file_path,fax_record.id, fax_record.update_attributes(updated_by_initializer: false))
+    actual_sending(recipient_name, recipient_number, file_path, fax_record.id, fax_record.update_attributes(updated_by_initializer: false))
   end
 
   # Exporting either all fax records OR the records results from filter (filtered_fax_records)
@@ -61,16 +59,8 @@ class FaxRecordsController < ApplicationController
       format.html
     end
   end
-
-# calling the file from the public folder /send_document
-  def file_path(file_name)
-    return  "#{Rails.root}/public/send_document/#{file_name}"
-  end
-
   private
-
   # Use callbacks to share common setup or constraints between actions.
-
   def set_fax_record
     @fax_record = FaxRecord.find(params[:id])
   end

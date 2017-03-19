@@ -1,16 +1,8 @@
 class FaxRecord < ApplicationRecord
 
-  # Validate the recipient number to be only integers , 11 digit length and can not be empty
-    validates   :recipient_number,numericality: {only_integer: true,message: "Recipient Number should not be Empty"},
-      length: {minimum: 11,maximum: 11,message: "Recipient Number should be 11 digit"},allow_blank: false
-
-  # Validate the recipient name to not be empty
-    validates_presence_of :recipient_name,message: "Recipitent Name should not be empty"
-
-  # Validate the Uploaded file to not be empty
-    validates_presence_of :file_path, message: "Attached file should not be empty"
-
-  # Filtering the fax records according to the entered search value
+  validates_format_of :recipient_number, with: /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/
+  validates_presence_of :recipient_name, message: "Recipitent Name should not be empty"
+  
   def self.filtered_fax_records(search_value)
     FaxRecord.where(["recipient_name LIKE ? or recipient_number LIKE ?",
     (search_value),(search_value)])
