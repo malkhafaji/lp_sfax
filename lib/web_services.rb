@@ -1,6 +1,6 @@
 module  WebServices
   def aws_response(file_id)
-    url="https://lp-file-ssharba.c9users.io/api/v1/documents/#{file_id}"        
+    url="http://54.236.45.31//api/v1/documents/#{file_id}"        
     response = HTTParty.get(url)        
     responsebody = JSON.parse(response.body)
     return responsebody    
