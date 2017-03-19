@@ -208,6 +208,7 @@ DEPENDENCIES
   httparty (~> 0.14.0)
   jbuilder (~> 2.5)
   jquery-rails
+  listen (~> 3.0)
   puma (~> 3.0)
   rails (~> 5.0.1)
   sass-rails (~> 5.0)
