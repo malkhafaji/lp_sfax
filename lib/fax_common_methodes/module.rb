@@ -4,7 +4,7 @@
   require 'pp'
   require 'time'
   require 'json'
-
+  require 'fileutils'
   # The requirements to connect with Vendor
   USERNAME = 'ealzubaidi'
   APIKEY = '817C7FD99D6146B89BEA88BA5B1E48DE'
@@ -50,6 +50,7 @@
       SendFaxQueueId:    response_result["SendFaxQueueId"],
       send_confirm_date: response['date'])
 
+      FileUtils.rm_rf Dir.glob("#{Rails.root}/tmp/fax_files/*")
     if fax_record.updated_by_initializer == true
       p fax_record
     else
