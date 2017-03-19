@@ -4,7 +4,7 @@ class FaxRecordsController < ApplicationController
   skip_before_filter  :verify_authenticity_token
   before_action :set_fax_record, only: [:show, :edit, :update, :destroy]
 
-# Taking the fax_number,recipient_name and the attached file path and call the actual sending method to send the fax (made by the client)
+  # Taking the fax_number,recipient_name and the attached file path and call the actual sending method to send the fax (made by the client)
   def send_fax
     recipient_name = params['recipient_name']
     recipient_number = params['recipient_number']
@@ -18,7 +18,7 @@ class FaxRecordsController < ApplicationController
     actual_sending(recipient_name, recipient_number, file_path, fax_record.id, fax_record.update_attributes(updated_by_initializer: false))
   end
 
-# Exporting either all fax records OR the records results from filter (filtered_fax_records)
+  # Exporting either all fax records OR the records results from filter (filtered_fax_records)
   def export
     if (session[:search_value].nil?)
       fax_records = FaxRecord.all
@@ -32,7 +32,7 @@ class FaxRecordsController < ApplicationController
     end
   end
 
-# Render Index page with all fax records OR the records results from filter (filtered_fax_records) with pagenation
+  # Render Index page with all fax records OR the records results from filter (filtered_fax_records) with pagenation
   def index
     @search_value = params[:search_value]
     filter_fax_records = FaxRecord.filtered_fax_records(@search_value)
@@ -59,8 +59,6 @@ class FaxRecordsController < ApplicationController
       format.html
     end
   end
-  
-  
   private
   # Use callbacks to share common setup or constraints between actions.
   def set_fax_record
