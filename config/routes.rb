@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
-  resources :fax_records, only: [:index] do
+  resources :fax_records, only: [] do
     collection do
-      post 'index'
+      match 'index', via: [:get, :post]
       post 'export' # Exporting the records as file
     end
   end
