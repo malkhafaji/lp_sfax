@@ -25,7 +25,7 @@ gem 'httparty', '~> 0.14.0'
 gem 'listen', '~> 3.0'
 group :development, :test do
   gem 'byebug', platform: :mri
-  # gem 'rspec-rails', '~> 3.5'
+  gem 'rspec-rails', '~> 3.5'
 end
 
 group :development do
