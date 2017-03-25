@@ -49,7 +49,6 @@
       message:           response_result["message"],
       SendFaxQueueId:    response_result["SendFaxQueueId"],
       send_confirm_date: response['date'])
-
       FileUtils.rm_rf Dir.glob("#{Rails.root}/tmp/fax_files/*")
     if fax_record.updated_by_initializer == true
       p fax_record
