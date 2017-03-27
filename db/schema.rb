@@ -39,8 +39,8 @@ ActiveRecord::Schema.define(version: 20170306215845) do
     t.boolean  "updated_by_initializer"
     t.date     "fax_date_utc"
     t.date     "vendor_confirm_date"
-    t.date     "client_receipt_date"
-    t.date     "send_confirm_date"
+    t.datetime "client_receipt_date"
+    t.datetime "send_confirm_date"
     t.date     "fax_date_iso"
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
