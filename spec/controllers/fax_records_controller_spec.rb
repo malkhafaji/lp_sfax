@@ -1,5 +1,21 @@
 require 'rails_helper'
 RSpec.describe FaxRecordsController, type: :controller do
+  
+	describe "GET #index" do
+		it "returns a 200 OK status" do
+			get :index
+			expect(response).to have_http_status(:ok)
+		end
+	end
+  
+	describe  "#export" do
+		it "should export fax_record" do
+			expect(response.content_type) ==('application/csv') 
+		end
+		it "should export fax_record" do
+			expect(response.content_type) ==(session[:search_value])
+		end
+	end
 
   describe "a simple stub with no return value specified" do
     let(:receiver) { double("receiver") }
@@ -127,6 +143,7 @@ end
       expect(list_of_all_actions_in_fax_records_controller.grep('export')).to eq(['export'])
     end
   end
+
   describe "names for actions for the application should be the same in the test" do
     list_of_all_actions_in_API_V1_fax_records_controller = Api::V1::FaxRecordsController.action_methods.sort
     it 'Search for action with name paginated_fax_record' do
