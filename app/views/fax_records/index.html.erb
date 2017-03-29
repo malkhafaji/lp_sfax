@@ -1,26 +1,26 @@
 
   <%= render 'form'%>
   
-  <table class="table table-striped", id= 'fax_record' >
-  
-    <thead>
-      <tr>
-        <th><div class="top">Fax ID</div></th>
-        <th><div class="name">Recipient name</div></th>
-        <th><div class="number">Recipient number</div></th>
-        <th><div class="path">File path</div></th>
-        <th><div class="result">Confirmation Message</div></th>
-        <th><div class="message">Send message</div></th>
-        <th><div class="pages">Attempts</div></th>
-        <th><div class="pages">Pages</div></th>
-        <th><div class="message">Sender fax</div></th>
+  <table class="table table-striped table-bordered table-condensed" , id= 'fax_record' >
+ 
+    <thead id="fax_record_thead">
+      <tr>  
+        <th><div id="fax_id">Fax ID</div></th>
+        <th><div id="recipient">Recipient name</div></th>
+        <th><div id="recipient">Recipient number</div></th>
+        <th><div id="file_path">File path</div></th>
+        <th><div id="confirmation_message">Confirmation Message</div></th>
+        <th><div class="send_message_sender_fax">Send message</div></th>
+        <th><div class="pages_attempts">Attempts</div></th>
+        <th><div class="pages_attempts">Pages</div></th>
+        <th><div class="send_message_sender_fax">Sender fax</div></th>
         <th><div class="date">Client receipt date</div></th>
         <th><div class="date">Vendor confirm date</div></th>
         <th><div class="date">Send confirm date</div></th>
       </tr>
     </thead>
 
-    <tbody>
+    <tbody  id="fax_record_tbody">
       <% @fax_records.each do |fax_record| %>
         <tr>
           <td><%= fax_record.id %></td>
@@ -41,21 +41,21 @@
   </table>
   <div class="container">
   <p>
-   <h5 style="color:black;"> Export the file as:
-       <%= link_to "CSV file" , export_fax_records_path(format: "csv"), method: :post, class: ' button-primary button-tiny' %>
-       <%= link_to "Excel file", export_fax_records_path(format: "xls"), method: :post, class: 'button-primary button-tiny' %>
+    <h5>Export the file as:
+       <%= link_to "CSV file" , export_fax_records_path(format: "csv"), method: :post, class: ' fax_record_button fax_record_button-tiny' %>
+       <%= link_to "Excel file", export_fax_records_path(format: "xls"), method: :post, class: 'fax_record_button fax_record_button-tiny' %>
   </h5>
   </p>
    </div>
   <div class="container">
-  <div class="top_paginate">
+  <div class="paginate_right_buttons">
+    <% unless @current_page.nil?%>
+       <% unless @current_page < 2 %>
+       <%= link_to "Previous page", fax_records_path(page: @current_page - 1, search_value: @search_value),class: 'fax_record_button fax_record_button-tiny' %> 
+       <%end%>
     <% unless @current_page >= @total_pages %>
-       <%= link_to "Next page", fax_records_path(page: @current_page + 1, search_value: @search_value),class: 'paginate-primary button-tiny' %>
-     <%end%>
-  <% unless @current_page.nil?%>
-    <% unless @current_page < 2 %>
-       <%= link_to "Previous page", fax_records_path(page: @current_page - 1, search_value: @search_value),class: 'paginate-primary button-tiny' %> &nbsp;&nbsp;&nbsp;
-     <%end%>
+       <%= link_to "Next page", fax_records_path(page: @current_page + 1, search_value: @search_value),class: 'fax_record_button fax_record_button-tiny' %>
+      <%end%>
     <%end%>
   </div>
 </div>

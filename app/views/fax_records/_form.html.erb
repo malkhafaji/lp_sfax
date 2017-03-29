@@ -1,11 +1,9 @@
 <div class="container">
-<div class="right_search">
-<p><h5 style="color:black;"><%= form_tag(controller: "fax_records", method: 'post') do %>
+<div id="search_field">
+<p><h5><%= form_tag(controller: "fax_records", method: 'post') do %>
 Search for:
 <%= text_field_tag :search_value, "#{ @search_value.present? ? @search_value : '' }" %>
-<%= submit_tag  "Search" , class: 'paginate-primary button-tiny'%>
+<%= submit_tag  "Search" , class: 'fax_record_button fax_record_button-tiny'%>
 <% end %></h5></p>
 </div>
 </div>
-
-
