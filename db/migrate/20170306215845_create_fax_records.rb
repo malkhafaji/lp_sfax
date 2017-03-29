@@ -25,13 +25,13 @@ class CreateFaxRecords < ActiveRecord::Migration[5.0]
       t.integer :fax_success
       t.integer :max_fax_response_check_tries
       t.integer :fax_pages
-      t.boolean :updated_by_initializer 
+      t.integer :sendback_final_response_to_client,  default: 0
+      t.boolean :updated_by_initializer
       t.date :fax_date_utc
       t.date :vendor_confirm_date
       t.date :client_receipt_date
       t.date :send_confirm_date
       t.date :fax_date_iso
-
       t.timestamps
     end
   end
