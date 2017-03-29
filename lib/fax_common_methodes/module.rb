@@ -89,9 +89,6 @@ def sending_faxes_without_queue_id
     faxes_without_queue_id = FaxRecord.where("SendFaxQueueId is null")
     faxes_without_queue_id.each do |fax_without_queue_id|
       begin
-        p fax_without_queue_id.recipient_name
-        p fax_without_queue_id.recipient_number
-        p fax_without_queue_id.file_path(params['file_id'],checksum),fax_without_queue_id.id
         actual_sending(fax_without_queue_id.recipient_name, fax_without_queue_id.recipient_number, fax_without_queue_id.file_path,fax_without_queue_id.id, fax_without_queue_id.update_attributes( updated_by_initializer:  true))
       rescue
         pp "error requesting sending for fax #{fax_without_queue_id}"
