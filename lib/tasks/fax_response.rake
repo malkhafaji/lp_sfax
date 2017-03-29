@@ -97,7 +97,7 @@ task :sendback_final_response_to_client => :environment do
       'Error code': sendback_final_response.error_code,
       'Client receipt date': sendback_final_response.client_receipt_date,
       'Send confirm date': sendback_final_response.fax_date_utc,
-      'Vendor confirm date': nil
+      'Vendor confirm date': sendback_final_response.vendor_confirm_date
     }
     array_of_jsons.push(x)
     sendback_final_response.update_attributes(sendback_final_response_to_client: 1)
