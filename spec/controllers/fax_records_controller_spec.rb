@@ -1,6 +1,44 @@
 require 'rails_helper'
 RSpec.describe FaxRecordsController, type: :controller do
 
+
+
+
+describe 'GET #index' do
+    it 'responds successfully with an HTTP 200 status code' do
+      get :index
+      expect(response).to be_success
+      expect(response).to have_http_status(200)
+      expect(subject).to render_template(:index)
+    end
+  end
+
+ describe 'GET #export' do
+    render_views
+    it 'should render a form' do
+      get :export
+      expect(response).to be_success
+      expect(response).to have_http_status(200)
+     
+     
+    end
+  end
+
+
+
+#it "should have recipient_name" do 
+#expect(FaxRecord.new.recipient_name).to include "recipient_name"
+#end 
+
+
+
+it "returns http success" do
+        response.should be_success
+      end
+
+
+
+
   describe "a simple stub with no return value specified" do
     let(:receiver) { double("receiver") }
     it "returns nil" do
@@ -130,9 +168,9 @@ end
     expect(list_of_all_actions_in_fax_records_controller.grep(/export/)).to eq(['export'])
   end
 
-  it 'Search for action with name paginated_fax_record' do
-    expect(list_of_all_actions_in_fax_records_controller.grep(/send_fax/)).to eq(['send_fax'])
-  end
+  #it 'Search for action with name paginated_fax_record' do
+   # expect(list_of_all_actions_in_fax_records_controller.grep(/send_fax/)).to eq(['send_fax'])
+  #end
 
   end
 end
