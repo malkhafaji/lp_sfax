@@ -1,0 +1,109 @@
+/* table style thead and tbody with blue and white text */
+
+#fax_record_thead {
+   font-family: bold;
+   font-size: 12px;
+   color: #fff;
+   background-image: linear-gradient(#0000FF, #0000FF, #0000FF);
+  }
+
+
+#fax_record_tbody tr td {
+   font-family: cursive;
+   font-weight: 700;
+   font-size: 10px;
+  }
+
+
+/* table header fields columns style */
+
+#fax_id {
+    text-align: center;
+    height: 40px;
+    width: 20px;
+    margin: 5px;
+  }
+
+#recipient {
+    height: 40px;
+    width: 70px;
+    margin: 5px;
+    text-align: center;
+  }
+
+#file_path {
+    width: 120px;
+    height: 25px;
+    margin: 10px; 
+    text-align: right;
+    padding-right:10px;
+  }
+
+#confirmation_message {
+    height: 40px;
+    width: 150px;
+    margin: 5px; 
+    text-align: center;
+  }
+
+.send_message_sender_fax {
+    height: 40px;
+     width: 70px;
+     margin: 5px;  
+     text-align: center;
+  }
+
+.pages_attempts {
+    width: 70px;
+    height: 30px;
+    margin: 5px; 
+    text-align: center;
+  }
+
+.date {
+    width: 80px;
+    height: 45px;
+    margin: 5px; 
+    text-align: center; 
+    padding-right: -50px;
+  }
+
+
+/* table paginate buttons next and previous style, float and padding to right  */
+
+.paginate_right_buttons {
+   margin: -32px;
+   padding-right: 30px;
+   float:right;
+  }
+
+/* table search field style, float to right  */
+
+#search_field {
+   float: right; 
+   margin: auto;
+  }
+
+/* table buttons, custom button with tiny style , blue color with white text important */
+
+.fax_record_button {
+  background: linear-gradient(to bottom, #0000FF, #0000FF);
+  color: #fff !important;
+  display: inline-block;
+  }
+
+.fax_record_button :hover, .fax_record_button :focus {
+  background: linear-gradient(to bottom, #0000FF, #0000FF); 
+  color: #fff !important;
+  }
+  
+.fax_record_button-tiny {
+  font-weight: bold;
+  font-size: 12px;
+  height: 22.4px;
+  line-height: 22.4px;
+  padding: 0px 20.2px; }
+
+input.fax_record_button-tiny, button.fax_record_button-tiny {
+  height: 25.0px; }
+
