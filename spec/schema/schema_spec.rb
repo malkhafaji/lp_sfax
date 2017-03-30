@@ -102,4 +102,102 @@ RSpec.describe 'FaxRecordschema', type: :schema do
       expect(list_of_schema_columns.grep('watermark_id')).to eq(['watermark_id'])
     end
   end
+
+  hash_of_schema_columns_names_and_types = FaxRecord.attribute_names.map{|n|[n.to_sym,FaxRecord.type_for_attribute(n).type]}.to_h
+  p hash_of_schema_columns_names_and_types = FaxRecord.attribute_names.map{|n|[n.to_sym,FaxRecord.type_for_attribute(n).type]}.to_h
+  describe "checking the types for the schema columns" do
+    it 'recipient_name should be type string' do
+      expect(hash_of_schema_columns_names_and_types[:recipient_name]).to eq(:string)
+    end
+    it 'recipient_number should be type string' do
+      expect(hash_of_schema_columns_names_and_types[:recipient_number]).to eq(:string)
+    end
+    it 'file_path should be type string' do
+      expect(hash_of_schema_columns_names_and_types[:file_path]).to eq(:string)
+    end
+    it 'status should be type string' do
+      expect(hash_of_schema_columns_names_and_types[:status]).to eq(:string)
+    end
+    it 'SendFaxQueueId should be type string' do
+      expect(hash_of_schema_columns_names_and_types[:SendFaxQueueId]).to eq(:string)
+    end
+    it 'message should be type string' do
+      expect(hash_of_schema_columns_names_and_types[:message]).to eq(:string)
+    end
+    it 'send_fax_queue_id should be type string' do
+      expect(hash_of_schema_columns_names_and_types[:send_fax_queue_id]).to eq(:string)
+    end
+    it 'is_success should be type string' do
+      expect(hash_of_schema_columns_names_and_types[:is_success]).to eq(:string)
+    end
+    it 'result_message should be type string' do
+      expect(hash_of_schema_columns_names_and_types[:result_message]).to eq(:string)
+    end
+    it 'recipient_fax should be type string' do
+      expect(hash_of_schema_columns_names_and_types[:recipient_fax]).to eq(:string)
+    end
+    it 'tracking_code should be type string' do
+      expect(hash_of_schema_columns_names_and_types[:tracking_code]).to eq(:string)
+    end
+    it 'fax_id should be type string' do
+      expect(hash_of_schema_columns_names_and_types[:fax_id]).to eq(:string)
+    end
+    it 'watermark_id should be type string' do
+      expect(hash_of_schema_columns_names_and_types[:watermark_id]).to eq(:string)
+    end
+    it 'sender_fax should be type string' do
+      expect(hash_of_schema_columns_names_and_types[:sender_fax]).to eq(:string)
+    end
+    it 'barcode_items should be type string' do
+      expect(hash_of_schema_columns_names_and_types[:barcode_items]).to eq(:string)
+    end
+    it 'out_bound_fax_id should be type string' do
+      expect(hash_of_schema_columns_names_and_types[:out_bound_fax_id]).to eq(:string)
+    end
+    it 'pages should be type integer' do
+      expect(hash_of_schema_columns_names_and_types[:pages]).to eq(:integer)
+    end
+    it 'result_code should be type integer' do
+      expect(hash_of_schema_columns_names_and_types[:result_code]).to eq(:integer)
+    end
+    it 'error_code should be type integer' do
+      expect(hash_of_schema_columns_names_and_types[:error_code]).to eq(:integer)
+    end
+    it 'attempts should be type integer' do
+      expect(hash_of_schema_columns_names_and_types[:attempts]).to eq(:integer)
+    end
+    it 'fax_success should be type integer' do
+      expect(hash_of_schema_columns_names_and_types[:fax_success]).to eq(:integer)
+    end
+    it 'max_fax_response_check_tries should be type integer' do
+      expect(hash_of_schema_columns_names_and_types[:max_fax_response_check_tries]).to eq(:integer)
+    end
+    it 'fax_pages should be type integer' do
+      expect(hash_of_schema_columns_names_and_types[:fax_pages]).to eq(:integer)
+    end
+    it 'updated_by_initializer should be type boolean' do
+      expect(hash_of_schema_columns_names_and_types[:updated_by_initializer]).to eq(:boolean)
+    end
+    it 'fax_date_utc should be type date' do
+      expect(hash_of_schema_columns_names_and_types[:fax_date_utc]).to eq(:date)
+    end
+    it 'vendor_confirm_date should be type date' do
+      expect(hash_of_schema_columns_names_and_types[:vendor_confirm_date]).to eq(:date)
+    end
+    it 'client_receipt_date should be type date' do
+      expect(hash_of_schema_columns_names_and_types[:client_receipt_date]).to eq(:date)
+    end
+    it 'send_confirm_date should be type date' do
+      expect(hash_of_schema_columns_names_and_types[:send_confirm_date]).to eq(:date)
+    end
+    it 'fax_date_iso should be type date' do
+      expect(hash_of_schema_columns_names_and_types[:fax_date_iso]).to eq(:date)
+    end
+    it 'created_at should be type datetime' do
+      expect(hash_of_schema_columns_names_and_types[:created_at]).to eq(:datetime)
+    end
+    it 'updated_at should be type datetime' do
+      expect(hash_of_schema_columns_names_and_types[:updated_at]).to eq(:datetime)
+    end
+  end
 end
