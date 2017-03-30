@@ -7,8 +7,8 @@ RSpec.describe FaxRecordsController, type: :controller do
 			expect(response).to have_http_status(:ok)
 		end
 	end
-  
-	describe  "#export" do
+
+  describe  "#export" do
 		it "should export fax_record" do
 			expect(response.content_type) ==('application/csv') 
 		end
@@ -148,6 +148,24 @@ end
     list_of_all_actions_in_API_V1_fax_records_controller = Api::V1::FaxRecordsController.action_methods.sort
     it 'Search for action with name paginated_fax_record' do
       expect(list_of_all_actions_in_API_V1_fax_records_controller.grep('send_fax')).to eq(['send_fax'])
+    end
+  end
+  
+  describe "stub_const" do
+  it "changes the constant value for the duration of the example" do
+    stub_const("Foo::SIZE", 10)
+    expect(Foo::SIZE).to eq(10)
+  end
+ end
+  describe "fax_record" do
+    let(:fake_class) { Class.new }
+
+    it "accidentally stubs the wrong constant" do
+      stub_const("SomeClass", fake_class)
+    end
+
+    it "stubs the right constant" do
+      stub_const("MyGem::SomeClass", fake_class)
     end
   end
 end

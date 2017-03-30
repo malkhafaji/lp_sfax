@@ -89,4 +89,15 @@ RSpec.describe FaxRecord, type: :model do
       expect(subject).to_not be_valid
     end
   end
+
+   describe 'check columns exsitence' do                
+    it { is_expected.to respond_to :recipient_name }
+    it { is_expected.to respond_to :recipient_number }
+    it { is_expected.to respond_to :file_path }
+    it { is_expected.to respond_to :client_receipt_date}
+    it { is_expected.to respond_to :status }
+    it { is_expected.to respond_to :message }
+    it { is_expected.to respond_to :send_confirm_date}
+    it { is_expected.to respond_to :vendor_confirm_date}
+  end
 end
