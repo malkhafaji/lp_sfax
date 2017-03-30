@@ -1,12 +1,28 @@
 require 'rails_helper'
 RSpec.describe FaxRecordsController, type: :controller do
   
-	describe "GET #index" do
-		it "returns a 200 OK status" do
-			get :index
-			expect(response).to have_http_status(:ok)
-		end
-	end
+	
+
+
+before(:all) do
+    @fax_record = FaxRecord.new( max_fax_response_check_tries: 20)
+end
+
+it "should have a max_fax_response_check_tries "do
+      expect(@fax_record.max_fax_response_check_tries).to eq(20)
+      end
+
+
+describe 'GET #index' do
+   it 'responds successfully with an HTTP 200 status code' do    ##new
+     get :index
+     expect(response).to be_success
+     expect(response).to have_http_status(200)
+     expect(subject).to render_template(:index)
+   end
+ end
+
+
   
 	describe  "#export" do
 		it "should export fax_record" do
