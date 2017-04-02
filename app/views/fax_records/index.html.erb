@@ -1,27 +1,24 @@
 <div class="container" >
-  <%= render 'form'%>
-  <p>
-     <h4>Export the results as:
-       <%= link_to "CSV file" , export_fax_records_path(format: "csv"), method: :post, class: 'btn btn-default' %>
-       <%= link_to "Excel file", export_fax_records_path(format: "xls"), method: :post, class: 'btn btn-default' %>
-  </h4>
-  </p>
+  <div class='text-right'>
+    <%= render 'form'%>
+  </div>
 
-  <table class="table table-striped table-bordered table-condensed", id= 'fax_record' >
-    <thead>
+
+  <table class="table table-striped table-bordered table-condensed table-responsive", id= 'fax_record' >
+    <thead id="fax_record_thead">
       <tr>
-        <th> Fax ID</div></th>
-        <th> Recipient name</div></th>
-        <th> Recipient number</div></th>
-        <th> File path</th>
-        <th> Confirmation Message</th>
-        <th> Send message</th>
-        <th> Attempts</th>
-        <th> Pages</th>
-        <th> Sender fax</div></th>
-        <th> Client receipt date</div></th>
-        <th> Vendor confirm date</div></th>
-        <th> Send confirm date</div></th>
+        <th class='text-center' > Fax ID</div></th>
+        <th class='text-center'> Recipient name</div></th>
+        <th class='text-center'> Recipient number</div></th>
+        <th class='text-center'> File path</th>
+        <th class='text-center'> Confirmation Message</th>
+        <th class='text-center'> Send message</th>
+        <th class='text-center'> Attempts</th>
+        <th class='text-center'> Pages</th>
+        <th class='text-center'> Sender fax</div></th>
+        <th class='text-center'> Client receipt date</div></th>
+        <th class='text-center'> Vendor confirm date</div></th>
+        <th class='text-center'> Send confirm date</div></th>
       </tr>
     </thead>
 
@@ -29,7 +26,7 @@
       <% @fax_records.each do |fax_record| %>
         <tr>
           <td><%= fax_record.id %></td>
-          <td><%= fax_record.recipient_name %></td>
+          <td class="col-md-2"><%= fax_record.recipient_name %></td>
           <td><%= fax_record.number_to_fax %></td>
           <td><%= fax_record.file_path %></td>
           <td><%= fax_record.message %></td>
@@ -44,6 +41,15 @@
       <% end %>
     </tbody>
   </table>
+  <div class='col-md-6'>
+    <p>
+     <h4>Export the results as:
+       <%= link_to "CSV file" , export_fax_records_path(format: "csv"), method: :post, class: 'btn btn-default' %>
+       <%= link_to "Excel file", export_fax_records_path(format: "xls"), method: :post, class: 'btn btn-default' %>
+    </h4>
+   </p>
+</div>
+ <div class='col-md-6 text-right'>
   <% unless @current_page.nil?%>
     <% unless @current_page < 2 %>
        <%= link_to "Previous page", fax_records_path(page: @current_page - 1, search_value: @search_value),class:"btn btn-danger"%>
@@ -52,4 +58,5 @@
        <%= link_to "Next page", fax_records_path(page: @current_page + 1, search_value: @search_value),class:"btn btn-info"%>
      <%end%>
   <%end%>
+ </div>
 </div>
