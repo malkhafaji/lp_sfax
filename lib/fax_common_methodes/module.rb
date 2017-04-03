@@ -92,12 +92,6 @@ def sending_faxes_without_queue_id
   end
 end
 
-
-
-
-
-
-
 # Sending the initial response to the client after sending the fax
   def sendback_initial_response_to_client(fax_record)
     client_initial_response ={'Fax_ID': fax_record.id,
@@ -107,7 +101,5 @@ end
       'Success':  fax_record.status,
       'Message': fax_record.message,
     client_receipt_date: fax_record.client_receipt_date}
-  p "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ "
-    p  "the json we sendback initially to the client ===>  #{client_initial_response}" #we should change this to the client URL to send the json
-    p "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ "
+     #we should put here the client URL to send the json
   end

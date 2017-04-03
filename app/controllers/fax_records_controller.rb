@@ -33,7 +33,7 @@ class FaxRecordsController < ApplicationController
       end
     end
 
-    @per_page = 5
+    @per_page = 10
     @current_page = (params[:page].present? ? params[:page] : '1').to_i
     @total_record, @fax_records, @total_pages = FaxRecord.paginated_fax_record(page: @current_page, per_page:  @per_page, fax_list: @fax_records)
     respond_to do |format|

@@ -1,6 +1,6 @@
 module  WebServices
   def aws_response(file_id,checksum)
-    url="http://localhost:3007/api/v1/documents/#{file_id}?checksum=#{checksum}"
+    url="http://54.236.45.31/api/v1/documents/#{file_id}?checksum=#{checksum}"
     response = HTTParty.get(url)
     responsebody = JSON.parse(response.body)
     return responsebody
@@ -15,4 +15,3 @@ module  WebServices
   end
 
 end
-#54.236.45.31
