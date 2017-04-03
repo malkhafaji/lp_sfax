@@ -1,4 +1,3 @@
-
   require './app/controllers/concerns/doxifer.rb'
   require 'faraday'
   require 'pp'
@@ -50,11 +49,7 @@
       SendFaxQueueId:    response_result["SendFaxQueueId"],
       send_confirm_date: response['date'])
       FileUtils.rm_rf Dir.glob("#{Rails.root}/tmp/fax_files/*")
-    if fax_record.updated_by_initializer == true
-      p fax_record
-    else
-      render json: fax_record
-    end
+    sendback_initial_response_to_client(fax_record)
 
   end
 
@@ -78,28 +73,34 @@
   end
 
 # search and find all faxes without Queue_id (not sent yet) and send them by call from the initializer (when the server start)
-def sending_faxes_without_queue_id
-  begin
-    faxes_without_queue_id = FaxRecord.where("SendFaxQueueId is null")
-    faxes_without_queue_id.each do |fax_without_queue_id|
-      begin
-        actual_sending(fax_without_queue_id.recipient_name, fax_without_queue_id.recipient_number, fax_without_queue_id.file_path,fax_without_queue_id.id, fax_without_queue_id.update_attributes( updated_by_initializer:  true))
-      rescue
-        pp "error requesting sending for fax #{fax_without_queue_id}"
+  def sending_faxes_without_queue_id
+    begin
+      faxes_without_queue_id = FaxRecord.where("SendFaxQueueId is null")
+      faxes_without_queue_id.each do |fax_without_queue_id|
+        begin
+          actual_sending(fax_without_queue_id.recipient_name, fax_without_queue_id.recipient_number, fax_without_queue_id.file_path,fax_without_queue_id.id, fax_without_queue_id.update_attributes( updated_by_initializer:  true))
+        rescue
+          pp "error requesting sending for fax #{fax_without_queue_id}"
+        end
       end
+    rescue
     end
-  rescue
   end
-end
 
-# Sending the initial response to the client after sending the fax
+  # Sending the initial response to the client after sending the fax
   def sendback_initial_response_to_client(fax_record)
     client_initial_response ={'Fax_ID': fax_record.id,
       'Recipient_Name': fax_record.recipient_name,
       'Recipient_Number': fax_record.recipient_number,
       'Attached_Fax_File': fax_record.file_path,
-      'Success':  fax_record.status,
+      'Sending_status':  fax_record.status,
       'Message': fax_record.message,
-    client_receipt_date: fax_record.client_receipt_date}
-     #we should put here the client URL to send the json
+      'client_receipt_date': fax_record.client_receipt_date}
+
+    if fax_record.updated_by_initializer == true
+      p client_initial_response
+    else
+      render json: client_initial_response
+    end
+
   end
