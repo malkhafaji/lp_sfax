@@ -1,33 +1,31 @@
-<div class="container" >
-  <%= render 'form'%>
-  <p>
-     <h4>Export the results as:
-       <%= link_to "CSV file" , export_fax_records_path(format: "csv"), method: :post, class: 'btn btn-default' %>
-       <%= link_to "Excel file", export_fax_records_path(format: "xls"), method: :post, class: 'btn btn-default' %>
-  </h4>
-  </p>
+<div class="container">
+  <div class='row'>
+    <div class= 'col-lg-11'>
+      <div class='pull-right'>
+       <div class='input-group'>
+        <span class='input-group-btn'>
+          <%= render 'form'%>
+          </span>
+       </div>
+     </div>
+   </div>
+</div>
 
-  <table class="table table-striped", id= 'fax_record' >
-    <thead>
+  <table class="table table-striped table-bordered table-condensed table-responsive", id= 'fax_record' >
+    <thead id="fax_record_thead">
       <tr>
-        <th>Fax ID</th>
-        <th>Recipient name</th>
-        <th>Recipient number</th>
-        <th>File path</th>
-        <th>Barcode items</th>
-        <th>Result message</th>
-        <th>Message</th>
-        <th>Attempts</th>
-        <th>Pages</th>
-        <th>Sender fax</th>
-        <th>Recipient fax</th>
-        <th>Is success</th>
-        <th>Client receipt date</th>
-        <th>Vendor confirm date</th>
-        <th>Status</th>
-        <th>Max fax response check tries</th>
-        <th>Send confirm date</th>
-        <th colspan="3"></th>
+        <th class='text-center'> Fax ID</div></th>
+        <th class='text-center'> Recipient name</div></th>
+        <th class='text-center'> Recipient number</div></th>
+        <th class='text-center'> File path</th>
+        <th class='text-center'> Confirmation Message</th>
+        <th class='text-center'> Send message</th>
+        <th class='text-center'> Attempts</th>
+        <th class='text-center'> Pages</th>
+        <th class='text-center'> Sender fax</div></th>
+        <th class='text-center'> Client receipt date</div></th>
+        <th class='text-center'> Vendor confirm date</div></th>
+        <th class='text-center'> Send confirm date</div></th>
       </tr>
     </thead>
 
@@ -35,32 +33,36 @@
       <% @fax_records.each do |fax_record| %>
         <tr>
           <td><%= fax_record.id %></td>
-          <td><%= fax_record.recipient_name %></td>
-          <td><%= fax_record.recipient_number %></td>
+          <td class="col-md-2"><%= fax_record.recipient_name %></td>
+          <td><%= fax_record.number_to_fax %></td>
           <td><%= fax_record.file_path %></td>
-          <td><%= fax_record.barcode_items %></td>
+          <td><%= fax_record.message %></td>                     
           <td><%= fax_record.result_message %></td>
-          <td><%= fax_record.message %></td>
           <td><%= fax_record.attempts %></td>
           <td><%= fax_record.pages %></td>
           <td><%= fax_record.sender_fax %></td>
-          <td><%= fax_record.recipient_fax %></td>
-          <td><%= fax_record.is_success %></td>
-          <td><%= fax_record.client_receipt_date %></td>
+          <td><%= fax_record.client_receipt_date.strftime("%I:%M:%S %p %m/%d/%Y")%></td>  
           <td><%= fax_record.vendor_confirm_date %></td>
-          <td><%= fax_record.status %></td>
-          <td><%= fax_record.max_fax_response_check_tries %></td>
-          <td><%= fax_record.send_confirm_date %></td>
+          <td><%= fax_record.send_confirm_date.strftime("%I:%M:%S %p %m/%d/%Y")%></td>
         </tr>
       <% end %>
     </tbody>
   </table>
+  <div class='col-md-6'>
+    <p><h5>
+     Export the results as:
+       <%= link_to "CSV file" , export_fax_records_path(format: "csv"), method: :post, class: 'btn btn-default btn-sm' %>
+       <%= link_to "Excel file", export_fax_records_path(format: "xls"), method: :post, class: 'btn btn-default btn-sm' %>
+   </h5></p>
+</div>
+ <div class='col-md-6 text-right'> 
   <% unless @current_page.nil?%>
     <% unless @current_page < 2 %>
-       <%= link_to "Previous page", fax_records_path(page: @current_page - 1, search_value: @search_value),class:"btn btn-danger"%>
+       <%= link_to "Previous page", fax_records_path(page: @current_page - 1, search_value: @search_value), class: "btn btn-primary btn-sm paginate" %>
      <%end%>
      <% unless @current_page >= @total_pages %>
-       <%= link_to "Next page", fax_records_path(page: @current_page + 1, search_value: @search_value),class:"btn btn-info"%>
+       <%= link_to "Next page", fax_records_path(page: @current_page + 1, search_value: @search_value),class: "btn btn-primary btn-sm paginate"%>
      <%end%>
   <%end%>
+ </div>
 </div>
