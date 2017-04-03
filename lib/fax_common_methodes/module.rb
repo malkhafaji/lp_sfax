@@ -97,7 +97,7 @@
       'message': fax_record.message,
       'status': fax_record.status,
       'result_message': fax_record.result_message,
-      'client_receipt_date': fax_record.client_receipt_date}
+      client_receipt_date: fax_record.client_receipt_date}
      #we should put here the client URL to send the json
 
     if fax_record.updated_by_initializer == true
