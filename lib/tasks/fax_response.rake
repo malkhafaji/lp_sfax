@@ -89,15 +89,15 @@ desc "check_fax_response "
                         'Recipient_Number': sendback_final_response.recipient_number,
                         'Attached_Fax_File': sendback_final_response.file_path,
                         'is_success': sendback_final_response.is_success,
-                        'initial Message': sendback_final_response.message,
-                        'Final Message': sendback_final_response.result_message,
-                        'Sender Number': sendback_final_response.sender_fax,
-                        'Number of pages': sendback_final_response.pages,
-                        'Number of attempts': sendback_final_response.attempts,
-                        'Error code': sendback_final_response.error_code,
-                        'Client receipt date': sendback_final_response.client_receipt_date,
-                        'Send confirm date': sendback_final_response.fax_date_utc,
-                        'Vendor confirm date': sendback_final_response.vendor_confirm_date
+                        'initial_Message': sendback_final_response.message,
+                        'Final_Message': sendback_final_response.result_message,
+                        'Sender_Number': sendback_final_response.sender_fax,
+                        'Number_of_pages': sendback_final_response.pages,
+                        'Number_of_attempts': sendback_final_response.attempts,
+                        'Error_code': sendback_final_response.error_code,
+                        'Client_receipt_date': sendback_final_response.client_receipt_date,
+                        'Send_confirm_date': sendback_final_response.fax_date_utc,
+                        'Vendor_confirm_date': sendback_final_response.vendor_confirm_date
                       }
                       array_of_jsons.push(x)
                       sendback_final_response.update_attributes(sendback_final_response_to_client: 1)
@@ -105,7 +105,7 @@ desc "check_fax_response "
             if array_of_jsons.blank?
               p ' No responses for faxes found '
             else
-              url = 'https://dcm-test-aqattan.c9users.io/receive_response'
+              url = 'https://mc1-efax-u.discoveryhealthpartners.com/eFaxService/OutboundDispositionService.svc/receive'
               @result = HTTParty.post(url,
               body: array_of_jsons.to_json,
               headers: { 'Content-Type' => 'application/json' } )
