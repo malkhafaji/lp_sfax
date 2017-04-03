@@ -75,3 +75,55 @@ desc "check_fax_response "
     end
     return JSON.parse(response.body)
   end
+
+
+  # Sending final response as array of jsons to the client for all sent faxes
+  desc "Sending final response as array of jsons to the client for all sent faxes "
+  task :sendback_final_response_to_client => :environment do
+            sendback_final_responses = FaxRecord.where("sendback_final_response_to_client is 0 and send_fax_queue_id is not null")
+            array_of_jsons = []
+            sendback_final_responses.each do |sendback_final_response|
+                          x= {
+                            'Fax_ID': sendback_final_response.id,
+                            'Recipient_Name': sendback_final_response.recipient_name,
+                            'Recipient_Number': sendback_final_response.recipient_number,
+                            'Attached_Fax_File': sendback_final_response.file_path,
+                            'is_success': sendback_final_response.is_success,
+                            'initial Message': sendback_final_response.message,
+                            'Final Message': sendback_final_response.result_message,
+                            'Sender Number': sendback_final_response.sender_fax,
+                            'Number of pages': sendback_final_response.pages,
+                            'Number of attempts': sendback_final_response.attempts,
+                            'Error code': sendback_final_response.error_code,
+                            'Client receipt date': sendback_final_response.client_receipt_date,
+                            'Send confirm date': sendback_final_response.fax_date_utc,
+                            'Vendor confirm date': sendback_final_response.vendor_confirm_date
+                          }
+                          array_of_jsons.push(x)
+                          sendback_final_response.update_attributes(sendback_final_response_to_client: 1)
+            end
+                if array_of_jsons.blank?
+                  p ' No responses for faxes found '
+                else
+                  uri = URI('https://dcm-test-aqattan.c9users.io/receive_response') #client URL   'https://mc1-efax-u.discoveryhealthpartners.com/eFaxService/OutboundDispositionService.svc/receive'
+                  req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
+                  req.body = array_of_jsons.to_json
+                  res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+                    http.request(req)
+                 end
+
+
+                  #
+                  # request = Net::HTTP::Post.new(uri.request_uri,'Content-Type' => 'application/json')
+                  # request.body = array_of_jsons.to_json
+                  # resp = http.request(request)
+
+# ----------------------------------------
+
+  # url="https://dcm-test-aqattan.c9users.io/receive_response"
+  # response = HTTParty.post(url)
+  # responsebody = JSON.parse(response.body)
+  #
+  #                 # p array_of_jsons
+               end
+  end
