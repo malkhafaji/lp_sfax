@@ -1,6 +1,18 @@
 require 'rails_helper'
 RSpec.describe FaxRecordsController, type: :controller do
   
+      describe "export"do
+      it "should  export fax_record" do
+        expect(response.content_type) ==('application/xls')
+      end
+    end
+
+    describe "export"do
+      it "should  export fax_record" do
+        expect(response.content_type) ==('application/csv')
+      end
+    end
+
 	describe "GET #index" do
 		it "returns a 200 OK status" do
 			get :index
