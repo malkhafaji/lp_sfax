@@ -49,8 +49,11 @@
       SendFaxQueueId:    response_result["SendFaxQueueId"],
       send_confirm_date: response['date'])
       FileUtils.rm_rf Dir.glob("#{Rails.root}/tmp/fax_files/*")
-    sendback_initial_response_to_client(fax_record)
-
+      if fax_record.updated_by_initializer == true
+        p fax_record
+      else
+        sendback_initial_response_to_client(fax_record)
+      end
   end
 
 # Getting the File Name , the File Extension and validate the document type
