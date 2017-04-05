@@ -15,7 +15,7 @@ class Api::V1::FaxRecordsController < ApplicationController
       fax_record.client_receipt_date = Time.now
       fax_record.recipient_number = recipient_number
       fax_record.recipient_name = recipient_name
-      fax_record.file_path = file_path
+      fax_record.file_path = @original_file_name
       fax_record.save!
       actual_sending(recipient_name, recipient_number, file_path, fax_record.id, fax_record.update_attributes(updated_by_initializer: false))
     rescue Exception => e
