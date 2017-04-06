@@ -105,7 +105,7 @@ desc "check_fax_response "
             if array_of_jsons.blank?
               p ' No responses for faxes found '
             else
-              url = 'https://mc1-efax-u.discoveryhealthpartners.com/eFaxService/OutboundDispositionService.svc/receive'
+              url = 'https://dhp-efax-q.discoveryhealthpartners.com/eFaxService/OutboundDispositionService.svc/receive'
               @result = HTTParty.post(url,
               body: array_of_jsons.to_json,
               headers: { 'Content-Type' => 'application/json' } )
