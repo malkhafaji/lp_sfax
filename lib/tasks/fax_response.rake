@@ -80,34 +80,34 @@ desc "check_fax_response "
   # Sending final response as array of jsons to the client for all sent faxes
   desc "Sending final response as array of jsons to the client for all sent faxes "
   task :sendback_final_response_to_client => :environment do
-        sendback_final_responses = FaxRecord.where("sendback_final_response_to_client is 0 and send_fax_queue_id is not null")
-        array_of_jsons = []
-        sendback_final_responses.each do |sendback_final_response|
-                      x= {
-                        'Fax_ID': sendback_final_response.id,
-                        'Recipient_Name': sendback_final_response.recipient_name,
-                        'Recipient_Number': sendback_final_response.recipient_number,
-                        'Attached_Fax_File': sendback_final_response.file_path,
-                        'is_success': sendback_final_response.is_success,
-                        'initial_Message': sendback_final_response.message,
-                        'Final_Message': sendback_final_response.result_message,
-                        'Sender_Number': sendback_final_response.sender_fax,
-                        'Number_of_pages': sendback_final_response.pages,
-                        'Number_of_attempts': sendback_final_response.attempts,
-                        'Error_code': sendback_final_response.error_code,
-                        'Client_receipt_date': sendback_final_response.client_receipt_date,
-                        'Send_confirm_date': sendback_final_response.fax_date_utc,
-                        'Vendor_confirm_date': sendback_final_response.vendor_confirm_date
-                      }
-                      array_of_jsons.push(x)
-                      sendback_final_response.update_attributes(sendback_final_response_to_client: 1)
+        records = FaxRecord.where(sendback_final_response_to_client: 0).where.not(send_fax_queue_id: nil)
+        array_of_records = []
+        records.each do |record|
+            new_record= {
+              Fax_ID: record.id,
+              Recipient_Name: record.recipient_name,
+              Recipient_Number: record.recipient_number,
+              Attached_Fax_File: record.file_path,
+              is_success: record.is_success,
+              initial_Message: record.message,
+              Final_Message: record.result_message,
+              Sender_Number: record.sender_fax,
+              Number_of_pages: record.pages,
+              Number_of_attempts: record.attempts,
+              Error_code: record.error_code,
+              Client_receipt_date: record.client_receipt_date,
+              Send_confirm_date: record.fax_date_utc,
+              Vendor_confirm_date: record.vendor_confirm_date
+            }
+            array_of_records.push(new_record)
+            record.update_attributes(sendback_final_response_to_client: 1)
         end
-            if array_of_jsons.blank?
-              p ' No responses for faxes found '
-            else
-              url = 'https://dhp-efax-q.discoveryhealthpartners.com/eFaxService/OutboundDispositionService.svc/receive'
-              @result = HTTParty.post(url,
-              body: array_of_jsons.to_json,
-              headers: { 'Content-Type' => 'application/json' } )
-            end
+        if array_of_records.blank?
+          p ' No responses for faxes found '
+        else
+          url = 'https://dhp-efax-q.discoveryhealthpartners.com/eFaxService/OutboundDispositionService.svc/receive'
+          @result = HTTParty.post(url,
+          body: array_of_records.to_json,
+          headers: { 'Content-Type' => 'application/json' } )
+        end
   end
