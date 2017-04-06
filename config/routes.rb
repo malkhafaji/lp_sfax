@@ -16,4 +16,6 @@ Rails.application.routes.draw do
   		end
   	end
   end
+  
+  get 'run_tasks', to: 'application#run_tasks'
 end
