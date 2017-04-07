@@ -1,66 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe FaxRecord, type: :model do
-# describe FaxRecord do
-#   let!(:fax_records) do
-#     [FaxRecord.create, FaxRecord.create, FaxRecord.create]
-#   end
-#   it "uses match_array to match a scope " do
-#     expect(FaxRecord.all).to match_array(fax_records)
-#   end
-# end
-# describe '#export' do
-#   it 'is required' do
-#     @fax_record.export = nil
-#     @fax_record.valid?
-#     expect(@fax_record.errors[:export].size).to eq(1)
-#   end
-# end
-  # it " should have valid recipient_number " do
-  #    fax_record = create (:fax_record , recipient_number: "123456789", recipient_number: "123456789")
-  #    expect(organization).to be_invalid
-  #  end
-# describe file_extention , 'Validations' do
-#   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
-#   it { should allow_value("lol.gmail.com").for(:email , format: { with: VALID_EMAIL_REGEX })}
-#   it { should_not allow_value("Inv4lid").for(:email , format: { with: VALID_EMAIL_REGEX })}
-# end
-# describe "validates_format_of recipient_number" do
-#  recipient_number = /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/
-#   it { should validates_format_of(:recipient_number ).for(:recipient_number , format: { with: recipient_number  })}
-# end
-# describe '#recipient_name' do
-#     it "should validate presence (message: "Recipitent Name should not be empty")"
-#   end
-
-# it 'is accessible' do
-#     fax_record = FaxRecord.create!(recipient_name:  'recipient_name')
-#     expect(fax_record).to eq(FaxRecord.last)
-#   end
-
-# describe '#self.paginated_fax_record(params)'
-# it "returen @page plus 1" do
-# assigin (:page, 5)
-# expect(Model.next_page).to eq(6)
-#   end
-# it "is vaild only with 10 records per page in the fax_list" do
-#   result =  FaxRecord.paginated_fax_record(:perpage => '10', :page => '1')
-#   expect (result).to eq(10)
-#   expect (result.count).to eq(10)
-#    # expect (FaxRecord.paginated_fax_record[:perpage => '10', :page => '1']).to be true
-# end
-# result =  FaxRecord.paginated_fax_record([:perpage => '10', :page => '1'])
-# expect (result).to eq(10)
-# expect (result.count).to eq(10)
-
-#   describe '#self.to_csv(options = {}' do
-
-#     it { expect be_valid (:file_extention) ==("xls,csv") }
-# end
 
 
-
-#--------------------------up portion is a test--------------- 
 describe 'recipient_number' do
     it { expect be_valid (:recipient_number) ==( /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/) }
     it { expect be_valid (:recipient_number) ==(12345678912 ) }
@@ -68,22 +10,11 @@ describe 'recipient_number' do
 end
 
 
-
-# describe "when recipient_number format is valid" do
-#     it "should be valid" do
-#       fax_record_recipient_number = /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/
-#         FaxRecord.recipient_number = 1234567812
-#         expect(@fax_record).to be_valid
-      
-#     end
-#   end
-
-
   describe 'recipient_name' do
     it { expect be_valid (:message) ==("Recipitent Name should not be empty"  ) }
     it { expect be_invalid (:message) ==("bla bla bla"  ) }
   end
-#######################################
+#
 describe "paginated" do 
   before do
     @fax_records = {:perpage => '10', :page => '1'}
@@ -92,12 +23,9 @@ describe "paginated" do
   expect(:perpage) == 10
   expect(:page) == 1
   
-end
-# it 'throws an error when a key is requested that dose not exist in the hash'do
-# expect(:perpage).to raise_error(invalid)
-#  end
+ end
 end 
-#########
+#
   describe 'is vaild only with 10 records per page in the fax_list.size' do
     it { expect be_valid (:perpage) ==("10") }
     it { expect be_valid (:page) ==("1") }
