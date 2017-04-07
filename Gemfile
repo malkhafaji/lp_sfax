@@ -26,6 +26,7 @@ gem 'listen', '~> 3.0'
 group :development, :test do
   gem 'byebug', platform: :mri
   gem 'rspec-rails', '~> 3.5'
+  gem 'rails-controller-testing'
 end
 group :development, :test do
   gem 'rspec-rails', '~> 3.5'
