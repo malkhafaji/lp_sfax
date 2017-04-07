@@ -1,11 +1,6 @@
 require 'rails_helper'
 RSpec.describe FaxRecordsController  do
 
-
-# before(:all) do
-#  @fax_record_1 = FaxRecord.create(recipient_name: "recipient_name_1", recipient_number: "recipient_number_1", file_path: "file_path_1")
-# end
-
 	let (:fax_records) {FaxRecord.all}
 	describe 'Get index' do 
 it "assigns all fax_records to @fax_records" do 
