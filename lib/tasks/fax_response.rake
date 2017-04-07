@@ -11,13 +11,13 @@ def get_token
 end
 
 # Checking which fax sent and which not by the SendFaxQueueId and max_fax_response_check_tries, if not send it then send it
-desc "check_fax_response "
+desc 'check_fax_response'
 task :check_fax_response => :environment do
   fax_requests_queue_ids = FaxRecord.where("fax_date_utc is null and SendFaxQueueId is not null and (max_fax_response_check_tries is null OR max_fax_response_check_tries < #{MAX_FAX_RESPONSE_CHECK_TRIES})").pluck(:SendFaxQueueId)
   fax_requests_queue_ids.each do |fax_requests_queue_id|
     begin
       fax_response(fax_requests_queue_id)
-      p FaxRecord.find_by(:SendFaxQueueId => fax_requests_queue_id)
+      puts 'OK'
     rescue
       pp "error requesting status for fax #{fax_requests_queue_id}"
       fax_record = FaxRecord.find_by(SendFaxQueueId: fax_requests_queue_id)
@@ -30,9 +30,9 @@ end
 def  fax_response(fax_requests_queue_id)
   response = send_fax_status(fax_requests_queue_id)
   parse_response = response["RecipientFaxStatusItems"][0]
-  fax_record = FaxRecord.find_by(:SendFaxQueueId => fax_requests_queue_id)
+  fax_record = FaxRecord.find_by_SendFaxQueueId(fax_requests_queue_id)
 
-  FaxRecord.update_all(
+  fax_record.update_attributes(
   send_fax_queue_id:   parse_response['SendFaxQueueId'],
   is_success:          parse_response['IsSuccess'],
   result_code:         parse_response['ResultCode'],
