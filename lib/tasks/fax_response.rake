@@ -1,5 +1,5 @@
 require "./app/controllers/concerns/doxifer.rb"
-MAX_FAX_RESPONSE_CHECK_TRIES = 20
+MAX_FAX_RESPONSE_CHECK_TRIES = ENV['max_fax_response_check_tries']
 
 # getting token
 def get_token
@@ -33,25 +33,25 @@ def  fax_response(fax_requests_queue_id)
   fax_record = FaxRecord.find_by_SendFaxQueueId(fax_requests_queue_id)
 
   fax_record.update_attributes(
-  send_fax_queue_id:   parse_response['SendFaxQueueId'],
-  is_success:          parse_response['IsSuccess'],
-  result_code:         parse_response['ResultCode'],
-  error_code:          parse_response['ErrorCode'],
-  result_message:      parse_response['ResultMessage'],
-  recipient_name:      parse_response['RecipientName'],
-  recipient_fax:       parse_response['RecipientFax'],
-  tracking_code:       parse_response['TrackingCode'],
-  fax_date_utc:        parse_response['FaxDateUtc'],
-  fax_id:              parse_response['FaxId'],
-  pages:               parse_response['Pages'],
-  attempts:            parse_response['Attempts'],
-  sender_fax:          parse_response['SenderFax'],
-  barcode_items:       parse_response['BarcodeItems'],
-  fax_success:         parse_response['FaxSuccess'],
-  out_bound_fax_id:    parse_response['OutBoundFaxId'],
-  fax_pages:           parse_response['FaxPages'],
-  fax_date_iso:        parse_response['FaxDateIso'],
-  watermark_id:        parse_response['WatermarkId'],
+    send_fax_queue_id:   parse_response['SendFaxQueueId'],
+    is_success:          parse_response['IsSuccess'],
+    result_code:         parse_response['ResultCode'],
+    error_code:          parse_response['ErrorCode'],
+    result_message:      parse_response['ResultMessage'],
+    recipient_name:      parse_response['RecipientName'],
+    recipient_fax:       parse_response['RecipientFax'],
+    tracking_code:       parse_response['TrackingCode'],
+    fax_date_utc:        parse_response['FaxDateUtc'],
+    fax_id:              parse_response['FaxId'],
+    pages:               parse_response['Pages'],
+    attempts:            parse_response['Attempts'],
+    sender_fax:          parse_response['SenderFax'],
+    barcode_items:       parse_response['BarcodeItems'],
+    fax_success:         parse_response['FaxSuccess'],
+    out_bound_fax_id:    parse_response['OutBoundFaxId'],
+    fax_pages:           parse_response['FaxPages'],
+    fax_date_iso:        parse_response['FaxDateIso'],
+    watermark_id:        parse_response['WatermarkId'],
   message:             response["message"])
   fax_record.save!
 end
@@ -65,8 +65,8 @@ def send_fax_status(fax_requests_queue_id)
   end
   token = get_token()
   parts = ["sendfaxstatus?",
-  "token=#{CGI.escape(token)}",
-  "ApiKey=#{CGI.escape(APIKEY)}",
+    "token=#{CGI.escape(token)}",
+    "ApiKey=#{CGI.escape(APIKEY)}",
   "SendFaxQueueId=#{(fax_requests_queue_id)}"]
   path = "/api/"+parts.join("&")
 
@@ -77,36 +77,36 @@ def send_fax_status(fax_requests_queue_id)
 end
 
 
-  # Sending final response as array of jsons to the client for all sent faxes
+# Sending final response as array of jsons to the client for all sent faxes
 desc "Sending final response as array of jsons to the client for all sent faxes "
 task :sendback_final_response_to_client => :environment do
   records = FaxRecord.where(sendback_final_response_to_client: 0).where.not(send_fax_queue_id: nil)
   array_of_records = []
   records.each do |record|
-      new_record= {
-        Fax_ID: record.id,
-        Recipient_Name: record.recipient_name,
-        Recipient_Number: record.recipient_number,
-        Attached_Fax_File: record.file_path,
-        is_success: record.is_success,
-        initial_Message: record.message,
-        Final_Message: record.result_message,
-        Sender_Number: record.sender_fax,
-        Number_of_pages: record.pages,
-        Number_of_attempts: record.attempts,
-        Error_code: record.error_code,
-        Client_receipt_date: record.client_receipt_date,
-        Send_confirm_date: record.fax_date_utc,
-        Vendor_confirm_date: record.vendor_confirm_date
-      }
-      array_of_records.push(new_record)
+    new_record= {
+      Fax_ID: record.id,
+      Recipient_Name: record.recipient_name,
+      Recipient_Number: record.recipient_number,
+      Attached_Fax_File: record.file_path,
+      is_success: record.is_success,
+      initial_Message: record.message,
+      Final_Message: record.result_message,
+      Sender_Number: record.sender_fax,
+      Number_of_pages: record.pages,
+      Number_of_attempts: record.attempts,
+      Error_code: record.error_code,
+      Client_receipt_date: record.client_receipt_date,
+      Send_confirm_date: record.fax_date_utc,
+      Vendor_confirm_date: record.vendor_confirm_date
+    }
+    array_of_records.push(new_record)
   end
   if array_of_records.blank?
     puts ' No responses for faxes found '
   else
-    url = 'https://dhp-efax-q.discoveryhealthpartners.com/eFaxService/OutboundDispositionService.svc/receive'
+    url = ENV['client_url']
     response = HTTParty.post(url,
-    body: array_of_records.to_json,
+      body: array_of_records.to_json,
     headers: { 'Content-Type' => 'application/json' } )
   end
   unless response.nil?
