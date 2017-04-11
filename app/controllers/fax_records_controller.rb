@@ -18,7 +18,7 @@ class FaxRecordsController < ApplicationController
     @search_value = params[:search_value]
     filter_fax_records = FaxRecord.filtered_fax_records(@search_value)
     session[:search_value] = @search_value
-
+    
     if @search_value && @search_value.empty?
       flash.now.alert = "Search value should not be empty !"
       @fax_records = FaxRecord.all
@@ -27,7 +27,7 @@ class FaxRecordsController < ApplicationController
       @fax_records = FaxRecord.all
     else
       if !filter_fax_records.present?
-        @fax_records = FaxRecord.all
+        @fax_records = FaxRecord.desc
       else
         @fax_records = filter_fax_records
       end

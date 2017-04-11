@@ -4,6 +4,7 @@
       <%= render 'form'%>
     </span>
   </div>
+      
   <table class="table table-striped table-bordered table-condensed table-responsive", id= 'fax_record' >
     <thead id="fax_record_thead">
       <tr>
@@ -12,16 +13,17 @@
         <th class='text-center'> Recipient number</div></th>
         <th class='text-center'> File path</th>
         <th class='text-center'> Confirmation Message</th>
-        <th class='text-center'> Send message</th>
+        <th class='text-center'> Send Message</th>
         <th class='text-center'> Attempts</th>
         <th class='text-center'> Pages</th>
-        <th class='text-center'> Sender fax</div></th>
-        <th class='text-center'> Client receipt date</div></th>
-        <th class='text-center'> Vendor confirm date</div></th>
-        <th class='text-center'> Send confirm date</div></th>
+        <th class='text-center'> Sender Fax</div></th>
+        <th class='text-center'> Request Initiated <div></th> 
+        <th class='text-center'> Request Sent to Vendor</div></th>
+        <th class='text-center'> Vendor Confirmation</div></th>
+        <th class='text-center'> Fax Sent Date</div></th>
       </tr>
     </thead>
-
+     
     <tbody>
       <% @fax_records.each do |fax_record| %>
         <tr>
@@ -34,9 +36,10 @@
           <td><%= fax_record.attempts %></td>
           <td><%= fax_record.pages %></td>
           <td><%= fax_record.sender_fax %></td>
-          <td><%= fax_record.client_receipt_date.strftime("%I:%M:%S %p %m/%d/%Y")%></td>  
+          <td><%= fax_record.created_at.strftime("%I:%M:%S %p %m/%d/%Y") %></td>
+          <td><%= fax_record.client_receipt_date.strftime("%I:%M:%S %p %m/%d/%Y")%></td>
+          <td><%= fax_record.send_confirm_date.strftime("%I:%M:%S %p %m/%d/%Y") if fax_record.send_confirm_date?%></td>  
           <td><%= fax_record.vendor_confirm_date %></td>
-          <td><%= fax_record.send_confirm_date.strftime("%I:%M:%S %p %m/%d/%Y") if fax_record.send_confirm_date?%></td>
         </tr>
       <% end %>
     </tbody>

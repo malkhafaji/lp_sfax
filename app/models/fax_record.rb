@@ -2,7 +2,9 @@ class FaxRecord < ApplicationRecord
 
   validates_format_of :recipient_number, with: /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/
   validates_presence_of :recipient_name, message: "Recipitent Name should not be empty"
-  
+  scope :desc,-> {order('fax_records.updated_at DESC')}
+
+
 
   def number_to_fax 
     fax_number = recipient_number
