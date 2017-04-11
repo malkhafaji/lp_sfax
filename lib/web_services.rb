@@ -1,6 +1,6 @@
 module  WebServices
   def aws_response(file_id,checksum)
-    url="http://54.236.45.31/api/v1/documents/#{file_id}?checksum=#{checksum}"
+    url="#{ENV['file_service_path']}/api/v1/documents/#{file_id}?checksum=#{checksum}"
     response = HTTParty.get(url)
     responsebody = JSON.parse(response.body)
     return responsebody
