@@ -37,7 +37,6 @@ def  fax_response(fax_requests_queue_id)
     is_success:          parse_response['IsSuccess'],
     result_code:         parse_response['ResultCode'],
     error_code:          parse_response['ErrorCode'],
-    result_message:      parse_response['ResultMessage'],
     recipient_name:      parse_response['RecipientName'],
     recipient_fax:       parse_response['RecipientFax'],
     tracking_code:       parse_response['TrackingCode'],
@@ -52,7 +51,12 @@ def  fax_response(fax_requests_queue_id)
     fax_pages:           parse_response['FaxPages'],
     fax_date_iso:        parse_response['FaxDateIso'],
     watermark_id:        parse_response['WatermarkId'],
-  message:             response["message"])
+    message:             response["message"])
+    if parse_response['ResultCode'] == 0
+      fax_record.result_message = 'Success'
+    else
+      fax_record.result_message = parse_response['ResultMessage']
+    end
   fax_record.save!
 end
 
@@ -97,7 +101,8 @@ task :sendback_final_response_to_client => :environment do
       Error_code: record.error_code,
       Client_receipt_date: record.client_receipt_date,
       Send_confirm_date: record.fax_date_utc,
-      Vendor_confirm_date: record.vendor_confirm_date
+      Vendor_confirm_date: record.vendor_confirm_date,
+      ResultCode: record.result_code
     }
     array_of_records.push(new_record)
   end
