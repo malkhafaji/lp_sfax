@@ -31,35 +31,42 @@ def  fax_response(fax_requests_queue_id)
   response = send_fax_status(fax_requests_queue_id)
   parse_response = response["RecipientFaxStatusItems"][0]
   fax_record = FaxRecord.find_by_SendFaxQueueId(fax_requests_queue_id)
-
+  if parse_response['ResultCode'] == 0
+    fax_duration = calculate_duration(fax_record.client_receipt_date, parse_response['FaxDateUtc'])
+    result_message = 'Success'
+  else
+    result_message = parse_response['ResultMessage']
+    fax_duration = 0.0
+  end
   fax_record.update_attributes(
-    send_fax_queue_id:   parse_response['SendFaxQueueId'],
-    is_success:          parse_response['IsSuccess'],
-    result_code:         parse_response['ResultCode'],
-    error_code:          parse_response['ErrorCode'],
-    recipient_name:      parse_response['RecipientName'],
-    recipient_fax:       parse_response['RecipientFax'],
-    tracking_code:       parse_response['TrackingCode'],
-    fax_date_utc:        parse_response['FaxDateUtc'],
-    fax_id:              parse_response['FaxId'],
-    pages:               parse_response['Pages'],
-    attempts:            parse_response['Attempts'],
-    sender_fax:          parse_response['SenderFax'],
-    barcode_items:       parse_response['BarcodeItems'],
-    fax_success:         parse_response['FaxSuccess'],
-    out_bound_fax_id:    parse_response['OutBoundFaxId'],
-    fax_pages:           parse_response['FaxPages'],
-    fax_date_iso:        parse_response['FaxDateIso'],
-    watermark_id:        parse_response['WatermarkId'],
-    message:             response["message"])
-    if parse_response['ResultCode'] == 0
-      fax_record.result_message = 'Success'
-    else
-      fax_record.result_message = parse_response['ResultMessage']
-    end
-  fax_record.save!
+      send_fax_queue_id:   parse_response['SendFaxQueueId'],
+      is_success:          parse_response['IsSuccess'],
+      result_code:         parse_response['ResultCode'],
+      error_code:          parse_response['ErrorCode'],
+      recipient_name:      parse_response['RecipientName'],
+      recipient_fax:       parse_response['RecipientFax'],
+      tracking_code:       parse_response['TrackingCode'],
+      fax_date_utc:        parse_response['FaxDateUtc'],
+      fax_id:              parse_response['FaxId'],
+      pages:               parse_response['Pages'],
+      attempts:            parse_response['Attempts'],
+      sender_fax:          parse_response['SenderFax'],
+      barcode_items:       parse_response['BarcodeItems'],
+      fax_success:         parse_response['FaxSuccess'],
+      out_bound_fax_id:    parse_response['OutBoundFaxId'],
+      fax_pages:           parse_response['FaxPages'],
+      fax_date_iso:        parse_response['FaxDateIso'],
+      watermark_id:        parse_response['WatermarkId'],
+      message:             response["message"],
+      fax_duration:        fax_duration,
+      result_message:      result_message)
 end
 
+def calculate_duration(t1,t2)
+  new_t2 = (DateTime.strptime(t2, '%Y-%m-%dT%H:%M:%S%z')).to_i
+  new_t1 = t1.to_i
+  return ((new_t2 - new_t1) / 60.0).round(2)
+end
 # Sending the Fax_Queue_Id to get the status
 def send_fax_status(fax_requests_queue_id)
   conn = Faraday.new(:url => FAX_SERVER_URL, :ssl => { :ca_file => 'C:/Ruby200/cacert.pem' }  ) do |faraday|
@@ -102,7 +109,8 @@ task :sendback_final_response_to_client => :environment do
       Client_receipt_date: record.client_receipt_date,
       Send_confirm_date: record.fax_date_utc,
       Vendor_confirm_date: record.vendor_confirm_date,
-      ResultCode: record.result_code
+      ResultCode: record.result_code,
+      fax_duration: record.fax_duration
     }
     array_of_records.push(new_record)
   end
@@ -112,7 +120,7 @@ task :sendback_final_response_to_client => :environment do
     url = ENV['client_url']
     response = HTTParty.post(url,
       body: array_of_records.to_json,
-    headers: { 'Content-Type' => 'application/json' } )
+      headers: { 'Content-Type' => 'application/json' } )
   end
   unless response.nil?
     result = JSON.parse(response)
