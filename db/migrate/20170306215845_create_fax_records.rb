@@ -32,6 +32,7 @@ class CreateFaxRecords < ActiveRecord::Migration[5.0]
       t.datetime :client_receipt_date
       t.datetime :send_confirm_date
       t.date :fax_date_iso
+      t.decimal :fax_duration
 
       t.timestamps
     end
