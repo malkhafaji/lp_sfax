@@ -91,42 +91,43 @@ end
 # Sending final response as array of jsons to the client for all sent faxes
 desc "Sending final response as array of jsons to the client for all sent faxes "
 task :sendback_final_response_to_client => :environment do
-  records = FaxRecord.where(sendback_final_response_to_client: 0).where.not(send_fax_queue_id: nil)
-  array_of_records = []
-  records.each do |record|
-    new_record= {
-      Fax_ID: record.id,
-      Recipient_Name: record.recipient_name,
-      Recipient_Number: record.recipient_number,
-      Attached_Fax_File: record.file_path,
-      is_success: record.is_success,
-      initial_Message: record.message,
-      Final_Message: record.result_message,
-      Sender_Number: record.sender_fax,
-      Number_of_pages: record.pages,
-      Number_of_attempts: record.attempts,
-      Error_code: record.error_code,
-      Client_receipt_date: record.client_receipt_date,
-      Send_confirm_date: record.fax_date_utc,
-      Vendor_confirm_date: record.vendor_confirm_date,
-      ResultCode: record.result_code,
-      fax_duration: record.fax_duration
-    }
-    array_of_records.push(new_record)
-  end
-  if array_of_records.blank?
-    puts ' No responses for faxes found '
-  else
-    url = ENV['client_url']
-    response = HTTParty.post(url,
-      body: array_of_records.to_json,
-      headers: { 'Content-Type' => 'application/json' } )
-  end
-  unless response.nil?
-    result = JSON.parse(response)
-    result.each do |r|
-      if r['Message'] == 'Success'
-        FaxRecord.find(r['Fax_Id']).update_attributes(sendback_final_response_to_client: 1)
+  records_groups = FaxRecord.where(sendback_final_response_to_client: 0).where.not(send_fax_queue_id: nil).group_by(&:callback_url)
+  records_groups.each do |url, records|
+    array_of_records = []
+    records.each do |record|
+      new_record= {
+        Fax_ID: record.id,
+        Recipient_Name: record.recipient_name,
+        Recipient_Number: record.recipient_number,
+        Attached_Fax_File: record.file_path,
+        is_success: record.is_success,
+        initial_Message: record.message,
+        Final_Message: record.result_message,
+        Sender_Number: record.sender_fax,
+        Number_of_pages: record.pages,
+        Number_of_attempts: record.attempts,
+        Error_code: record.error_code,
+        Client_receipt_date: record.client_receipt_date,
+        Send_confirm_date: record.fax_date_utc,
+        Vendor_confirm_date: record.vendor_confirm_date,
+        ResultCode: record.result_code,
+        fax_duration: record.fax_duration
+      }
+      array_of_records.push(new_record)
+    end
+    if array_of_records.blank?
+      puts ' No responses for faxes found '
+    else
+      response = HTTParty.post(url,
+        body: array_of_records.to_json,
+        headers: { 'Content-Type' => 'application/json' } )
+    end
+    unless response.nil?
+      result = JSON.parse(response)
+      result.each do |r|
+        if r['Message'] == 'Success'
+          FaxRecord.find(r['Fax_Id']).update_attributes(sendback_final_response_to_client: 1)
+        end
       end
     end
   end

@@ -1,17 +1,16 @@
 class FaxRecord < ApplicationRecord
 
   validates_format_of :recipient_number, with: /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/
-  validates_presence_of :recipient_name, message: "Recipitent Name should not be empty"
-  validates_presence_of :callback_url
+  validates_presence_of :recipient_name, :callback_url
   scope :desc,-> {order('fax_records.updated_at DESC')}
 
 
 
-  def number_to_fax 
+  def number_to_fax
     fax_number = recipient_number
     fax_number.insert(1,'-').insert(5,'-').insert(9,'-')
   end
-  
+
   def self.filtered_fax_records(search_value)
     FaxRecord.where(["recipient_name LIKE ? or recipient_number LIKE ?",
     (search_value),(search_value)])

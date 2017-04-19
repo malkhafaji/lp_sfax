@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170306215845) do
+ActiveRecord::Schema.define(version: 20170419145717) do
 
   create_table "fax_records", force: :cascade do |t|
     t.string   "recipient_name"
@@ -46,6 +46,7 @@ ActiveRecord::Schema.define(version: 20170306215845) do
     t.decimal  "fax_duration"
     t.datetime "created_at",                                    null: false
     t.datetime "updated_at",                                    null: false
+    t.string   "callback_url"
   end
 
 end
