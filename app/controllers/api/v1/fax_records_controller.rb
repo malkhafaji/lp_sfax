@@ -10,12 +10,14 @@ class Api::V1::FaxRecordsController < ApplicationController
       recipient_name = params['recipient_name']
       recipient_number = params['recipient_number']
       checksum = params['checksum']
+      callback_url = params['FaxDispositionURL']
       file_path = file_path(params['file_id'],checksum)
       fax_record =FaxRecord.new
       fax_record.client_receipt_date = Time.now
       fax_record.recipient_number = recipient_number
       fax_record.recipient_name = recipient_name
       fax_record.file_path = @original_file_name
+      fax_record.callback_url = callback_url
       fax_record.save!
       actual_sending(recipient_name, recipient_number, file_path, fax_record.id, fax_record.update_attributes(updated_by_initializer: false))
     rescue Exception => e
