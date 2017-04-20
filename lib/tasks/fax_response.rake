@@ -32,7 +32,7 @@ def  fax_response(fax_requests_queue_id)
   parse_response = response["RecipientFaxStatusItems"][0]
   fax_record = FaxRecord.find_by_SendFaxQueueId(fax_requests_queue_id)
   if parse_response['ResultCode'] == 0
-    fax_duration = calculate_duration(fax_record.client_receipt_date, parse_response['FaxDateUtc'])
+    fax_duration = calculate_duration(fax_record.client_receipt_date, (Time.parse(parse_response['FaxDateUtc'])))
     result_message = 'Success'
   else
     result_message = parse_response['ResultMessage']
@@ -41,7 +41,6 @@ def  fax_response(fax_requests_queue_id)
   fax_record.update_attributes(
       send_fax_queue_id:   parse_response['SendFaxQueueId'],
       is_success:          parse_response['IsSuccess'],
-      result_code:         parse_response['ResultCode'],
       error_code:          parse_response['ErrorCode'],
       recipient_name:      parse_response['RecipientName'],
       recipient_fax:       parse_response['RecipientFax'],
@@ -58,14 +57,13 @@ def  fax_response(fax_requests_queue_id)
       fax_date_iso:        parse_response['FaxDateIso'],
       watermark_id:        parse_response['WatermarkId'],
       message:             response["message"],
-      fax_duration:        fax_duration,
-      result_message:      result_message)
+      result_message:      result_message,
+      fax_duration:        fax_duration
+      )
 end
 
 def calculate_duration(t1,t2)
-  new_t2 = (DateTime.strptime(t2, '%Y-%m-%dT%H:%M:%S%z')).to_i
-  new_t1 = t1.to_i
-  return ((new_t2 - new_t1) / 60.0).round(2)
+  return ((t2 - t1) / 60.0).round(2)
 end
 # Sending the Fax_Queue_Id to get the status
 def send_fax_status(fax_requests_queue_id)
