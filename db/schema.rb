@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170419145717) do
+ActiveRecord::Schema.define(version: 20170420170826) do
 
   create_table "fax_records", force: :cascade do |t|
     t.string   "recipient_name"
@@ -38,11 +38,11 @@ ActiveRecord::Schema.define(version: 20170419145717) do
     t.integer  "fax_pages"
     t.boolean  "updated_by_initializer"
     t.integer  "sendback_final_response_to_client", default: 0
-    t.date     "fax_date_utc"
+    t.datetime "fax_date_utc"
     t.datetime "vendor_confirm_date"
     t.datetime "client_receipt_date"
     t.datetime "send_confirm_date"
-    t.date     "fax_date_iso"
+    t.datetime "fax_date_iso"
     t.decimal  "fax_duration"
     t.datetime "created_at",                                    null: false
     t.datetime "updated_at",                                    null: false
