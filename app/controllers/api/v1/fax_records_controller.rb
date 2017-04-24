@@ -11,6 +11,7 @@ class Api::V1::FaxRecordsController < ApplicationController
       recipient_number = params['recipient_number']
       callback_url = params['FaxDispositionURL']
       attachments = []
+      @original_file_name = ''
       params[:attachments].each_with_index do |file_info|
         attachments << file_path(file_info[1]['file_id'],file_info[1]['checksum'])
       end
