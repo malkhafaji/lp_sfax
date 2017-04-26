@@ -21,7 +21,7 @@ def get_token
 end
 
 # sending the fax with the parameters fax_number,recipient_name ,attached file_path,fax_id and define either its sent by user call or by initializer call
-def actual_sending(recipient_name, recipient_number, file_path, fax_id, updated_by_initializer)
+def actual_sending(recipient_name, recipient_number, attachments, fax_id, updated_by_initializer)
   tid = nil
   conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
     faraday.request :multipart
@@ -39,7 +39,9 @@ def actual_sending(recipient_name, recipient_number, file_path, fax_id, updated_
   path = "/api/" + parts.join("&")
   response = conn.post path do |req|
     req.body = {}
-    req.body['file_name'] = Faraday::UploadIO.new("#{file_path}", file_specification(file_path)[0], file_specification(file_path)[1])
+    attachments.each_with_index do |file, i|
+      req.body["file_name#{i}"] = Faraday::UploadIO.new("#{file}", file_specification(file)[0], file_specification(file)[1])
+    end
   end
   response_result = JSON.parse(response.body)
   fax_record = FaxRecord.find_by(id: fax_id)
