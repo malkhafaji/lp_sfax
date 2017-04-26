@@ -11,8 +11,8 @@ module  WebServices
     @original_file_name += "#{res_json["original_file_name"]}; "
     file_url = res_json["file"]["url"]
     file_name = File.basename(file_url)
-    system("curl #{file_url} -o #{Rails.root}/tmp/fax_files/#{file_name}")
-    "#{Rails.root}/tmp/fax_files/#{file_name}"
+    system("wget #{file_url} -P #{Rails.root}/tmp/fax_files/")
+    return "#{Rails.root}/tmp/fax_files/#{file_name}"
   end
 
 end
