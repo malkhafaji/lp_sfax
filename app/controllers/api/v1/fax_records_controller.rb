@@ -33,7 +33,7 @@ class Api::V1::FaxRecordsController < ApplicationController
   def params_to_array(string)
     array_of_files_id_and_checksum = []
     j,u = 0,0
-    parsed_string= string.split(/[\s,;=]/)
+    parsed_string= string.split(/[\s,+=]/)
     parsed_string.each do |i|
       j = j+1
         if j % 2 == 0
