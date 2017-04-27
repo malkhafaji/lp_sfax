@@ -57,6 +57,7 @@ def  fax_response(fax_requests_queue_id)
       fax_date_iso:        parse_response['FaxDateIso'],
       watermark_id:        parse_response['WatermarkId'],
       message:             response["message"],
+      result_code:         parse_response['ResultCode'],
       result_message:      result_message,
       fax_duration:        fax_duration
       )
