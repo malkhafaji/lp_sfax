@@ -121,7 +121,7 @@ task :sendback_final_response_to_client => :environment do
         body: array_of_records.to_json,
         headers: { 'Content-Type' => 'application/json' } )
     end
-    unless response.nil?
+    unless response.nil? || response.code != 200
       result = JSON.parse(response)
       result.each do |r|
         if r['Message'] == 'Success'
