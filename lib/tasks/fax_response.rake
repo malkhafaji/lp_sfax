@@ -117,17 +117,22 @@ task :sendback_final_response_to_client => :environment do
     if array_of_records.blank?
       puts ' No responses for faxes found '
     else
-      response = HTTParty.post(url,
-        body: array_of_records.to_json,
-        headers: { 'Content-Type' => 'application/json' } )
-    end
-    unless response.nil? || response.code != 200
-      result = JSON.parse(response)
-      result.each do |r|
-        if r['Message'] == 'Success'
-          FaxRecord.find(r['Fax_Id']).update_attributes(sendback_final_response_to_client: 1)
+      begin
+        response = HTTParty.post(url,
+          body: array_of_records.to_json,
+          headers: { 'Content-Type' => 'application/json' } )
+        unless response.nil? || response.code != 200
+          result = JSON.parse(response)
+          result.each do |r|
+            if r['Message'] == 'Success'
+              FaxRecord.find(r['Fax_Id']).update_attributes(sendback_final_response_to_client: 1)
+            end
+          end
         end
-      end
+      rescue Exception => e
+        render json: e.message.inspect
+      end    
     end
+
   end
 end
