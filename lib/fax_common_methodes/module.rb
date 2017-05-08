@@ -70,6 +70,28 @@ def file_specification(file_path)
     return "application/DOCX", file_name
   elsif file_extension == ".tif"
     return "application/TIF", file_name
+  elsif file_extension == ".png"
+    return "application/PNG", file_name
+  elsif file_extension == ".xls"
+    return "application/XLS", file_name
+  elsif file_extension == ".rtf"
+    return "application/RTF", file_name
+  elsif file_extension == ".xlsx"
+    return "application/XLSX", file_name
+  elsif file_extension == ".ppt"
+    return "application/PPT", file_name
+  elsif file_extension == ".odt"
+    return "application/ODT", file_name
+  elsif file_extension == ".ods"
+    return "application/ODS", file_name
+  elsif file_extension == ".odp"
+    return "application/ODP", file_name
+  elsif file_extension == ".bmp"
+    return "application/BMP", file_name
+  elsif file_extension == ".gif"
+    return "application/GIF", file_name
+  elsif file_extension == ".jpg"
+    return "application/JPG", file_name
   else
     return false
   end
