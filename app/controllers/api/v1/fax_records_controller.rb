@@ -7,6 +7,9 @@ class Api::V1::FaxRecordsController < ApplicationController
   # Taking the fax_number,recipient_name and the attached file path and call the actual sending method to send the fax (made by the client)
   def send_fax
     begin
+      Rails.logger.debug "******* request for new fax **********************"
+      Rails.logger.debug params.inspect
+      Rails.logger.debug "**************************************************"
       recipient_name = params['recipient_name']
       recipient_number = params['recipient_number']
       callback_url = params['FaxDispositionURL']

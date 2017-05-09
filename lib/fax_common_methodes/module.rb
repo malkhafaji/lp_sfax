@@ -52,6 +52,10 @@ def actual_sending(recipient_name, recipient_number, attachments, fax_id, update
     send_confirm_date: response['date'])
   FileUtils.rm_rf Dir.glob("#{Rails.root}/tmp/fax_files/*")
 
+  Rails.logger.debug "******* initial response **********************"
+  Rails.logger.debug fax_record.inspect
+  Rails.logger.debug "***********************************************"
+
   sendback_initial_response_to_client(fax_record)
 
 end
@@ -71,7 +75,7 @@ end
 # search and find all faxes without Queue_id (not sent yet) and send them by call from the initializer (when the server start)
 def sending_faxes_without_queue_id
   begin
-    faxes_without_queue_id = FaxRecord.where("SendFaxQueueId is null")
+    faxes_without_queue_id = FaxRecord.where(send_fax_queue_id: nil)
     faxes_without_queue_id.each do |fax_without_queue_id|
       begin
         actual_sending(fax_without_queue_id.recipient_name, fax_without_queue_id.recipient_number, fax_without_queue_id.file_path,fax_without_queue_id.id, fax_without_queue_id.update_attributes( updated_by_initializer:  true))
