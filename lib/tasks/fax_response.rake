@@ -13,14 +13,15 @@ end
 # Checking which fax sent and which not by the SendFaxQueueId and max_fax_response_check_tries, if not send it then send it
 desc 'check_fax_response'
 task :check_fax_response => :environment do
-  fax_requests_queue_ids = FaxRecord.where("fax_date_utc is null and SendFaxQueueId is not null and (max_fax_response_check_tries is null OR max_fax_response_check_tries < #{MAX_FAX_RESPONSE_CHECK_TRIES})").pluck(:SendFaxQueueId)
+  fax_requests_queue_ids = FaxRecord.where("fax_date_utc is null and send_fax_queue_id is not null and (max_fax_response_check_tries is null OR max_fax_response_check_tries < #{MAX_FAX_RESPONSE_CHECK_TRIES})").pluck(:send_fax_queue_id)
   fax_requests_queue_ids.each do |fax_requests_queue_id|
     begin
       fax_response(fax_requests_queue_id)
-      puts 'OK'
-    rescue
-      pp "error requesting status for fax #{fax_requests_queue_id}"
-      fax_record = FaxRecord.find_by(SendFaxQueueId: fax_requests_queue_id)
+    rescue Exception => e
+      Rails.logger.debug "******* final response error **********************"
+      Rails.logger.debug e.message.inspect
+      Rails.logger.debug "*********************************************"
+      fax_record = FaxRecord.find_by(send_fax_queue_id: fax_requests_queue_id)
       fax_record.update_attributes(max_fax_response_check_tries: fax_record.max_fax_response_check_tries.to_i + 1)
     end
   end
@@ -30,7 +31,10 @@ end
 def  fax_response(fax_requests_queue_id)
   response = send_fax_status(fax_requests_queue_id)
   parse_response = response["RecipientFaxStatusItems"][0]
-  fax_record = FaxRecord.find_by_SendFaxQueueId(fax_requests_queue_id)
+  Rails.logger.debug "******* final response **********************"
+  Rails.logger.debug parse_response
+  Rails.logger.debug "*********************************************"
+  fax_record = FaxRecord.find_by_send_fax_queue_id(fax_requests_queue_id)
   if parse_response['ResultCode'] == 0
     fax_duration = calculate_duration(fax_record.client_receipt_date, (Time.parse(parse_response['FaxDateUtc'])))
     result_message = 'Success'
@@ -70,7 +74,7 @@ end
 def send_fax_status(fax_requests_queue_id)
   conn = Faraday.new(:url => FAX_SERVER_URL, :ssl => { :ca_file => 'C:/Ruby200/cacert.pem' }  ) do |faraday|
     faraday.request  :url_encoded
-    # faraday.response :logger
+    faraday.response :logger
     faraday.adapter Faraday.default_adapter
   end
   token = get_token()
@@ -131,7 +135,7 @@ task :sendback_final_response_to_client => :environment do
         end
       rescue Exception => e
         render json: e.message.inspect
-      end    
+      end
     end
 
   end
