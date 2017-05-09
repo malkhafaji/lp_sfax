@@ -1,0 +1,22 @@
+%table{:border => "1"}
+  %tr
+    %th Recipient name
+    %th Recipient number
+    %th File path
+    %th Client receipt date
+    %th Status
+    %th Message
+    %th Send confirm date
+    %th Vendor confirm date
+  - fax_records_id = session[:fax_records_ids]
+  - fax_records= FaxRecord.where(id: fax_records_id)
+  - fax_records.each do |fax_record|
+    %tr
+      %td= fax_record['recipient_name']
+      %td= fax_record['recipient_number']
+      %td= fax_record['file_path']
+      %td= fax_record['client_receipt_date']
+      %td= fax_record['status']
+      %td= fax_record['message']
+      %td= fax_record['send_confirm_date']
+      %td= fax_record['vendor_confirm_date']

@@ -15,10 +15,11 @@ class FaxRecordsController < ApplicationController
 
   # Render Index page with all fax records OR the records results from filter (filtered_fax_records) with pagenation
   def index
+    @zone = ActiveSupport::TimeZone.new("Central Time (US & Canada)")
     @search_value = params[:search_value]
     filter_fax_records = FaxRecord.filtered_fax_records(@search_value)
     session[:search_value] = @search_value
-    
+
     if @search_value && @search_value.empty?
       flash.now.alert = "Search value should not be empty !"
       @fax_records = FaxRecord.all
@@ -33,7 +34,7 @@ class FaxRecordsController < ApplicationController
       end
     end
 
-    @per_page = 10
+    @per_page = 2
     @current_page = (params[:page].present? ? params[:page] : '1').to_i
     @total_record, @fax_records, @total_pages = FaxRecord.paginated_fax_record(page: @current_page, per_page:  @per_page, fax_list: @fax_records)
     respond_to do |format|
