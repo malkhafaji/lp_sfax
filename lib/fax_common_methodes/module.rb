@@ -49,7 +49,7 @@ def actual_sending(recipient_name, recipient_number, attachments, fax_id, update
     status:            response_result["isSuccess"],
     message:           response_result["message"],
     send_fax_queue_id:    response_result["SendFaxQueueId"],
-    send_confirm_date: response['date'])
+  send_confirm_date: response['date'])
   FileUtils.rm_rf Dir.glob("#{Rails.root}/tmp/fax_files/*")
 
   Rails.logger.debug "******* initial response **********************"
@@ -65,11 +65,11 @@ def file_specification(file_path)
   file_name = File.basename ("#{file_path}").downcase
   file_extension = File.extname (file_name).downcase
   accepted_extensions = [".tif",".xls",".doc",".pdf",".docx",".txt",".rtf",".xlsx",".ppt",".odt",".ods",".odp",".bmp",".gif",".jpg",".png"]
-   if accepted_extensions.include?(file_extension)
-     return "application/#{file_extension}", file_name
-   else
+  if accepted_extensions.include?(file_extension)
+    return "application/#{file_extension}", file_name
+  else
     return false
-   end
+  end
 end
 
 # search and find all faxes without Queue_id (not sent yet) and send them by call from the initializer (when the server start)
@@ -99,11 +99,13 @@ def sendback_initial_response_to_client(fax_record)
     status: fax_record.status,
     result_message: fax_record.result_message,
   client_receipt_date: fax_record.client_receipt_date}
-  #we should put here the client URL to send the json
 
   if fax_record.updated_by_initializer == true
+    p client_initial_response
+  elsif fax_record.record_completed == false
     p client_initial_response
   else
     render json: client_initial_response
   end
+
 end
