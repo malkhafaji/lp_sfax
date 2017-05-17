@@ -136,13 +136,14 @@ task :sendback_final_response_to_client => :environment do
     if array_of_records.blank?
       Rails.logger.debug '==> sendback_final_response_to_client: No responses for faxes found <=='
     else
-      array_in_batches = array_of_records.each_slice(2).to_a
+      array_in_batches = array_of_records.each_slice(ENV['max_records_send_to_client'].to_i).to_a
       array_in_batches.each do |batch_of_records|
         begin
-          Rails.logger.debug "==> sending #{batch_of_records.size} records to #{url} <=="
+          Rails.logger.debug "==> #{Time.now} posing #{batch_of_records.size} records to #{url} <=="
           response = HTTParty.post(url,
             body: batch_of_records.to_json,
             headers: { 'Content-Type' => 'application/json' } )
+          Rails.logger.debug "==> #{Time.now} end posting <=="
           if response.present? && response.code == 200
             result = JSON.parse(response)
             success_ids = []
