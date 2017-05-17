@@ -51,11 +51,7 @@ def actual_sending(recipient_name, recipient_number, attachments, fax_id, update
     send_fax_queue_id:    response_result["SendFaxQueueId"],
     send_confirm_date: response['date'])
   FileUtils.rm_rf Dir.glob("#{Rails.root}/tmp/fax_files/*")
-
-  Rails.logger.debug "******* initial response **********************"
-  Rails.logger.debug fax_record.inspect
-  Rails.logger.debug "***********************************************"
-
+  Rails.logger.debug "==> initial response: #{response_result}"
   sendback_initial_response_to_client(fax_record)
 
 end
@@ -78,9 +74,9 @@ def sending_faxes_without_queue_id
     faxes_without_queue_id = FaxRecord.where(send_fax_queue_id: nil)
     faxes_without_queue_id.each do |fax_without_queue_id|
       begin
-        actual_sending(fax_without_queue_id.recipient_name, fax_without_queue_id.recipient_number, fax_without_queue_id.file_path,fax_without_queue_id.id, fax_without_queue_id.update_attributes( updated_by_initializer:  true))
+        # actual_sending(fax_without_queue_id.recipient_name, fax_without_queue_id.recipient_number, fax_without_queue_id.file_path,fax_without_queue_id.id, fax_without_queue_id.update_attributes( updated_by_initializer:  true))
       rescue
-        pp "error requesting sending for fax #{fax_without_queue_id}"
+        Rails.logger.debug "==>error requesting sending for fax #{fax_without_queue_id.id}"
       end
     end
   rescue
