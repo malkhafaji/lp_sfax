@@ -48,10 +48,10 @@ def actual_sending(recipient_name, recipient_number, attachments, fax_id, update
   fax_record.update_attributes(
     status:            response_result["isSuccess"],
     message:           response_result["message"],
-    SendFaxQueueId:    response_result["SendFaxQueueId"],
-  send_confirm_date: response['date'])
+    send_fax_queue_id:    response_result["SendFaxQueueId"],
+    send_confirm_date: response['date'])
   FileUtils.rm_rf Dir.glob("#{Rails.root}/tmp/fax_files/*")
-
+  Rails.logger.debug "==> initial response: #{response_result}"
   sendback_initial_response_to_client(fax_record)
 
 end
@@ -60,30 +60,23 @@ end
 def file_specification(file_path)
   file_name = File.basename ("#{file_path}").downcase
   file_extension = File.extname (file_name).downcase
-  if file_extension  == ".pdf"
-    return "application/PDF", file_name
-  elsif file_extension == ".txt"
-    return "application/TXT", file_name
-  elsif file_extension == ".doc"
-    return "application/DOC", file_name
-  elsif file_extension == ".docx"
-    return "application/DOCX", file_name
-  elsif file_extension == ".tif"
-    return "application/TIF", file_name
-  else
+  accepted_extensions = [".tif",".xls",".doc",".pdf",".docx",".txt",".rtf",".xlsx",".ppt",".odt",".ods",".odp",".bmp",".gif",".jpg",".png"]
+   if accepted_extensions.include?(file_extension)
+     return "application/#{file_extension}", file_name
+   else
     return false
-  end
+   end
 end
 
 # search and find all faxes without Queue_id (not sent yet) and send them by call from the initializer (when the server start)
 def sending_faxes_without_queue_id
   begin
-    faxes_without_queue_id = FaxRecord.where("SendFaxQueueId is null")
+    faxes_without_queue_id = FaxRecord.where(send_fax_queue_id: nil)
     faxes_without_queue_id.each do |fax_without_queue_id|
       begin
-        actual_sending(fax_without_queue_id.recipient_name, fax_without_queue_id.recipient_number, fax_without_queue_id.file_path,fax_without_queue_id.id, fax_without_queue_id.update_attributes( updated_by_initializer:  true))
+        # actual_sending(fax_without_queue_id.recipient_name, fax_without_queue_id.recipient_number, fax_without_queue_id.file_path,fax_without_queue_id.id, fax_without_queue_id.update_attributes( updated_by_initializer:  true))
       rescue
-        pp "error requesting sending for fax #{fax_without_queue_id}"
+        Rails.logger.debug "==>error requesting sending for fax #{fax_without_queue_id.id}"
       end
     end
   rescue
