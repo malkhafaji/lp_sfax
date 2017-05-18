@@ -4,6 +4,8 @@ require 'pp'
 require 'time'
 require 'json'
 require 'fileutils'
+require './lib/web_services.rb'
+include WebServices
 # The requirements to connect with Vendor
 USERNAME = ENV['username']
 APIKEY = ENV['APIkey']
@@ -70,16 +72,17 @@ end
 
 # search and find all faxes without Queue_id (not sent yet) and send them by call from the initializer (when the server start)
 def sending_faxes_without_queue_id
-  begin
-    faxes_without_queue_id = FaxRecord.where(send_fax_queue_id: nil)
-    faxes_without_queue_id.each do |fax_without_queue_id|
-      begin
-        # actual_sending(fax_without_queue_id.recipient_name, fax_without_queue_id.recipient_number, fax_without_queue_id.file_path,fax_without_queue_id.id, fax_without_queue_id.update_attributes( updated_by_initializer:  true))
-      rescue
-        Rails.logger.debug "==>error requesting sending for fax #{fax_without_queue_id.id}"
-      end
+  attachments= []
+  @original_file_name = ''
+  FaxRecord.where(send_fax_queue_id: nil).each do |fax|
+    begin
+      attachments<<file_path(fax.attachments[0][:file_id],fax.attachments[0][:checksum])
+      actual_sending(fax.recipient_name , fax.recipient_number, attachments , fax.id , fax.update_attributes( updated_by_initializer: true))
+    rescue
+      Rails.logger.debug "************** Error sending Fax **************"
+      Rails.logger.debug  fax.inspect
+      Rails.logger.debug "***********************************************"
     end
-  rescue
   end
 end
 
