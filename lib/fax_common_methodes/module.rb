@@ -76,11 +76,13 @@ def sending_faxes_without_queue_id
   @original_file_name = ''
   FaxRecord.where(send_fax_queue_id: nil).each do |fax|
     begin
-      attachments<<file_path(fax.attachments[0][:file_id],fax.attachments[0][:checksum])
+      Attachment.where(fax_record_id:fax.id).each do |file|
+        attachments<<file_path(file[:file_id],file[:checksum])
+      end
       actual_sending(fax.recipient_name , fax.recipient_number, attachments , fax.id , fax.update_attributes( updated_by_initializer: true))
     rescue
       Rails.logger.debug "************** Error sending Fax **************"
-      Rails.logger.debug  fax.inspect
+      Rails.logger.debug "==> Error on sending_faxes_without_queue_id: #{fax.id} <=="
       Rails.logger.debug "***********************************************"
     end
   end
