@@ -81,9 +81,7 @@ def sending_faxes_without_queue_id
       end
       actual_sending(fax.recipient_name , fax.recipient_number, attachments , fax.id , fax.update_attributes( updated_by_initializer: true))
     rescue
-      Rails.logger.debug "************** Error sending Fax **************"
       Rails.logger.debug "==> Error on sending_faxes_without_queue_id: #{fax.id} <=="
-      Rails.logger.debug "***********************************************"
     end
   end
 end
