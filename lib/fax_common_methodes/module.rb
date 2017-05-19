@@ -53,7 +53,9 @@ def actual_sending(recipient_name, recipient_number, attachments, fax_id, update
     send_fax_queue_id:    response_result["SendFaxQueueId"],
     send_confirm_date: response['date'])
   FileUtils.rm_rf Dir.glob("#{Rails.root}/tmp/fax_files/*")
-  Rails.logger.debug "==> initial response: #{response_result}"
+  if fax_record.send_fax_queue_id.nil?
+    Rails.logger.debug "==> error send_fax_queue_id is nil: #{response_result} <=="
+  end
   sendback_initial_response_to_client(fax_record)
 
 end
@@ -62,7 +64,7 @@ end
 def file_specification(file_path)
   file_name = File.basename ("#{file_path}").downcase
   file_extension = File.extname (file_name).downcase
-  accepted_extensions = [".tif",".xls",".doc",".pdf",".docx",".txt",".rtf",".xlsx",".ppt",".odt",".ods",".odp",".bmp",".gif",".jpg",".png"]
+  accepted_extensions = [".tif", ".xls", ".doc", ".pdf", ".docx", ".txt", ".rtf", ".xlsx", ".ppt", ".odt", ".ods", ".odp", ".bmp", ".gif", ".jpg", ".png"]
    if accepted_extensions.include?(file_extension)
      return "application/#{file_extension}", file_name
    else
@@ -77,11 +79,11 @@ def sending_faxes_without_queue_id
   FaxRecord.where(send_fax_queue_id: nil).each do |fax|
     begin
       Attachment.where(fax_record_id:fax.id).each do |file|
-        attachments<<file_path(file[:file_id],file[:checksum])
+        attachments << file_path(file[:file_id],file[:checksum])
       end
       actual_sending(fax.recipient_name , fax.recipient_number, attachments , fax.id , fax.update_attributes( updated_by_initializer: true))
     rescue
-      Rails.logger.debug "==> Error on sending_faxes_without_queue_id: #{fax.id} <=="
+      Rails.logger.debug "==> Error sending_faxes_without_queue_id: #{fax.id} <=="
     end
   end
 end
@@ -101,8 +103,9 @@ def sendback_initial_response_to_client(fax_record)
   #we should put here the client URL to send the json
 
   if fax_record.updated_by_initializer == true
-    p client_initial_response
+    Rails.logger.debug "==> sendback_initial_response_to_client/updated_by_initializer: #{client_initial_response} <=="
   else
     render json: client_initial_response
+    Rails.logger.debug "==> sendback_initial_response_to_client: #{client_initial_response} <=="
   end
 end
