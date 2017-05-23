@@ -4,6 +4,8 @@ class FaxRecord < ApplicationRecord
   validates_presence_of :recipient_name, :callback_url
   scope :desc,-> {order('fax_records.updated_at DESC')}
   scope :send_error,-> { where(result_code: '6000').where(result_message: 'Fax Number Busy')}
+  scope :without_queue_id,-> { where(send_fax_queue_id: nil)}
+
 
   def number_to_fax
     fax_number = recipient_number

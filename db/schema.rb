@@ -10,7 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 20170523154809) do
+=======
+ActiveRecord::Schema.define(version: 20170519163312) do
+>>>>>>> 1dc5d6741f36b3173a88690a944732afbbf2ab4f
 
   create_table "attachments", force: :cascade do |t|
     t.integer  "fax_record_id"
