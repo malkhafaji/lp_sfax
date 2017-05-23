@@ -104,6 +104,8 @@ def sendback_initial_response_to_client(fax_record)
 
   if fax_record.updated_by_initializer == true
     Rails.logger.debug "==> sendback_initial_response_to_client/updated_by_initializer: #{client_initial_response} <=="
+  elsif fax_record.record_completed == false
+    Rails.logger.debug "==> sendback_initial_response_to_client/Resend: #{client_initial_response} <=="
   else
     render json: client_initial_response
     Rails.logger.debug "==> sendback_initial_response_to_client: #{client_initial_response} <=="

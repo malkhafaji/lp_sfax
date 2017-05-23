@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170512162939) do
+ActiveRecord::Schema.define(version: 20170523154809) do
 
   create_table "attachments", force: :cascade do |t|
     t.integer  "fax_record_id"
@@ -52,9 +52,11 @@ ActiveRecord::Schema.define(version: 20170512162939) do
     t.datetime "send_confirm_date"
     t.datetime "fax_date_iso"
     t.decimal  "fax_duration"
-    t.datetime "created_at",                                    null: false
-    t.datetime "updated_at",                                    null: false
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
     t.string   "callback_url"
+    t.boolean  "record_completed",                  default: false
+    t.integer  "resend",                            default: 0
   end
 
 end
