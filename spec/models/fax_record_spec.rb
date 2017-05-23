@@ -2,6 +2,48 @@ require 'rails_helper'
 
 RSpec.describe FaxRecord, type: :model do
 
+
+describe 'recipient_number' do
+    it { expect be_valid (:recipient_number) ==( /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/) }
+    it { expect be_valid (:recipient_number) ==(12345678912 ) }
+    it { should be_invalid  (:recipient_number) ==( "yuienidn9") }
+end
+
+
+  describe 'recipient_name' do
+    it { expect be_valid (:message) ==("Recipitent Name should not be empty"  ) }
+    it { expect be_invalid (:message) ==("bla bla bla"  ) }
+  end
+#
+describe "paginated" do 
+  before do
+    @fax_records = {:perpage => '10', :page => '1'}
+  end 
+  it 'prooperly retrieves a value given a key 'do 
+  expect(:perpage) == 10
+  expect(:page) == 1
+  
+ end
+end 
+#
+  describe 'is vaild only with 10 records per page in the fax_list.size' do
+    it { expect be_valid (:perpage) ==("10") }
+    it { expect be_valid (:page) ==("1") }
+    it { expect be_invalid (:perpage) ==("5") }
+    it { expect be_invalid (:page) ==("2") }
+  end
+context 'check columns exsitence' do
+     it { is_expected.to respond_to :recipient_name }
+     it { is_expected.to respond_to :recipient_number }
+     it { is_expected.to respond_to :file_path }
+     it { is_expected.to respond_to :client_receipt_date}
+     it { is_expected.to respond_to :status }
+     it { is_expected.to respond_to :message }
+     it { is_expected.to respond_to :send_confirm_date}
+     it { is_expected.to respond_to :vendor_confirm_date}
+ end
+
+
   list_of_all_methods_in_the_class = FaxRecord.methods.sort
   describe "names for methods for the application should be the same in the test" do
 
