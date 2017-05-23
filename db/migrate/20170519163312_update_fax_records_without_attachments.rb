@@ -1,13 +1,11 @@
 class UpdateFaxRecordsWithoutAttachments < ActiveRecord::Migration[5.0]
 
 
-    FaxRecord.where(file_path: nil).each do |fax|
-        fax.result_message = "Fax sending failed - No attachments"
-        fax.result_code = 9000
-        fax.status = false
-        fax.save!
+    FaxRecord.without_queue_id.each do |fax|
+      unless fax.attachments.any?
+        fax.update_attributes( result_message: "Transmission not completed", result_code: '7001', status: false )
+      end
     end
-
 
 
 end
