@@ -81,6 +81,8 @@ GEM
       thor (~> 0.14)
     globalid (0.3.7)
       activesupport (>= 4.1.0)
+    haml (4.0.7)
+      tilt
     httparty (0.14.0)
       multi_xml (>= 0.5.2)
     i18n (0.8.0)
@@ -226,6 +228,7 @@ DEPENDENCIES
   execjs
   faraday
   figaro
+  haml (~> 4.0.5)
   httparty (~> 0.14.0)
   jbuilder (~> 2.5)
   jquery-rails

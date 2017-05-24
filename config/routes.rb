@@ -6,7 +6,7 @@ Rails.application.routes.draw do
     end
   end
   root 'fax_records#index' # assigning the index page as the home page
-  
+
   namespace :api do
   	namespace :v1 do
   		resources :fax_records, only: [] do
@@ -16,6 +16,6 @@ Rails.application.routes.draw do
   		end
   	end
   end
-  
+
   get 'run_tasks', to: 'application#run_tasks'
 end

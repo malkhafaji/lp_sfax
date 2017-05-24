@@ -1,6 +1,0 @@
-<p><%= form_tag(controller: "fax_records", method: 'post') do %> 
-<%= text_field_tag :search_value, "#{ @search_value.present? ? @search_value : '' }" , placeholder: "Search for..." , class: 'form-control' %>
-<%= submit_tag "Go!", class: 'btn btn-default' %>
-<% end %></p>
-
-
