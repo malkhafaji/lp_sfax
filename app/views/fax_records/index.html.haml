@@ -26,7 +26,7 @@
           %th.text-center Request Initiated
           %th.text-center Request Sent to Vendor
           %th.text-center Vendor Confirmation
-          %th.text-center Duration
+          %th.text-center Duration sec
       %tbody
         - @fax_records.each do |fax_record|
           %tr
@@ -55,7 +55,7 @@
             %td
               = fax_record.send_confirm_date.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m %p") if fax_record.send_confirm_date?
             %td
-              = fax_record.fax_duration
+              = (fax_record.fax_duration.round(2) * 100).to_i
   .row-fluid
     .col-md-6.text-left
       Export the results as:

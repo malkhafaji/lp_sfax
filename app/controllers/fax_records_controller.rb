@@ -7,9 +7,17 @@ class FaxRecordsController < ApplicationController
       fax_records = FaxRecord.filtered_fax_records(session[:search_value])
     end
     respond_to do |format|
-      format.html
-      format.csv { send_data fax_records.to_csv}
-      format.xls { send_data fax_records.to_csv(col_sep: "\t") }
+      format.csv do
+        filename = "fax_records_csv_#{Date.today.strftime('%m_%d_%Y')}.csv"
+        set_csv_streaming_headers(filename)
+        self.response_body = fax_records.to_csv
+      end
+      format.xls do
+        filename = "fax_records_xls_#{Date.today.strftime('%m_%d_%Y')}.xls"
+        set_csv_streaming_headers(filename)
+        self.response_body = fax_records.to_csv(col_sep: "\t")
+      end
+
     end
   end
 
