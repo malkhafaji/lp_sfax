@@ -23,9 +23,11 @@ class Api::V1::FaxRecordsController < ApplicationController
       fax_record.recipient_name = recipient_name
       fax_record.file_path = @original_file_name
       fax_record.callback_url = callback_url
+      fax_record.updated_by_initializer = false
       fax_record.save!
       fax_record_attachment(fax_record, attachments_array)
-      actual_sending(recipient_name, recipient_number, attachments, fax_record.id, fax_record.update_attributes(updated_by_initializer: false))
+      initial_response = actual_sending(recipient_name, recipient_number, attachments, fax_record.id)
+      render json: initial_response
     rescue Exception => e
       render json: e.message.inspect
       Rails.logger.debug "==> error send_fax: #{e.message.inspect} <=="

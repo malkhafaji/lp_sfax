@@ -23,41 +23,42 @@ def get_token
 end
 
 # sending the fax with the parameters fax_number,recipient_name ,attached file_path,fax_id and define either its sent by user call or by initializer call
-def actual_sending(recipient_name, recipient_number, attachments, fax_id, updated_by_initializer)
+def actual_sending(recipient_name, recipient_number, attachments, fax_id)
   begin
-      tid = nil
-      conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
-        faraday.request :multipart
-        faraday.request  :url_encoded
-        faraday.response :logger
-        faraday.adapter Faraday.default_adapter
+    tid = nil
+    conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
+      faraday.request :multipart
+      faraday.request  :url_encoded
+      faraday.response :logger
+      faraday.adapter Faraday.default_adapter
+    end
+    token = get_token()
+    parts = ["sendfax?",
+      "token=#{CGI.escape(token)}",
+      "ApiKey=#{CGI.escape(APIKEY)}",
+      "RecipientFax=#{recipient_number}",
+      "RecipientName=#{recipient_name}",
+    "OptionalParams=&" ]
+    path = "/api/" + parts.join("&")
+    response = conn.post path do |req|
+      req.body = {}
+      attachments.each_with_index do |file, i|
+        req.body["file_name#{i}"] = Faraday::UploadIO.new("#{file}", file_specification(file)[0], file_specification(file)[1])
       end
-      token = get_token()
-      parts = ["sendfax?",
-        "token=#{CGI.escape(token)}",
-        "ApiKey=#{CGI.escape(APIKEY)}",
-        "RecipientFax=#{recipient_number}",
-        "RecipientName=#{recipient_name}",
-      "OptionalParams=&" ]
-      path = "/api/" + parts.join("&")
-      response = conn.post path do |req|
-        req.body = {}
-        attachments.each_with_index do |file, i|
-          req.body["file_name#{i}"] = Faraday::UploadIO.new("#{file}", file_specification(file)[0], file_specification(file)[1])
-        end
-      end
-      response_result = JSON.parse(response.body)
-      fax_record = FaxRecord.find_by(id: fax_id)
-      fax_record.update_attributes(
-        status:            response_result["isSuccess"],
-        message:           response_result["message"],
-        send_fax_queue_id:    response_result["SendFaxQueueId"],
-        send_confirm_date: response['date'])
-      FileUtils.rm_rf Dir.glob("#{Rails.root}/tmp/fax_files/*")
-      if fax_record.send_fax_queue_id.nil?
-        Rails.logger.debug "==> error send_fax_queue_id is nil: #{response_result} <=="
-      end
-      sendback_initial_response_to_client(fax_record)
+    end
+    response_result = JSON.parse(response.body)
+    fax_record = FaxRecord.find_by(id: fax_id)
+    fax_record.update_attributes(
+      status:            response_result["isSuccess"],
+      message:           response_result["message"],
+      send_fax_queue_id:    response_result["SendFaxQueueId"],
+      send_confirm_date: response['date'])
+    FileUtils.rm_rf Dir.glob("#{Rails.root}/tmp/fax_files/*")
+    if fax_record.send_fax_queue_id.nil?
+      Rails.logger.debug "==> error send_fax_queue_id is nil: #{response_result} <=="
+      fax_record.update_attributes(is_success: false, message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
+    end
+    sendback_initial_response_to_client(fax_record)
   rescue
     fax_record.update_attributes(is_success: false, message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
     Rails.logger.debug "==> Error actual_sending: #{fax.id} <=="
@@ -84,7 +85,8 @@ def sending_faxes_without_queue_id
       Attachment.where(fax_record_id:fax.id).each do |file|
         attachments << file_path(file[:file_id],file[:checksum])
       end
-      actual_sending(fax.recipient_name , fax.recipient_number, attachments , fax.id , fax.update_attributes( updated_by_initializer: true))
+      fax.update_attributes( updated_by_initializer: true)
+      actual_sending(fax.recipient_name , fax.recipient_number, attachments , fax.id)
     rescue
       Rails.logger.debug "==> Error sending_faxes_without_queue_id: #{fax.id} <=="
     end
@@ -107,10 +109,10 @@ def sendback_initial_response_to_client(fax_record)
 
   if fax_record.updated_by_initializer == true
     Rails.logger.debug "==> sendback_initial_response_to_client/updated_by_initializer: #{client_initial_response} <=="
-  elsif fax_record.record_completed == false
+  elsif fax_record.resend > 0 && fax_record.record_completed == false 
     Rails.logger.debug "==> sendback_initial_response_to_client/Resend: #{client_initial_response} <=="
   else
-    render json: client_initial_response
     Rails.logger.debug "==> sendback_initial_response_to_client: #{client_initial_response} <=="
+    client_initial_response
   end
 end
