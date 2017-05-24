@@ -1,4 +1,7 @@
-require "./app/controllers/concerns/doxifer.rb"
+require './app/controllers/concerns/doxifer.rb'
+require './lib/web_services.rb'
+include WebServices
+
 MAX_FAX_RESPONSE_CHECK_TRIES = ENV['max_fax_response_check_tries']
 
 # getting token
@@ -13,12 +16,12 @@ end
 # Checking which fax sent and which not by the SendFaxQueueId and max_fax_response_check_tries, if not send it then send it
 desc 'check_fax_response'
 task :check_fax_response => :environment do
-  fax_requests_queue_ids = FaxRecord.where("fax_date_utc is null and send_fax_queue_id is not null and (max_fax_response_check_tries is null OR max_fax_response_check_tries < #{MAX_FAX_RESPONSE_CHECK_TRIES})").pluck(:send_fax_queue_id)
+  fax_requests_queue_ids = FaxRecord.where(record_completed: false).where.not(send_fax_queue_id: nil).where("max_fax_response_check_tries is null OR max_fax_response_check_tries<#{MAX_FAX_RESPONSE_CHECK_TRIES}").pluck(:send_fax_queue_id)
   if fax_requests_queue_ids.any?
     Rails.logger.debug "==> checking response for: #{fax_requests_queue_ids}<=="
     fax_requests_queue_ids.each do |fax_requests_queue_id|
       begin
-        Rails.logger.debug "==>requesting response for: #{fax_requests_queue_ids}<=="
+        Rails.logger.debug "==>requesting response for: #{fax_requests_queue_id}<=="
         fax_response(fax_requests_queue_id)
       rescue Exception => e
         Rails.logger.debug "==>error: #{e.message.inspect}<=="
@@ -47,28 +50,31 @@ def  fax_response(fax_requests_queue_id)
         fax_duration = 0.0
       end
       fax_record.update_attributes(
-          send_fax_queue_id:   parse_response['SendFaxQueueId'],
-          is_success:          parse_response['IsSuccess'],
-          error_code:          parse_response['ErrorCode'],
-          recipient_name:      parse_response['RecipientName'],
-          recipient_fax:       parse_response['RecipientFax'],
-          tracking_code:       parse_response['TrackingCode'],
-          fax_date_utc:        parse_response['FaxDateUtc'],
-          fax_id:              parse_response['FaxId'],
-          pages:               parse_response['Pages'],
-          attempts:            parse_response['Attempts'],
-          sender_fax:          parse_response['SenderFax'],
-          barcode_items:       parse_response['BarcodeItems'],
-          fax_success:         parse_response['FaxSuccess'],
-          out_bound_fax_id:    parse_response['OutBoundFaxId'],
-          fax_pages:           parse_response['FaxPages'],
-          fax_date_iso:        parse_response['FaxDateIso'],
-          watermark_id:        parse_response['WatermarkId'],
-          message:             response["message"],
-          result_code:         parse_response['ResultCode'],
-          result_message:      result_message,
-          fax_duration:        fax_duration
-          )
+        send_fax_queue_id:   parse_response['SendFaxQueueId'],
+        is_success:          parse_response['IsSuccess'],
+        error_code:          parse_response['ErrorCode'],
+        recipient_name:      parse_response['RecipientName'],
+        recipient_fax:       parse_response['RecipientFax'],
+        tracking_code:       parse_response['TrackingCode'],
+        fax_date_utc:        parse_response['FaxDateUtc'],
+        fax_id:              parse_response['FaxId'],
+        pages:               parse_response['Pages'],
+        attempts:            parse_response['Attempts'],
+        sender_fax:          parse_response['SenderFax'],
+        barcode_items:       parse_response['BarcodeItems'],
+        fax_success:         parse_response['FaxSuccess'],
+        out_bound_fax_id:    parse_response['OutBoundFaxId'],
+        fax_pages:           parse_response['FaxPages'],
+        fax_date_iso:        parse_response['FaxDateIso'],
+        watermark_id:        parse_response['WatermarkId'],
+        message:             response["message"],
+        result_code:         parse_response['ResultCode'],
+        result_message:      result_message,
+        fax_duration:        fax_duration
+      )
+      if parse_response['ResultCode'] != 6000
+        fax_record.update_attributes(record_completed:true)
+      end
     else
       Rails.logger.debug '==>fax_response: no response found <=='
     end
@@ -142,7 +148,7 @@ task :sendback_final_response_to_client => :environment do
           Rails.logger.debug "==> #{Time.now} posing #{batch_of_records.size} records to #{url} <=="
           response = HTTParty.post(url,
             body: batch_of_records.to_json,
-            headers: { 'Content-Type' => 'application/json' } )
+          headers: { 'Content-Type' => 'application/json' } )
           Rails.logger.debug "==> #{Time.now} end posting <=="
           if response.present? && response.code == 200
             result = JSON.parse(response)
@@ -162,6 +168,21 @@ task :sendback_final_response_to_client => :environment do
         end
       end
     end
+  end
+end
 
+# Resend the fax if the result code is 6000 and result message is "Fax Number Busy"
+desc "Resending Faxes with error"
+task :resend_fax_with_errors => :environment do
+  FaxRecord.has_send_error.each do |fax|
+    attachments= []
+    @original_file_name = ''
+    if ( (fax[:resend]).between?(0,4) ) && ( (fax[:record_completed] == false) )  # DON'T FORGET TO CHANGE THE 100 TO 4
+      fax.update_attributes( resend: fax.resend+1)
+            Attachment.where(fax_record_id: fax.id).each do |file|
+        attachments << file_path(file[:file_id],file[:checksum])
+      end
+      actual_sending(fax.recipient_name , fax.recipient_number, attachments , fax.id , fax.update_attributes( updated_by_initializer:  false))
+    end
   end
 end
