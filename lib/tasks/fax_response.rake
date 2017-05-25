@@ -73,7 +73,7 @@ def  fax_response(fax_requests_queue_id)
         fax_duration:        fax_duration
       )
       if parse_response['ResultCode'] != 6000
-        fax_record.update_attributes(record_completed:true)
+        fax_record.update_attributes(record_completed: true)
       end
     else
       Rails.logger.debug '==>fax_response: no response found <=='
@@ -114,7 +114,7 @@ end
 # Sending final response as array of jsons to the client for all sent faxes
 desc 'Sending final response as array of jsons to the client for all sent faxes'
 task :sendback_final_response_to_client => :environment do
-  records_groups = FaxRecord.where(sendback_final_response_to_client: 0).where.not(send_fax_queue_id: nil).group_by(&:callback_url)
+  records_groups = FaxRecord.where(sendback_final_response_to_client: 0).where.not(send_fax_queue_id: nil).where(record_completed: true).group_by(&:callback_url)
   records_groups.each do |url, records|
     array_of_records = []
     Rails.logger.debug "==> total #{records.size} records for #{url} <=="
@@ -177,13 +177,16 @@ task :resend_fax_with_errors => :environment do
   FaxRecord.has_send_error.each do |fax|
     attachments= []
     @original_file_name = ''
-    if ( (fax[:resend]).between?(0,4) ) && ( (fax[:record_completed] == false) )
-      fax.update_attributes( resend: fax.resend+1)
+    if ((fax[:resend]).between?(0,4) ) && ( (fax[:record_completed] == false))
+      fax.update_attributes( resend: fax.resend + 1)
       Attachment.where(fax_record_id: fax.id).each do |file|
         attachments << file_path(file[:file_id],file[:checksum])
       end
       Rails.logger.debug "==> resend_fax_with_errors: #{fax.id} <=="
       actual_sending(fax.recipient_name , fax.recipient_number, attachments , fax.id)
+    else
+      Rails.logger.debug "==> resend_fax_with_errors reached max: #{fax.id} <=="
+      fax.update_attributes(record_completed: true)
     end
   end
 end
