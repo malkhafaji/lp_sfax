@@ -177,12 +177,13 @@ task :resend_fax_with_errors => :environment do
   FaxRecord.has_send_error.each do |fax|
     attachments= []
     @original_file_name = ''
-    if ( (fax[:resend]).between?(0,4) ) && ( (fax[:record_completed] == false) )  # DON'T FORGET TO CHANGE THE 100 TO 4
+    if ( (fax[:resend]).between?(0,4) ) && ( (fax[:record_completed] == false) )
       fax.update_attributes( resend: fax.resend+1)
-            Attachment.where(fax_record_id: fax.id).each do |file|
+      Attachment.where(fax_record_id: fax.id).each do |file|
         attachments << file_path(file[:file_id],file[:checksum])
       end
-      actual_sending(fax.recipient_name , fax.recipient_number, attachments , fax.id , fax.update_attributes( updated_by_initializer:  false))
+      Rails.logger.debug "==> resend_fax_with_errors: #{fax.id} <=="
+      actual_sending(fax.recipient_name , fax.recipient_number, attachments , fax.id)
     end
   end
 end
