@@ -89,7 +89,7 @@ end
 # Sending the Fax_Queue_Id to get the status
 def send_fax_status(fax_requests_queue_id)
   begin
-    conn = Faraday.new(:url => FAX_SERVER_URL, :ssl => { :ca_file => 'C:/Ruby200/cacert.pem' }  ) do |faraday|
+    conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }) do |faraday|
       faraday.request  :url_encoded
       faraday.response :logger
       faraday.adapter Faraday.default_adapter
