@@ -40,7 +40,7 @@ def  fax_response(fax_requests_queue_id)
     response = send_fax_status(fax_requests_queue_id)
     if response["RecipientFaxStatusItems"].present?
       parse_response = response["RecipientFaxStatusItems"][0]
-      Rails.logger.debug "==>final response: #{parse_response}<=="
+      Rails.logger.debug "==> final response: #{parse_response} <=="
       fax_record = FaxRecord.find_by_send_fax_queue_id(fax_requests_queue_id)
       if parse_response['ResultCode'] == 0
         fax_duration = calculate_duration(fax_record.client_receipt_date, (Time.parse(parse_response['FaxDateUtc'])))
