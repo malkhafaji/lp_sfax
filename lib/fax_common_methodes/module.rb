@@ -86,7 +86,7 @@ def sending_faxes_without_queue_id
         attachments << file_path(file[:file_id],file[:checksum])
       end
       fax.update_attributes( updated_by_initializer: true)
-      actual_sending(fax.recipient_name , fax.recipient_number, attachments , fax.id)
+      actual_sending(fax.recipient_name ,fax.recipient_number, attachments ,fax.id)
     rescue
       Rails.logger.debug "==> Error sending_faxes_without_queue_id: #{fax.id} <=="
     end
@@ -109,7 +109,7 @@ def sendback_initial_response_to_client(fax_record)
 
   if fax_record.updated_by_initializer == true
     Rails.logger.debug "==> sendback_initial_response_to_client/updated_by_initializer: #{client_initial_response} <=="
-  elsif fax_record.resend > 0 && fax_record.record_completed == false 
+  elsif fax_record.resend > 0 && fax_record.record_completed == false
     Rails.logger.debug "==> sendback_initial_response_to_client/Resend: #{client_initial_response} <=="
   else
     Rails.logger.debug "==> sendback_initial_response_to_client: #{client_initial_response} <=="
