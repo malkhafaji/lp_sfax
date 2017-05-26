@@ -26,7 +26,7 @@ class Api::V1::FaxRecordsController < ApplicationController
       fax_record.updated_by_initializer = false
       fax_record.save!
       fax_record_attachment(fax_record, attachments_array)
-      initial_response = actual_sending(recipient_name, recipient_number, attachments, fax_record.id)
+      initial_response = FaxServices::Fax.actual_sending(recipient_name, recipient_number, attachments, fax_record.id)
       render json: initial_response
     rescue Exception => e
       render json: e.message.inspect
