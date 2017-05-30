@@ -12,21 +12,23 @@ class Api::V1::FaxRecordsController < ApplicationController
       recipient_number = params['recipient_number']
       callback_url = params['FaxDispositionURL']
       attachments_array = params_to_array(params['Attachments'])
-      @original_file_name = ''
       attachments = []
+      original_file_name = ''
       attachments_array.each_with_index do |file_info|
-        attachments << file_path(file_info[0], file_info[1])
+        file_info = WebServices::Web.file_path(file_info[0], file_info[1])
+        attachments << file_info[0]
+        original_file_name += file_info[1]
       end
       fax_record = FaxRecord.new
       fax_record.client_receipt_date = Time.now
       fax_record.recipient_number = recipient_number
       fax_record.recipient_name = recipient_name
-      fax_record.file_path = @original_file_name
+      fax_record.file_path = original_file_name
       fax_record.callback_url = callback_url
       fax_record.updated_by_initializer = false
       fax_record.save!
       fax_record_attachment(fax_record, attachments_array)
-      initial_response = actual_sending(recipient_name, recipient_number, attachments, fax_record.id)
+      initial_response = FaxServices::Fax.actual_sending(recipient_name, recipient_number, attachments, fax_record.id)
       render json: initial_response
     rescue Exception => e
       render json: e.message.inspect

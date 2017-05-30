@@ -49,14 +49,14 @@ class FaxRecordsController < ApplicationController
       format.html
     end
   end
-  private
-  # Use callbacks to share common setup or constraints between actions.
-  def set_fax_record
-    @fax_record = FaxRecord.find(params[:id])
-  end
-
-  # Never trust parameters from the scary internet, only allow the white list through.
-  def fax_record_params
-    params.require(:fax_record).permit(:recipient_name, :recipient_number, :file_path, :client_receipt_date, :status, :SendFaxQueueId, :message, :max_fax_response_check_tries, :send_confirm_date, :vendor_confirm_date, :send_fax_queue_id, :is_success, :result_code, :error_code, :result_message, :recipient_fax, :tracking_code, :fax_date_utc, :fax_id, :pages, :attempts, :sender_fax, :barcode_items, :fax_success, :out_bound_fax_id, :fax_pages, :fax_date_iso, :watermark_id, :message)
-  end
+  # private
+  # # Use callbacks to share common setup or constraints between actions.
+  # def set_fax_record
+  #   @fax_record = FaxRecord.find(params[:id])
+  # end
+  #
+  # # Never trust parameters from the scary internet, only allow the white list through.
+  # def fax_record_params
+  #   params.require(:fax_record).permit(:recipient_name, :recipient_number, :file_path, :client_receipt_date, :status, :SendFaxQueueId, :message, :max_fax_response_check_tries, :send_confirm_date, :vendor_confirm_date, :send_fax_queue_id, :is_success, :result_code, :error_code, :result_message, :recipient_fax, :tracking_code, :fax_date_utc, :fax_id, :pages, :attempts, :sender_fax, :barcode_items, :fax_success, :out_bound_fax_id, :fax_pages, :fax_date_iso, :watermark_id, :message)
+  # end
 end

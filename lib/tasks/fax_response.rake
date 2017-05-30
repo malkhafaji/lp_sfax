@@ -1,17 +1,5 @@
-require './app/controllers/concerns/doxifer.rb'
-require './lib/web_services.rb'
-include WebServices
 
 MAX_FAX_RESPONSE_CHECK_TRIES = ENV['max_fax_response_check_tries']
-
-# getting token
-def get_token
-  timestr = Time.now.utc.iso8601()
-  raw ="Username=#{USERNAME}&ApiKey=#{APIKEY}&GenDT=#{timestr}"
-  dox = Doxipher.new(ENCRYPTIONKEY, {:base64=>true})
-  cipher = dox.encrypt(raw)
-  return cipher
-end
 
 # Checking which fax sent and which not by the SendFaxQueueId and max_fax_response_check_tries, if not send it then send it
 desc 'check_fax_response'
@@ -22,7 +10,7 @@ task :check_fax_response => :environment do
     fax_requests_queue_ids.each do |fax_requests_queue_id|
       begin
         Rails.logger.debug "==>requesting response for: #{fax_requests_queue_id}<=="
-        fax_response(fax_requests_queue_id)
+        FaxServices::Fax.fax_response(fax_requests_queue_id)
       rescue Exception => e
         Rails.logger.debug "==>error: #{e.message.inspect}<=="
         fax_record = FaxRecord.find_by(send_fax_queue_id: fax_requests_queue_id)
@@ -33,83 +21,6 @@ task :check_fax_response => :environment do
     Rails.logger.debug '==> check_fax_response: No records found to check'
   end
 end
-
-# Getting the response for certain fax defained by the SendFaxQueueId
-def  fax_response(fax_requests_queue_id)
-  begin
-    response = send_fax_status(fax_requests_queue_id)
-    if response["RecipientFaxStatusItems"].present?
-      parse_response = response["RecipientFaxStatusItems"][0]
-      Rails.logger.debug "==> final response: #{parse_response} <=="
-      fax_record = FaxRecord.find_by_send_fax_queue_id(fax_requests_queue_id)
-      if parse_response['ResultCode'] == 0
-        fax_duration = calculate_duration(fax_record.client_receipt_date, (Time.parse(parse_response['FaxDateUtc'])))
-        result_message = 'Success'
-      else
-        result_message = parse_response['ResultMessage']
-        fax_duration = 0.0
-      end
-      fax_record.update_attributes(
-        send_fax_queue_id:   parse_response['SendFaxQueueId'],
-        is_success:          parse_response['IsSuccess'],
-        error_code:          parse_response['ErrorCode'],
-        recipient_name:      parse_response['RecipientName'],
-        recipient_fax:       parse_response['RecipientFax'],
-        tracking_code:       parse_response['TrackingCode'],
-        fax_date_utc:        parse_response['FaxDateUtc'],
-        fax_id:              parse_response['FaxId'],
-        pages:               parse_response['Pages'],
-        attempts:            parse_response['Attempts'],
-        sender_fax:          parse_response['SenderFax'],
-        barcode_items:       parse_response['BarcodeItems'],
-        fax_success:         parse_response['FaxSuccess'],
-        out_bound_fax_id:    parse_response['OutBoundFaxId'],
-        fax_pages:           parse_response['FaxPages'],
-        fax_date_iso:        parse_response['FaxDateIso'],
-        watermark_id:        parse_response['WatermarkId'],
-        message:             response["message"],
-        result_code:         parse_response['ResultCode'],
-        result_message:      result_message,
-        fax_duration:        fax_duration
-      )
-      if parse_response['ResultCode'] != 6000
-        fax_record.update_attributes(record_completed: true)
-      end
-    else
-      Rails.logger.debug '==>fax_response: no response found <=='
-    end
-  rescue Exception => e
-    Rails.logger.debug "==>fax_response error: #{e.message} <=="
-  end
-end
-
-def calculate_duration(t1,t2)
-  return ((t2 - t1) / 60.0).round(2)
-end
-# Sending the Fax_Queue_Id to get the status
-def send_fax_status(fax_requests_queue_id)
-  begin
-    conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }) do |faraday|
-      faraday.request  :url_encoded
-      faraday.response :logger
-      faraday.adapter Faraday.default_adapter
-    end
-    token = get_token()
-    parts = ["sendfaxstatus?",
-      "token=#{CGI.escape(token)}",
-      "ApiKey=#{CGI.escape(APIKEY)}",
-    "SendFaxQueueId=#{(fax_requests_queue_id)}"]
-    path = "/api/"+parts.join("&")
-
-    response = conn.get path do |req|
-      req.body = {}
-    end
-    return JSON.parse(response.body)
-  rescue Exception => e
-    Rails.logger.debug "==>send_fax_status error: #{e.message} <=="
-  end
-end
-
 
 # Sending final response as array of jsons to the client for all sent faxes
 desc 'Sending final response as array of jsons to the client for all sent faxes'
@@ -180,10 +91,11 @@ task :resend_fax_with_errors => :environment do
     if ((fax[:resend]).between?(0,4) ) && ( (fax[:record_completed] == false))
       fax.update_attributes( resend: fax.resend + 1)
       Attachment.where(fax_record_id: fax.id).each do |file|
-        attachments << file_path(file[:file_id],file[:checksum])
+        file_info = WebServices::Web.file_path(file[:file_id],file[:checksum])
+        attachments << file_info[0]
       end
       Rails.logger.debug "==> resend_fax_with_errors: #{fax.id} <=="
-      actual_sending(fax.recipient_name , fax.recipient_number, attachments , fax.id)
+      FaxServices::Fax.actual_sending(fax.recipient_name , fax.recipient_number, attachments , fax.id)
     else
       Rails.logger.debug "==> resend_fax_with_errors reached max: #{fax.id} <=="
       fax.update_attributes(record_completed: true)
