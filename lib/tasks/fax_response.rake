@@ -1,5 +1,3 @@
-# require './app/lib/doxifer.rb'
-# include WebServices
 
 MAX_FAX_RESPONSE_CHECK_TRIES = ENV['max_fax_response_check_tries']
 
@@ -93,7 +91,7 @@ task :resend_fax_with_errors => :environment do
     if ((fax[:resend]).between?(0,4) ) && ( (fax[:record_completed] == false))
       fax.update_attributes( resend: fax.resend + 1)
       Attachment.where(fax_record_id: fax.id).each do |file|
-        attachments << file_path(file[:file_id],file[:checksum])
+        attachments << WebServices::Web.file_path(file[:file_id],file[:checksum])
       end
       Rails.logger.debug "==> resend_fax_with_errors: #{fax.id} <=="
       FaxServices::Fax.actual_sending(fax.recipient_name , fax.recipient_number, attachments , fax.id)

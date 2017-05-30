@@ -80,11 +80,11 @@ module FaxServices
       # search and find all faxes without Queue_id (not sent yet) and send them by call from the initializer (when the server start)
       def sending_faxes_without_queue_id
         attachments= []
-        @original_file_name = ''
         FaxRecord.where(send_fax_queue_id: nil).each do |fax|
           begin
             Attachment.where(fax_record_id:fax.id).each do |file|
-              attachments << file_path(file[:file_id],file[:checksum])
+              file_info = WebServices::Web.file_path(file[:file_id],file[:checksum])
+              attachments << file_info[0]
             end
             fax.update_attributes( updated_by_initializer: true)
             FaxServices::Fax.actual_sending(fax.recipient_name ,fax.recipient_number, attachments ,fax.id)
