@@ -8,8 +8,7 @@ class Api::V1::FaxRecordsController < ApplicationController
     original_file_name, attachments_array = get_attachments(params_to_array(params['Attachments']))
     fax_record = FaxRecord.new(recipient_name: params['recipient_name'],
         recipient_number: params['recipient_number'], client_receipt_date: Time.now,
-        file_path: original_file_name, callback_url: params['FaxDispositionURL'],
-        updated_by_initializer: false)
+        callback_url: params['FaxDispositionURL'], updated_by_initializer: false)
     if fax_record.save!
       fax_record_attachment(fax_record, attachments_array)
       render json: {status: 200}
