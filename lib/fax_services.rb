@@ -23,7 +23,7 @@ module FaxServices
         return cipher
       end
 
-  # Will check it the server running or down
+      # Will check it the server running or not
       def service_alive?
         conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
           faraday.request :multipart
@@ -70,7 +70,7 @@ module FaxServices
             status:            response_result["isSuccess"],
             message:           response_result["message"],
             send_fax_queue_id:    response_result["SendFaxQueueId"],
-            send_confirm_date: response['date'])
+          send_confirm_date: response['date'])
           FileUtils.rm_rf Dir.glob("#{Rails.root}/tmp/fax_files/*")
           if fax_record.send_fax_queue_id.nil?
             Rails.logger.debug "==> error send_fax_queue_id is nil: #{response_result} <=="
@@ -82,6 +82,7 @@ module FaxServices
           Rails.logger.debug "==> Error actual_sending: #{fax_record.id} <=="
         end
       end
+
       # Getting the File Name , the File Extension and validate the document type
       def file_specification(file_path)
         file_name = File.basename ("#{file_path}").downcase
