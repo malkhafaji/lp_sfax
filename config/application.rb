@@ -13,5 +13,9 @@ module Fax
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
     #config.time_zone = 'Central Time (US & Canada)'
+
+    # Use a real queuing backend for Active Job (and separate queues per environment)
+    Rails.application.config.active_job.queue_adapter = :async
+    # config.active_job.queue_name_prefix = "fax_#{Rails.env}"
   end
 end
