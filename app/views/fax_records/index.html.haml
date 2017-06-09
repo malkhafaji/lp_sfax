@@ -21,7 +21,6 @@
           %th.text-center Fax ID
           %th.text-center Recipient name
           %th.text-center Recipient number
-          %th.text-center File(s) name
           %th.text-center Confirmation Message
           %th.text-center Status
           %th.text-center Attempts
@@ -40,8 +39,6 @@
               = fax_record.recipient_name
             %td
               = number_to_phone(fax_record.number_to_fax)
-            %td
-              = fax_record.file_path
             %td
               = fax_record.message
             %td
