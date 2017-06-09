@@ -23,7 +23,6 @@ ActiveRecord::Schema.define(version: 20170523154809) do
   create_table "fax_records", force: :cascade do |t|
     t.string   "recipient_name"
     t.string   "recipient_number"
-    t.string   "file_path"
     t.string   "status"
     t.string   "deprecated_send_fax_queue_id"
     t.string   "message"
