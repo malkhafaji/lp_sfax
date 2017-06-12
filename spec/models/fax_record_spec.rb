@@ -34,11 +34,6 @@ RSpec.describe FaxRecord, type: :model do
       fax_record_attributes.recipient_number ='recipient_number'
       expect(fax_record_attributes.recipient_number).to eq('recipient_number')
     end
-      it 'should have a file path in file_path' do
-      fax_record_attributes=FaxRecord.new
-      fax_record_attributes.file_path ='file_path'
-      expect(fax_record_attributes.file_path).to eq('file_path')
-    end
       it 'should have a message in message' do
       fax_record_attributes=FaxRecord.new
       fax_record_attributes.message ='Fax is received and being processed'
