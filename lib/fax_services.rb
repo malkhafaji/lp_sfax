@@ -100,7 +100,6 @@ module FaxServices
           fax_id: fax_record.id,
           recipient_name: fax_record.recipient_name,
           recipient_number: fax_record.recipient_number,
-          attached_fax_file: fax_record.file_path,
           success:  fax_record.status,
           message: fax_record.message,
           status: fax_record.status,
