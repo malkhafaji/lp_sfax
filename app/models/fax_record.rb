@@ -19,7 +19,7 @@ class FaxRecord < ApplicationRecord
 
   # Generating CSV file either for all records OR the records results from filter
   def self.to_csv(options = {})
-    columns_headers = {id:'Fax ID',recipient_name:'Recipient name',recipient_number:'Recipient number',file_path:'File(s) name',message:'Confirmation Message',result_message:'Status',attempts:'Attempts',pages:'Pages',sender_fax:'Sender No.',created_at:'Request Initiated',client_receipt_date:'Request Sent to Vendor',send_confirm_date:'Vendor Confirmation',fax_duration:'Duration'}
+    columns_headers = {id:'Fax ID',recipient_name:'Recipient name',recipient_number:'Recipient number',message:'Confirmation Message',result_message:'Status',attempts:'Attempts',pages:'Pages',sender_fax:'Sender No.',created_at:'Request Initiated',client_receipt_date:'Request Sent to Vendor',send_confirm_date:'Vendor Confirmation',fax_duration:'Duration'}
     attributes = %w{id recipient_name recipient_number file_path message result_message attempts pages sender_fax created_at client_receipt_date send_confirm_date fax_duration}
     CSV.generate(options) do |csv|
       csv << columns_headers.values

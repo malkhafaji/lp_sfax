@@ -38,9 +38,6 @@ RSpec.describe 'FaxRecordschema', type: :schema do
     it 'Search for column with name fax_success' do
       expect(list_of_schema_columns.grep('fax_success')).to eq(['fax_success'])
     end
-    it 'Search for column with name file_path' do
-      expect(list_of_schema_columns.grep('file_path')).to eq(['file_path'])
-    end
     it 'Search for column with name is_success' do
       expect(list_of_schema_columns.grep('is_success')).to eq(['is_success'])
     end
@@ -111,9 +108,6 @@ RSpec.describe 'FaxRecordschema', type: :schema do
     end
     it 'recipient_number should be type string' do
       expect(hash_of_schema_columns_names_and_types[:recipient_number]).to eq(:string)
-    end
-    it 'file_path should be type string' do
-      expect(hash_of_schema_columns_names_and_types[:file_path]).to eq(:string)
     end
     it 'status should be type string' do
       expect(hash_of_schema_columns_names_and_types[:status]).to eq(:string)

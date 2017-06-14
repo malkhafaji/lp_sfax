@@ -34,7 +34,6 @@ task :sendback_final_response_to_client => :environment do
         Fax_ID: record.id,
         Recipient_Name: record.recipient_name,
         Recipient_Number: record.recipient_number,
-        Attached_Fax_File: record.file_path,
         is_success: record.is_success,
         initial_Message: record.message,
         Final_Message: record.result_message,
