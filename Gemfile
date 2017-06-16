@@ -4,6 +4,7 @@ git_source(:github) do |repo_name|
   repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
   "https://github.com/#{repo_name}.git"
 end
+gem 'sidekiq'
 gem "execjs"
 gem 'therubyracer', platforms: :ruby
 gem 'capistrano'
@@ -35,6 +36,9 @@ group :development do
   gem 'web-console', '>= 3.3.0'
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
+
+  gem 'awesome_print'
+  gem 'interactive_editor'
 end
 
 group :production do

@@ -23,58 +23,88 @@ module FaxServices
         return cipher
       end
 
-      # sending the fax with the parameters fax_number,recipient_name ,attached file_path,fax_id and define either its sent by user call or by initializer call
-      def actual_sending(recipient_name, recipient_number, attachments, fax_id)
+      # Will check it the server running or not
+      def service_alive?
+        conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
+          faraday.request :multipart
+          faraday.request  :url_encoded
+          # faraday.response :logger
+          faraday.adapter Faraday.default_adapter
+        end
         begin
-          tid = nil
-          conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
-            faraday.request :multipart
-            faraday.request  :url_encoded
-            faraday.response :logger
-            faraday.adapter Faraday.default_adapter
+          if  conn.post.present?
+            return true
           end
-          token = get_token()
-          parts = ["sendfax?",
-            "token=#{CGI.escape(token)}",
-            "ApiKey=#{CGI.escape(APIKEY)}",
-            "RecipientFax=#{recipient_number}",
-            "RecipientName=#{recipient_name}",
-          "OptionalParams=&" ]
-          path = "/api/" + parts.join("&")
-          response = conn.post path do |req|
-            req.body = {}
-            attachments.each_with_index do |file, i|
-              req.body["file_name#{i}"] = Faraday::UploadIO.new("#{file}", file_specification(file)[0], file_specification(file)[1])
-            end
-          end
-          response_result = JSON.parse(response.body)
-          fax_record = FaxRecord.find_by(id: fax_id)
-          fax_record.update_attributes(
-            status:            response_result["isSuccess"],
-            message:           response_result["message"],
-            send_fax_queue_id:    response_result["SendFaxQueueId"],
-            send_confirm_date: response['date'])
-          FileUtils.rm_rf Dir.glob("#{Rails.root}/tmp/fax_files/*")
-          if fax_record.send_fax_queue_id.nil?
-            Rails.logger.debug "==> error send_fax_queue_id is nil: #{response_result} <=="
-            fax_record.update_attributes(is_success: false, message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
-          end
-          FaxServices::Fax.sendback_initial_response_to_client(fax_record)
         rescue
-          fax_record.update_attributes(is_success: false, message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
-          Rails.logger.debug "==> Error actual_sending: #{fax.id} <=="
+          return false
         end
       end
+
+      # checking for the server status every 30 sec
+      def checking_server
+        if service_alive?
+          $fax_service_status = true
+        else
+          $fax_service_status = false
+        end
+        sleep 30
+        checking_server
+      end
+
+
+      # sending the fax with the parameters fax_number,recipient_name ,attached file_path,fax_id and define either its sent by user call or by initializer call
+      def actual_sending(recipient_name, recipient_number, attachments, fax_id)
+        # begin
+        tid = nil
+        conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
+          faraday.request :multipart
+          faraday.request  :url_encoded
+          faraday.response :logger
+          faraday.adapter Faraday.default_adapter
+        end
+        token = get_token()
+        parts = ["sendfax?",
+          "token=#{CGI.escape(token)}",
+          "ApiKey=#{CGI.escape(APIKEY)}",
+          "RecipientFax=#{recipient_number}",
+          "RecipientName=#{recipient_name}",
+        "OptionalParams=&" ]
+        path = "/api/" + parts.join("&")
+        response = conn.post path do |req|
+          req.body = {}
+          attachments.each_with_index do |file, i|
+            req.body["file_name#{i}"] = Faraday::UploadIO.new("#{file}", file_specification(file)[0], file_specification(file)[1])
+          end
+        end
+        response_result = JSON.parse(response.body)
+        fax_record = FaxRecord.find_by(id: fax_id)
+        fax_record.update_attributes(
+          status:            response_result["isSuccess"],
+          message:           response_result["message"],
+          send_fax_queue_id:    response_result["SendFaxQueueId"],
+        send_confirm_date: response['date'])
+        FileUtils.rm_rf Dir.glob("#{Rails.root}/tmp/fax_files/*")
+        if fax_record.send_fax_queue_id.nil?
+          Rails.logger.debug "==> error send_fax_queue_id is nil: #{response_result} <=="
+          fax_record.update_attributes( message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
+        end
+        FaxServices::Fax.sendback_initial_response_to_client(fax_record)
+        # rescue
+        #   fax_record.update_attributes( message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
+        #   Rails.logger.debug "==> Error actual_sending: #{fax_record.id} <=="
+        # end
+      end
+
       # Getting the File Name , the File Extension and validate the document type
       def file_specification(file_path)
         file_name = File.basename ("#{file_path}").downcase
         file_extension = File.extname (file_name).downcase
         accepted_extensions = [".tif", ".xls", ".doc", ".pdf", ".docx", ".txt", ".rtf", ".xlsx", ".ppt", ".odt", ".ods", ".odp", ".bmp", ".gif", ".jpg", ".png"]
-         if accepted_extensions.include?(file_extension)
-           return "application/#{file_extension}", file_name
-         else
+        if accepted_extensions.include?(file_extension)
+          return "application/#{file_extension}", file_name
+        else
           return false
-         end
+        end
       end
 
       # search and find all faxes without Queue_id (not sent yet) and send them by call from the initializer (when the server start)
