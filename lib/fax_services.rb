@@ -26,6 +26,8 @@ module FaxServices
       # sending the fax with the parameters fax_number,recipient_name ,attached file_path,fax_id and define either its sent by user call or by initializer call
       def actual_sending(recipient_name, recipient_number, attachments, fax_id)
         begin
+          fax_record = FaxRecord.find_by(id: fax_id)
+          Rails.logger.debug "***********#{fax_record.inspect}"
           tid = nil
           conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
             faraday.request :multipart
@@ -49,6 +51,7 @@ module FaxServices
           end
           response_result = JSON.parse(response.body)
           fax_record = FaxRecord.find_by(id: fax_id)
+          Rails.logger.debug "***********#{response_result}"
           fax_record.update_attributes(
             status:            response_result["isSuccess"],
             message:           response_result["message"],

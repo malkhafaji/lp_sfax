@@ -29,6 +29,8 @@ gem 'haml', '~> 4.0.5'
 group :development, :test do
   gem 'byebug', platform: :mri
   gem 'rspec-rails', '~> 3.5'
+  gem 'faker', '~> 1.7', '>= 1.7.3'
+  gem 'fakeweb', '~> 1.3'
 end
 
 group :development do
