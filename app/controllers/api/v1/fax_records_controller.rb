@@ -23,7 +23,6 @@ class Api::V1::FaxRecordsController < ApplicationController
       fax_record.client_receipt_date = Time.now
       fax_record.recipient_number = recipient_number
       fax_record.recipient_name = recipient_name
-      fax_record.file_path = original_file_name
       fax_record.callback_url = callback_url
       fax_record.updated_by_initializer = false
       fax_record.save!
