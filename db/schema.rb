@@ -10,14 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170523154809) do
+ActiveRecord::Schema.define(version: 20170627160932) do
 
   create_table "attachments", force: :cascade do |t|
     t.integer  "fax_record_id"
     t.integer  "file_id"
     t.string   "checksum"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+    t.string   "file_reference"
   end
 
   create_table "fax_records", force: :cascade do |t|
