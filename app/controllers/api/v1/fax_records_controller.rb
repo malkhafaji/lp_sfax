@@ -13,12 +13,15 @@ class Api::V1::FaxRecordsController < ApplicationController
       callback_url = params['FaxDispositionURL']
       attachments_array = params_to_array(params['Attachments'])
       attachments = []
+      url_array = []
       original_file_name = ''
       attachments_array.each_with_index do |file_info|
-        file_info = WebServices::Web.file_path(file_info[0], file_info[1])
-        attachments << file_info[0]
-        original_file_name += file_info[1]
-      end
+        attachment_info = WebServices::Web.file_path(file_info[0], file_info[1])
+        attachments << attachment_info[0]
+        original_file_name += attachment_info[1]
+        url_array << {id: file_info[0], url: attachment_info[2]}
+       end
+
       fax_record = FaxRecord.new
       fax_record.client_receipt_date = Time.now
       fax_record.recipient_number = recipient_number
@@ -27,7 +30,7 @@ class Api::V1::FaxRecordsController < ApplicationController
       fax_record.callback_url = callback_url
       fax_record.updated_by_initializer = false
       fax_record.save!
-      fax_record_attachment(fax_record, attachments_array)
+      fax_record_attachment(fax_record, attachments_array, url_array)
       initial_response = FaxServices::Fax.actual_sending(recipient_name, recipient_number, attachments, fax_record.id)
       render json: initial_response
     rescue Exception => e
@@ -51,9 +54,10 @@ class Api::V1::FaxRecordsController < ApplicationController
     array_of_files_id_and_checksum.each_slice(2).to_a
   end
 
-  def fax_record_attachment(fax_record, attachments_array)
+  def fax_record_attachment(fax_record, attachments_array, url_array )
     attachments_array.each do |file_info|
-      Attachment.create(fax_record_id: fax_record.id, file_id: file_info[0], checksum: file_info[1])
+      url= url_array.select {|f| f[:id] ==  file_info[0]}
+      Attachment.create(fax_record_id: fax_record.id, file_id: file_info[0], checksum: file_info[1], file_reference: url[0][:url])
     end
   end
 end
