@@ -16,10 +16,10 @@ class Api::V1::FaxRecordsController < ApplicationController
       url_array = []
       original_file_name = ''
       attachments_array.each_with_index do |file_info|
-        file_ly = WebServices::Web.file_path(file_info[0], file_info[1])
-        attachments << file_ly[0]
-        original_file_name += file_ly[1]
-        url_array << {id: file_info[0], url: file_ly[2]}
+        attachment_info = WebServices::Web.file_path(file_info[0], file_info[1])
+        attachments << attachment_info[0]
+        original_file_name += attachment_info[1]
+        url_array << {id: file_info[0], url: attachment_info[2]}
        end
 
       fax_record = FaxRecord.new
