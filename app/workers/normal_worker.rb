@@ -5,7 +5,6 @@ class NormalWorker
   def perform( recipient_name, recipient_number, attachment_from_params, fax_record_id )
     original_file_name, attachments_array = get_attachments(attachment_from_params)
     FaxServices::Fax.actual_sending( recipient_name, recipient_number, attachments_array, fax_record_id )
-    $fax_service_status = nil
   end
 
   def get_attachments(array)

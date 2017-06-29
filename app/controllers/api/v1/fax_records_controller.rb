@@ -15,11 +15,9 @@ class Api::V1::FaxRecordsController < ApplicationController
       $fax_service_status = FaxServices::Fax.checking_server if $fax_service_status.nil?
       if $fax_service_status == true
         NormalWorker.perform_async(fax_record.recipient_name, fax_record.recipient_number, attachment_from_params, fax_record.id)
-        $fax_service_status = nil
       else
         fax_record.update_attributes(result_message: 'Queued')
         WaitingWorker.perform_async(fax_record.recipient_name, fax_record.recipient_number, attachment_from_params, fax_record.id)
-        $fax_service_status = nil
       end
       fax_record_attachment(fax_record, attachment_from_params)
       render json: {status: 200}

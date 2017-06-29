@@ -36,9 +36,6 @@ group :development do
   gem 'web-console', '>= 3.3.0'
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
-
-  gem 'awesome_print'
-  gem 'interactive_editor'
 end
 
 group :production do
