@@ -14,10 +14,10 @@ class Api::V1::FaxRecordsController < ApplicationController
       attachments_array = params_to_array(params['Attachments'])
       attachments = []
       original_file_name = ''
-      attachments_array.each_with_index do |file_info|
-        file_info = WebServices::Web.file_path(file_info[0], file_info[1])
-        attachments << file_info[0]
-        original_file_name += file_info[1]
+      attachments_array.each do |file_info|
+        file_info_list = WebServices::Web.file_path(file_info[0])
+        attachments << file_info_list[0]
+        original_file_name += file_info_list[1]
       end
       fax_record = FaxRecord.new
       fax_record.client_receipt_date = Time.now
@@ -53,7 +53,7 @@ class Api::V1::FaxRecordsController < ApplicationController
 
   def fax_record_attachment(fax_record, attachments_array)
     attachments_array.each do |file_info|
-      Attachment.create(fax_record_id: fax_record.id, file_id: file_info[0], checksum: file_info[1])
+      Attachment.create(fax_record_id: fax_record.id, file_unique_key: file_info[0])
     end
   end
 end
