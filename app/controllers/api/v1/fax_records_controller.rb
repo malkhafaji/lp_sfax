@@ -34,22 +34,22 @@ class Api::V1::FaxRecordsController < ApplicationController
 
   private
   def params_to_array(string)
-    array_of_files_id_and_checksum = []
+    array_of_files_key = []
     j,u = 0,0
     parsed_string= string.split(/[\s,+=]/)
     parsed_string.each do |i|
       j = j+1
         if j % 2 == 0
-         array_of_files_id_and_checksum = ( (u % 2 == 0) ? array_of_files_id_and_checksum.push(i.to_i) : array_of_files_id_and_checksum.push(i.to_s) )
+         array_of_files_key = ( (u % 2 == 0) ? array_of_files_key.push(i.to_i) : array_of_files_key.push(i.to_s) )
           u=u+1
         end
     end
-    array_of_files_id_and_checksum.each_slice(2).to_a
+    array_of_files_key.each_slice(2).to_a
   end
 
   def fax_record_attachment(fax_record, attachments_array)
     attachments_array.each do |file_info|
-      Attachment.create(fax_record_id: fax_record.id, file_unique_key: file_info[0])
+      Attachment.create(fax_record_id: fax_record.id, file_key: file_info[0])
     end
   end
 end
