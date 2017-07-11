@@ -43,8 +43,8 @@ class Api::V1::FaxRecordsController < ApplicationController
   end
 
   def fax_record_attachment(fax_record, attachments_array)
-    attachments_array.each do |file_info|
-      Attachment.create(fax_record_id: fax_record.id, file_key: file_info[0])
+    attachments_array.each do |file_key|
+      Attachment.create(fax_record_id: fax_record.id, file_key: file_key)
     end
   end
 end
