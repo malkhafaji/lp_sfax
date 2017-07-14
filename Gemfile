@@ -6,10 +6,6 @@ git_source(:github) do |repo_name|
 end
 gem "execjs"
 gem 'therubyracer', platforms: :ruby
-gem 'capistrano'
-gem 'capistrano-rails'
-gem 'capistrano-bundler'
-gem 'capistrano-rvm'
 gem 'ci_reporter'
 gem 'faraday'
 gem 'rails', '~> 5.0.1'
@@ -22,7 +18,6 @@ gem 'jquery-rails'
 gem 'turbolinks', '~> 5'
 gem 'jbuilder', '~> 2.5'
 gem 'httparty', '~> 0.14.0'
-gem 'listen', '~> 3.0'
 gem 'figaro'
 gem 'haml', '~> 4.0.5'
 
@@ -32,9 +27,12 @@ group :development, :test do
 end
 
 group :development do
+  gem 'capistrano', '~> 3.6'
+  gem 'capistrano-rails', '~> 1.3'
   gem 'web-console', '>= 3.3.0'
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
+  gem 'listen', '~> 3.1', '>= 3.1.5'
 end
 
 group :production do
