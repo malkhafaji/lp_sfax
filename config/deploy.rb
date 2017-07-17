@@ -35,7 +35,7 @@ set :normalize_asset_timestamps, %w{public/images public/javascripts public/styl
 # set this to the number of versions to keep
 set :keep_assets, 2
 # Default branch is :master
-# ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
+ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
 
 # Default deploy_to directory is /var/www/my_app_name
 set :deploy_to, "/var/www/apps/fax_service"
@@ -49,7 +49,6 @@ set :deploy_to, "/var/www/apps/fax_service"
 set :linked_files, %w{config/application.yml}
 # Default value for :pty is false
 set :pty, true
-
 # Default value for :linked_files is []
 # append :linked_files, "config/database.yml", "config/secrets.yml"
 
