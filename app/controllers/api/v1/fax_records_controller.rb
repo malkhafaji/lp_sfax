@@ -12,10 +12,7 @@ class Api::V1::FaxRecordsController < ApplicationController
       recipient_number = params['recipient_number']
       callback_url = params['FaxDispositionURL']
       attachments_array = params_to_array(params['Attachments'])
-      attachments = []
-      attachments_array.each do |file_key|
-        attachments << WebServices::Web.file_path(file_key)
-      end
+      attachments=  WebServices::Web.file_path(attachments_array)
       fax_record = FaxRecord.new
       fax_record.client_receipt_date = Time.now
       fax_record.recipient_number = recipient_number
