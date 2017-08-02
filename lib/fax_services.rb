@@ -57,11 +57,11 @@ module FaxServices
           FileUtils.rm_rf Dir.glob("#{Rails.root}/tmp/fax_files/*")
           if fax_record.send_fax_queue_id.nil?
             Rails.logger.debug "==> error send_fax_queue_id is nil: #{response_result} <=="
-            fax_record.update_attributes(is_success: false, message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
+            fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
           end
           FaxServices::Fax.sendback_initial_response_to_client(fax_record)
         rescue
-          fax_record.update_attributes(is_success: false, message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
+          fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
           Rails.logger.debug "==> Error actual_sending: #{fax.id} <=="
         end
       end
