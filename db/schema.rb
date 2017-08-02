@@ -53,11 +53,9 @@ ActiveRecord::Schema.define(version: 20170706205531) do
     t.datetime "send_confirm_date"
     t.datetime "fax_date_iso"
     t.decimal  "fax_duration"
-    t.datetime "created_at",                                        null: false
-    t.datetime "updated_at",                                        null: false
+    t.datetime "created_at",                                    null: false
+    t.datetime "updated_at",                                    null: false
     t.string   "callback_url"
-    t.boolean  "record_completed",                  default: false
-    t.integer  "resend",                            default: 0
   end
 
 end

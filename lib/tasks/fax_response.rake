@@ -4,7 +4,7 @@ MAX_FAX_RESPONSE_CHECK_TRIES = ENV['max_fax_response_check_tries']
 # Checking which fax sent and which not by the SendFaxQueueId and max_fax_response_check_tries, if not send it then send it
 desc 'check_fax_response'
 task :check_fax_response => :environment do
-  fax_requests_queue_ids = FaxRecord.where(record_completed: false).where.not(send_fax_queue_id: nil).where("max_fax_response_check_tries is null OR max_fax_response_check_tries<#{MAX_FAX_RESPONSE_CHECK_TRIES}").pluck(:send_fax_queue_id)
+  fax_requests_queue_ids = FaxRecord.where.not(send_fax_queue_id: nil).where("max_fax_response_check_tries is null OR max_fax_response_check_tries<#{MAX_FAX_RESPONSE_CHECK_TRIES}").pluck(:send_fax_queue_id)
   if fax_requests_queue_ids.any?
     Rails.logger.debug "==> checking response for: #{fax_requests_queue_ids}<=="
     fax_requests_queue_ids.each do |fax_requests_queue_id|
@@ -25,7 +25,7 @@ end
 # Sending final response as array of jsons to the client for all sent faxes
 desc 'Sending final response as array of jsons to the client for all sent faxes'
 task :sendback_final_response_to_client => :environment do
-  records_groups = FaxRecord.where(sendback_final_response_to_client: 0).where.not(send_fax_queue_id: nil).where(record_completed: true).group_by(&:callback_url)
+  records_groups = FaxRecord.where(sendback_final_response_to_client: 0).where.not(send_fax_queue_id: nil).group_by(&:callback_url)
   records_groups.each do |url, records|
     array_of_records = []
     Rails.logger.debug "==> total #{records.size} records for #{url} <=="
@@ -78,27 +78,6 @@ task :sendback_final_response_to_client => :environment do
           Rails.logger.debug "==> post error: #{e.message} <=="
         end
       end
-    end
-  end
-end
-
-# Resend the fax if the result code is 6000 and result message is "Fax Number Busy"
-desc "Resending Faxes with error"
-task :resend_fax_with_errors => :environment do
-  FaxRecord.has_send_error.each do |fax|
-    attachments= []
-    @original_file_name = ''
-    if ((fax[:resend]).between?(0,4) ) && ( (fax[:record_completed] == false))
-      fax.update_attributes( resend: fax.resend + 1)
-      Attachment.where(fax_record_id: fax.id).each do |file|
-        file_info = WebServices::Web.file_path(file[:file_id],file[:checksum])
-        attachments << file_info[0]
-      end
-      Rails.logger.debug "==> resend_fax_with_errors: #{fax.id} <=="
-      FaxServices::Fax.actual_sending(fax.recipient_name , fax.recipient_number, attachments , fax.id)
-    else
-      Rails.logger.debug "==> resend_fax_with_errors reached max: #{fax.id} <=="
-      fax.update_attributes(record_completed: true)
     end
   end
 end

@@ -110,8 +110,6 @@ module FaxServices
 
         if fax_record.updated_by_initializer == true
           Rails.logger.debug "==> sendback_initial_response_to_client/updated_by_initializer: #{client_initial_response} <=="
-        elsif fax_record.resend > 0 && fax_record.record_completed == false
-          Rails.logger.debug "==> sendback_initial_response_to_client/Resend: #{client_initial_response} <=="
         else
           Rails.logger.debug "==> sendback_initial_response_to_client: #{client_initial_response} <=="
           client_initial_response
@@ -160,9 +158,6 @@ module FaxServices
               result_message:      result_message,
               fax_duration:        fax_duration
             )
-            if parse_response['ResultCode'] != 6000
-              fax_record.update_attributes(record_completed: true)
-            end
           else
             Rails.logger.debug '==>fax_response: no response found <=='
           end
