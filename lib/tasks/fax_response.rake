@@ -4,13 +4,16 @@ MAX_FAX_RESPONSE_CHECK_TRIES = ENV['max_fax_response_check_tries']
 # Checking which fax sent and which not by the SendFaxQueueId and max_fax_response_check_tries, if not send it then send it
 desc 'check_fax_response'
 task :check_fax_response => :environment do
-  fax_requests_queue_ids = FaxRecord.where.not(send_fax_queue_id: nil).where("max_fax_response_check_tries is null OR max_fax_response_check_tries<#{MAX_FAX_RESPONSE_CHECK_TRIES}").pluck(:send_fax_queue_id)
+  fax_requests_queue_ids = FaxRecord.where(result_code: nil).where.not(send_fax_queue_id: nil).where("max_fax_response_check_tries is null OR max_fax_response_check_tries<#{MAX_FAX_RESPONSE_CHECK_TRIES}").pluck(:send_fax_queue_id)
   if fax_requests_queue_ids.any?
     Rails.logger.debug "==> checking response for: #{fax_requests_queue_ids}<=="
     fax_requests_queue_ids.each do |fax_requests_queue_id|
       begin
         Rails.logger.debug "==>requesting response for: #{fax_requests_queue_id}<=="
         FaxServices::Fax.fax_response(fax_requests_queue_id)
+        if FaxRecord.find_by(send_fax_queue_id: fax_requests_queue_id).result_code == 6000 && FaxRecord.find_by(send_fax_queue_id: fax_requests_queue_id).result_message == 'Fax Number Busy'
+          FaxResendWorker.perform_in(60.minutes,fax_requests_queue_id)
+        end
       rescue Exception => e
         Rails.logger.debug "==>error: #{e.message.inspect}<=="
         fax_record = FaxRecord.find_by(send_fax_queue_id: fax_requests_queue_id)

@@ -21,6 +21,7 @@ gem 'httparty', '~> 0.14.0'
 gem 'figaro'
 gem 'haml', '~> 4.0.5'
 gem 'rubyzip'
+gem 'sidekiq'
 
 group :development, :test do
   gem 'byebug', platform: :mri

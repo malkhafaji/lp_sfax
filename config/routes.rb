@@ -1,4 +1,10 @@
 Rails.application.routes.draw do
+
+  require 'sidekiq/web'
+  mount Sidekiq::Web => '/sidekiq'
+
+  get 'run_tasks', to: 'application#run_tasks'
+
   resources :fax_records, only: [] do
     collection do
       match 'index', via: [:get, :post]
@@ -17,5 +23,4 @@ Rails.application.routes.draw do
   	end
   end
 
-  get 'run_tasks', to: 'application#run_tasks'
 end
