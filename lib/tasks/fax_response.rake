@@ -12,6 +12,7 @@ task :check_fax_response => :environment do
         Rails.logger.debug "==>requesting response for: #{fax_requests_queue_id}<=="
         FaxServices::Fax.fax_response(fax_requests_queue_id)
       rescue Exception => e
+        NotificationMailer.sys_error(e.message).deliver
         Rails.logger.debug "==>error: #{e.message.inspect}<=="
         fax_record = FaxRecord.find_by(send_fax_queue_id: fax_requests_queue_id)
         fax_record.update_attributes(max_fax_response_check_tries: fax_record.max_fax_response_check_tries.to_i + 1)
@@ -75,6 +76,7 @@ task :sendback_final_response_to_client => :environment do
             Rails.logger.debug "==> response error: #{response} <=="
           end
         rescue Exception => e
+          NotificationMailer.sys_error(e.message).deliver
           Rails.logger.debug "==> post error: #{e.message} <=="
         end
       end
