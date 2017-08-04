@@ -127,7 +127,7 @@ module FaxServices
           if response["RecipientFaxStatusItems"].present?
             fax_record = FaxRecord.find_by_send_fax_queue_id(fax_requests_queue_id)
             parse_response = response["RecipientFaxStatusItems"][0]
-            unless parse_response['ResultCode'] == 6000
+            unless fax_record.resend <= ENV['MAX_RESEND'].to_i && parse_response['ResultCode'] == 6000
               Rails.logger.debug "==> final response: #{parse_response} <=="
               if parse_response['ResultCode'] == 0
                 fax_duration = calculate_duration(fax_record.client_receipt_date, (Time.parse(parse_response['FaxDateUtc'])))
@@ -162,7 +162,7 @@ module FaxServices
             else
               Rails.logger.debug "==> Resend fax with ID = #{fax_record.id} <=="
               fax_record.update_attributes(resend: (fax_record.resend+1))
-              FaxResendWorker.perform_in((ENV['resend_delay'].to_i).minutes, fax_requests_queue_id)
+              ResendFax.perform_in((ENV['DELAY_RESEND'].to_i).minutes, fax_record.id)
               sleep 15
             end
           else
