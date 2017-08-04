@@ -25,6 +25,7 @@ module FaxServices
 
       # sending the fax with the parameters fax_number,recipient_name ,attached file_path,fax_id and define either its sent by user call or by initializer call
       def actual_sending(recipient_name, recipient_number, attachments, fax_id)
+        fax_record = FaxRecord.find_by(id: fax_id)
         begin
           tid = nil
           conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
@@ -48,7 +49,6 @@ module FaxServices
             end
           end
           response_result = JSON.parse(response.body)
-          fax_record = FaxRecord.find_by(id: fax_id)
           fax_record.update_attributes(
             status:            response_result["isSuccess"],
             message:           response_result["message"],
@@ -62,7 +62,7 @@ module FaxServices
           FaxServices::Fax.sendback_initial_response_to_client(fax_record)
         rescue
           fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
-          Rails.logger.debug "==> Error actual_sending: #{fax.id} <=="
+          Rails.logger.debug "==> Error actual_sending: #{fax_record.id} <=="
         end
       end
       # Getting the File Name , the File Extension and validate the document type
@@ -126,8 +126,8 @@ module FaxServices
           response = send_fax_status(fax_requests_queue_id)
           if response["RecipientFaxStatusItems"].present?
             fax_record = FaxRecord.find_by_send_fax_queue_id(fax_requests_queue_id)
+            parse_response = response["RecipientFaxStatusItems"][0]
             unless parse_response['ResultCode'] == 6000
-              parse_response = response["RecipientFaxStatusItems"][0]
               Rails.logger.debug "==> final response: #{parse_response} <=="
               if parse_response['ResultCode'] == 0
                 fax_duration = calculate_duration(fax_record.client_receipt_date, (Time.parse(parse_response['FaxDateUtc'])))
@@ -160,9 +160,10 @@ module FaxServices
                 fax_duration:        fax_duration
               )
             else
-              Rails.logger.debug '==> resending the fax <=='
-              fax_record.update_attribute(resend, fax_record.resend + 1)
-              FaxResendWorker.perform_in(60.minutes, fax_requests_queue_id)
+              Rails.logger.debug "==> Resend fax with ID = #{fax_record.id} <=="
+              fax_record.update_attributes(resend: (fax_record.resend+1))
+              FaxResendWorker.perform_in((ENV['resend_delay'].to_i).minutes, fax_requests_queue_id)
+              sleep 15
             end
           else
             Rails.logger.debug '==>fax_response: no response found <=='
