@@ -1,7 +1,7 @@
 # Checking which fax sent and which not by the SendFaxQueueId and max_fax_response_check_tries, if not send it then send it
 desc 'check_fax_response'
 task :check_fax_response => :environment do
-  fax_requests_queue_ids = FaxRecord.fax_without_response
+  fax_requests_queue_ids = FaxRecord.without_response_q_ids
   if fax_requests_queue_ids.any?
     Rails.logger.debug "==> checking response for: #{fax_requests_queue_ids}<=="
     fax_requests_queue_ids.each do |fax_requests_queue_id|
