@@ -14,3 +14,7 @@ MAX_RESEND: '1'
 file_service_path: ''
 
 pagination_per_page: '100'
+
+GMAIL_USER: ''
+GMAIL_PASSWORD: ''
+ADMIN_LIST: ''
