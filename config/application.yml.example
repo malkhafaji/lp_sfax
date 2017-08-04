@@ -6,7 +6,7 @@ encryptionkey: ''
 fax_server_url: ''
 
 # variables for lib/tasks/fax_response.rake
-max_fax_response_check_tries: '20'
+MAX_RESPONSE_CHECK: '20'
 max_records_send_to_client: '25'
 MAX_RESEND: '1'
 #file service server info
