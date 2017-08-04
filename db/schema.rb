@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(version: 20170804183140) do
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
     t.string   "file_key"
+    t.index ["file_key"], name: "index_attachments_on_file_key"
   end
 
   create_table "fax_records", force: :cascade do |t|

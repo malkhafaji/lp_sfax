@@ -164,7 +164,6 @@ module FaxServices
               Rails.logger.debug "==> Resend fax with ID = #{fax_record.id} <=="
               fax_record.update_attributes(resend: (fax_record.resend+1))
               ResendFax.perform_in((ENV['DELAY_RESEND'].to_i).minutes, fax_record.id)
-              sleep 15
             end
           else
             Rails.logger.debug '==>fax_response: no response found <=='
