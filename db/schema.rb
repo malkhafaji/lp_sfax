@@ -58,7 +58,7 @@ ActiveRecord::Schema.define(version: 20170804183140) do
     t.datetime "updated_at",                                    null: false
     t.string   "callback_url"
     t.integer  "resend",                            default: 0
-    t.index ["send_fax_queue_id"], name: "index_fax_records_on_send_fax_queue_id", unique: true
+    t.index ["send_fax_queue_id"], name: "index_fax_records_on_send_fax_queue_id"
   end
 
 end
