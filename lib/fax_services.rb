@@ -25,6 +25,7 @@ module FaxServices
 
       # sending the fax with the parameters fax_number,recipient_name ,attached file_path,fax_id and define either its sent by user call or by initializer call
       def actual_sending(recipient_name, recipient_number, attachments, fax_id)
+        fax_record = FaxRecord.find_by(id: fax_id)
         begin
           tid = nil
           conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
@@ -48,11 +49,11 @@ module FaxServices
             end
           end
           response_result = JSON.parse(response.body)
-          fax_record = FaxRecord.find_by(id: fax_id)
           fax_record.update_attributes(
             status:            response_result["isSuccess"],
             message:           response_result["message"],
-            send_fax_queue_id:    response_result["SendFaxQueueId"],
+            send_fax_queue_id: response_result["SendFaxQueueId"],
+            max_fax_response_check_tries: 0,
             send_confirm_date: response['date'])
           FileUtils.rm_rf Dir.glob("#{Rails.root}/tmp/fax_files/*")
           if fax_record.send_fax_queue_id.nil?
@@ -62,7 +63,7 @@ module FaxServices
           FaxServices::Fax.sendback_initial_response_to_client(fax_record)
         rescue
           fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
-          Rails.logger.debug "==> Error actual_sending: #{fax.id} <=="
+          Rails.logger.debug "==> Error actual_sending: #{fax_record.id} <=="
         end
       end
       # Getting the File Name , the File Extension and validate the document type
@@ -125,39 +126,45 @@ module FaxServices
         begin
           response = send_fax_status(fax_requests_queue_id)
           if response["RecipientFaxStatusItems"].present?
-            parse_response = response["RecipientFaxStatusItems"][0]
-            Rails.logger.debug "==> final response: #{parse_response} <=="
             fax_record = FaxRecord.find_by_send_fax_queue_id(fax_requests_queue_id)
-            if parse_response['ResultCode'] == 0
-              fax_duration = calculate_duration(fax_record.client_receipt_date, (Time.parse(parse_response['FaxDateUtc'])))
-              result_message = 'Success'
+            parse_response = response["RecipientFaxStatusItems"][0]
+            unless fax_record.resend <= ENV['MAX_RESEND'].to_i && parse_response['ResultCode'] == 6000
+              Rails.logger.debug "==> final response: #{parse_response} <=="
+              if parse_response['ResultCode'] == 0
+                fax_duration = calculate_duration(fax_record.client_receipt_date, (Time.parse(parse_response['FaxDateUtc'])))
+                result_message = 'Success'
+              else
+                result_message = parse_response['ResultMessage']
+                fax_duration = 0.0
+              end
+              fax_record.update_attributes(
+                send_fax_queue_id:   parse_response['SendFaxQueueId'],
+                is_success:          parse_response['IsSuccess'],
+                error_code:          parse_response['ErrorCode'],
+                recipient_name:      parse_response['RecipientName'],
+                recipient_fax:       parse_response['RecipientFax'],
+                tracking_code:       parse_response['TrackingCode'],
+                fax_date_utc:        parse_response['FaxDateUtc'],
+                fax_id:              parse_response['FaxId'],
+                pages:               parse_response['Pages'],
+                attempts:            parse_response['Attempts'],
+                sender_fax:          parse_response['SenderFax'],
+                barcode_items:       parse_response['BarcodeItems'],
+                fax_success:         parse_response['FaxSuccess'],
+                out_bound_fax_id:    parse_response['OutBoundFaxId'],
+                fax_pages:           parse_response['FaxPages'],
+                fax_date_iso:        parse_response['FaxDateIso'],
+                watermark_id:        parse_response['WatermarkId'],
+                message:             response['message'],
+                result_code:         parse_response['ResultCode'],
+                result_message:      result_message,
+                fax_duration:        fax_duration
+              )
             else
-              result_message = parse_response['ResultMessage']
-              fax_duration = 0.0
+              Rails.logger.debug "==> Resend fax with ID = #{fax_record.id} <=="
+              fax_record.update_attributes(resend: (fax_record.resend+1))
+              ResendFax.perform_in((ENV['DELAY_RESEND'].to_i).minutes, fax_record.id)
             end
-            fax_record.update_attributes(
-              send_fax_queue_id:   parse_response['SendFaxQueueId'],
-              is_success:          parse_response['IsSuccess'],
-              error_code:          parse_response['ErrorCode'],
-              recipient_name:      parse_response['RecipientName'],
-              recipient_fax:       parse_response['RecipientFax'],
-              tracking_code:       parse_response['TrackingCode'],
-              fax_date_utc:        parse_response['FaxDateUtc'],
-              fax_id:              parse_response['FaxId'],
-              pages:               parse_response['Pages'],
-              attempts:            parse_response['Attempts'],
-              sender_fax:          parse_response['SenderFax'],
-              barcode_items:       parse_response['BarcodeItems'],
-              fax_success:         parse_response['FaxSuccess'],
-              out_bound_fax_id:    parse_response['OutBoundFaxId'],
-              fax_pages:           parse_response['FaxPages'],
-              fax_date_iso:        parse_response['FaxDateIso'],
-              watermark_id:        parse_response['WatermarkId'],
-              message:             response['message'],
-              result_code:         parse_response['ResultCode'],
-              result_message:      result_message,
-              fax_duration:        fax_duration
-            )
           else
             Rails.logger.debug '==>fax_response: no response found <=='
           end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170706205531) do
+ActiveRecord::Schema.define(version: 20170804183140) do
 
   create_table "attachments", force: :cascade do |t|
     t.integer  "fax_record_id"
@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(version: 20170706205531) do
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
     t.string   "file_key"
+    t.index ["file_key"], name: "index_attachments_on_file_key"
   end
 
   create_table "fax_records", force: :cascade do |t|
@@ -56,6 +57,8 @@ ActiveRecord::Schema.define(version: 20170706205531) do
     t.datetime "created_at",                                    null: false
     t.datetime "updated_at",                                    null: false
     t.string   "callback_url"
+    t.integer  "resend",                            default: 0
+    t.index ["send_fax_queue_id"], name: "index_fax_records_on_send_fax_queue_id", unique: true
   end
 
 end
