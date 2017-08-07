@@ -169,7 +169,7 @@ module FaxServices
             Rails.logger.debug '==>fax_response: no response found <=='
           end
         rescue Exception => e
-          NotificationMailer.sys_error(e.message).deliver
+          NotificationMailer.app_error(e.message).deliver
           Rails.logger.debug "==>fax_response error: #{e.message} <=="
         end
       end
@@ -194,7 +194,7 @@ module FaxServices
           end
           return JSON.parse(response.body)
         rescue Exception => e
-          NotificationMailer.sys_error(e.message).deliver
+          NotificationMailer.app_error(e.message).deliver
           Rails.logger.debug "==>send_fax_status error: #{e.message} <=="
         end
       end
