@@ -1,3 +1,5 @@
+
+include HelperMethods
 require 'open-uri'
 include WebServices
 class Api::V1::FaxRecordsController < ApplicationController
@@ -24,9 +26,7 @@ class Api::V1::FaxRecordsController < ApplicationController
       initial_response = FaxServices::Fax.actual_sending(recipient_name, recipient_number, attachments, fax_record.id)
       render json: initial_response
     rescue Exception => e
-      NotificationMailer.sys_error(e.message).deliver
-      render json: e.message.inspect
-      Rails.logger.debug "==> error send_fax: #{e.message.inspect} <=="
+      app_logger('error', e, 'def send_fax')
     end
   end
 
