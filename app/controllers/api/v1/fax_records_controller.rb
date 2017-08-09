@@ -1,5 +1,3 @@
-
-include HelperMethods
 require 'open-uri'
 include WebServices
 class Api::V1::FaxRecordsController < ApplicationController
@@ -26,7 +24,7 @@ class Api::V1::FaxRecordsController < ApplicationController
       initial_response = FaxServices::Fax.actual_sending(recipient_name, recipient_number, attachments, fax_record.id)
       render json: initial_response
     rescue Exception => e
-      app_logger('error', e, 'def send_fax')
+      app_logger('error', e)
     end
   end
 

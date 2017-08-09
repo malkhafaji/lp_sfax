@@ -1,4 +1,3 @@
-include HelperMethods
 require 'doxifer.rb'
 require 'faraday'
 require 'pp'
@@ -170,7 +169,7 @@ module FaxServices
             Rails.logger.debug '==>fax_response: no response found <=='
           end
         rescue Exception => e
-          app_logger('error', e, 'def fax_response')
+          app_logger('error', e)
         end
       end
 
@@ -194,7 +193,7 @@ module FaxServices
           end
           return JSON.parse(response.body)
         rescue Exception => e
-            app_logger('error', e, 'def send_fax_status')
+            app_logger('error', e)
         end
       end
     end
