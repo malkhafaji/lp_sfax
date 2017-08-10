@@ -1,5 +1,4 @@
 require 'open-uri'
-include WebServices
 class Api::V1::FaxRecordsController < ApplicationController
   skip_before_action  :verify_authenticity_token
 
@@ -24,7 +23,7 @@ class Api::V1::FaxRecordsController < ApplicationController
       initial_response = FaxServices::Fax.actual_sending(recipient_name, recipient_number, attachments, fax_record.id)
       render json: initial_response
     rescue Exception => e
-      app_logger('error', e)
+      HelperMethods::LogApp.app_logger('error', e)
     end
   end
 

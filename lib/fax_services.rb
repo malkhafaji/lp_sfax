@@ -5,6 +5,7 @@ require 'time'
 require 'json'
 require 'fileutils'
 include WebServices
+
 # The requirements to connect with Vendor
 USERNAME = ENV['username']
 APIKEY = ENV['APIkey']
@@ -169,7 +170,9 @@ module FaxServices
             Rails.logger.debug '==>fax_response: no response found <=='
           end
         rescue Exception => e
-          app_logger('error', e)
+          HelperMethods::LogApp.app_logger('error', e)
+
+
         end
       end
 
@@ -193,7 +196,7 @@ module FaxServices
           end
           return JSON.parse(response.body)
         rescue Exception => e
-            app_logger('error', e)
+            HelperMethods::LogApp.app_logger('error', e)
         end
       end
     end
