@@ -171,8 +171,6 @@ module FaxServices
           end
         rescue Exception => e
           HelperMethods::Logger.app_logger('error', e)
-
-
         end
       end
 
