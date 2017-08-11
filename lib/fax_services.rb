@@ -170,7 +170,7 @@ module FaxServices
             Rails.logger.debug '==>fax_response: no response found <=='
           end
         rescue Exception => e
-          HelperMethods::LogApp.app_logger('error', e)
+          HelperMethods::Logger.app_logger('error', e)
 
 
         end
@@ -196,7 +196,7 @@ module FaxServices
           end
           return JSON.parse(response.body)
         rescue Exception => e
-            HelperMethods::LogApp.app_logger('error', e)
+            HelperMethods::Logger.app_logger('error', e)
         end
       end
     end

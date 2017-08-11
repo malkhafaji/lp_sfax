@@ -1,5 +1,5 @@
 module HelperMethods
-  class LogApp
+  class Logger
     class << self
   def app_logger(type, e)
      case type

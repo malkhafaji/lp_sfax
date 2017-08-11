@@ -23,7 +23,7 @@ class Api::V1::FaxRecordsController < ApplicationController
       initial_response = FaxServices::Fax.actual_sending(recipient_name, recipient_number, attachments, fax_record.id)
       render json: initial_response
     rescue Exception => e
-      HelperMethods::LogApp.app_logger('error', e)
+      HelperMethods::Logger.app_logger('error', e)
     end
   end
 
