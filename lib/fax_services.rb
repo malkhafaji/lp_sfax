@@ -58,13 +58,13 @@ module FaxServices
             send_confirm_date: response['date'])
           FileUtils.rm_rf Dir.glob("#{Rails.root}/tmp/fax_files/*")
           if fax_record.send_fax_queue_id.nil?
-            Rails.logger.debug "==> error send_fax_queue_id is nil: #{response_result} <=="
+          HelperMethods::Logger.app_logger('error', e)
             fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
           end
           FaxServices::Fax.sendback_initial_response_to_client(fax_record)
         rescue
           fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
-          Rails.logger.debug "==> Error actual_sending: #{fax_record.id} <=="
+          HelperMethods::Logger.app_logger('error', e)
         end
       end
       # Getting the File Name , the File Extension and validate the document type
@@ -91,7 +91,7 @@ module FaxServices
             fax.update_attributes( updated_by_initializer: true)
             FaxServices::Fax.actual_sending(fax.recipient_name ,fax.recipient_number, attachments ,fax.id)
           rescue
-            Rails.logger.debug "==> Error sending_faxes_without_queue_id: #{fax.id} <=="
+            HelperMethods::Logger.app_logger('error', e)
           end
         end
       end
@@ -111,9 +111,9 @@ module FaxServices
         #we should put here the client URL to send the json
 
         if fax_record.updated_by_initializer == true
-          Rails.logger.debug "==> sendback_initial_response_to_client/updated_by_initializer: #{client_initial_response} <=="
+         HelperMethods::Logger.app_logger('error', e)
         else
-          Rails.logger.debug "==> sendback_initial_response_to_client: #{client_initial_response} <=="
+        HelperMethods::Logger.app_logger('error', e)
           client_initial_response
         end
       end
@@ -130,7 +130,7 @@ module FaxServices
             fax_record = FaxRecord.find_by_send_fax_queue_id(fax_requests_queue_id)
             parse_response = response["RecipientFaxStatusItems"][0]
             unless fax_record.resend <= ENV['MAX_RESEND'].to_i && parse_response['ResultCode'] == 6000
-              Rails.logger.debug "==> final response: #{parse_response} <=="
+             HelperMethods::Logger.app_logger('error', e)
               if parse_response['ResultCode'] == 0
                 fax_duration = calculate_duration(fax_record.client_receipt_date, (Time.parse(parse_response['FaxDateUtc'])))
                 result_message = 'Success'
@@ -162,15 +162,15 @@ module FaxServices
                 fax_duration:        fax_duration
               )
             else
-              Rails.logger.debug "==> Resend fax with ID = #{fax_record.id} <=="
+              HelperMethods::Logger.app_logger('error', e)
               fax_record.update_attributes(resend: (fax_record.resend+1))
               ResendFax.perform_in((ENV['DELAY_RESEND'].to_i).minutes, fax_record.id)
             end
           else
-            Rails.logger.debug '==>fax_response: no response found <=='
+             HelperMethods::Logger.app_logger('error', e)
           end
         rescue Exception => e
-          HelperMethods::Logger.app_logger('error', e)
+          HelperMethods::Logger.app_logger('error', e) 
         end
       end
 
