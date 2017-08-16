@@ -1,5 +1,10 @@
 Rails.application.routes.draw do
 
+  root 'public#index' # assigning the index page as the home page
+  match 'auth/:provider/callback', to: 'sessions#create', via: [:get, :post]
+  match 'auth/failure', to: redirect('/'), via: [:get, :post]
+  match 'signout', to: 'sessions#logout', as: 'signout', via: [:get, :post]
+
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
 
@@ -11,7 +16,6 @@ Rails.application.routes.draw do
       post 'export' # Exporting the records as file
     end
   end
-  root 'fax_records#index' # assigning the index page as the home page
 
   namespace :api do
   	namespace :v1 do

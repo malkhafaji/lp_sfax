@@ -2,6 +2,7 @@ require 'open-uri'
 include WebServices
 class Api::V1::FaxRecordsController < ApplicationController
   skip_before_action  :verify_authenticity_token
+  skip_before_action :authenticate_user!
 
 
   # Taking the fax_number,recipient_name and the attached file path and call the actual sending method to send the fax (made by the client)
