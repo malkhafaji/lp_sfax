@@ -10,6 +10,7 @@ task :check_fax_response => :environment do
         FaxServices::Fax.fax_response(fax_requests_queue_id)
       rescue Exception => e
         HelperMethods::Logger.app_logger('error', e)
+        SendLaterJob.perform_later(ENV['GMAIL_ADMIN'])
         fax_record = FaxRecord.find_by(send_fax_queue_id: fax_requests_queue_id)
         fax_record.update_attributes(max_fax_response_check_tries: fax_record.max_fax_response_check_tries.to_i + 1)
       end
@@ -73,6 +74,7 @@ task :sendback_final_response_to_client => :environment do
           end
         rescue Exception => e
           HelperMethods::Logger.app_logger('error', e)
+          SendLaterJob.perform_later(ENV['GMAIL_ADMIN'])
         end
       end
     end
