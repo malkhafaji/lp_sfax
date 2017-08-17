@@ -3,6 +3,6 @@ class SendLaterJob < ApplicationJob
 
   def perform(e)
     @message = e
-    NotificationMailer.app_error(@message).deliver_now <<<<<<this class we user the actionmailerclass and the method then we pass in the contents
+    NotificationMailer.app_error(@message).deliver_later
   end
 end

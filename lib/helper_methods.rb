@@ -11,11 +11,11 @@ module HelperMethods
       when type = 'info'
             Rails.logger.debug "==> error send_fax: #{e.message} <=="
       when type = 'debug'
-            Rails.logger.debug "==> error send_fax: #{e.message} <=="
+            Rails.logger.debug "==> error send_fax: #{e.message}<=="
       when type = 'warn'
             Rails.logger.warn "==> error send_fax: #{e.message} <=="
        end
       end
-     end #self
-   end #class
+    end #self
+  end #class
 end
