@@ -5,7 +5,7 @@ module HelperMethods
      case type
       when type = 'error'
         if Rails.env.production?
-           NotificationMailer.app_error(e.message).deliver
+           NotificationMailer.app_error(e.message).deliver_later
          end
            Rails.logger.debug "==> error send_fax: #{e.message} <=="
       when type = 'info'
