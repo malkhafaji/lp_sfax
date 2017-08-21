@@ -1,10 +1,9 @@
-
-  - if current_user
-    %p= current_user.token_expired?
-    Signed in as
-    = succeed "!" do
-      %strong= current_user.name
-    = link_to "Sign out", signout_path, id: "sign_out"
-  - else
-  .container
-    = link_to "Sign in with Azure", "/auth/azure_oauth2", id: "sign_in"
+- if current_user
+  %p= current_user.token_expired?
+  Signed in as
+  = succeed "!" do
+    %strong= current_user.name
+  = link_to "Sign out", signout_path, id: "sign_out"
+- else
+.container
+  = link_to "Sign in with Azure", "/auth/azure_oauth2", id: "sign_in"
