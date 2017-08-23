@@ -3,7 +3,17 @@ $(document).ready(function() {
      var delay = 15 * 60000;
   // Delay after displaying modal before moving to different location
      var reactionDelay = 15 * 60000;
-     var logoutHref = $("#sign_out").attr("href");
+     var logoutHref = $("ul.dropdown>li#nav-li>#nav-a").attr("href");
+
+     $("#nav-ul #nav-li").on('click', function(){
+       if($("#nav-ul.dropdown").is(":visible")){
+         $("#nav-ul.dropdown").hide();
+       }
+       else{
+         $("#nav-ul.dropdown").show();
+       }
+
+     });
 
      if(logoutHref == null)
         return;
@@ -16,14 +26,15 @@ $(document).ready(function() {
      var getNow = performance && performance.now ? function(){ return performance.now() } : function(){ return Date.now();}
      var showAFKModal = function showAFKModal() {
 
-         modalShown = getNow();
-     $(document.body).append($modal);
+        modalShown = getNow();
+        $(document.body).append($modal);
         $modal.show();
         $('.cont').toggleClass('modal-blur');
 
      };
 
        var checkTimeout = function checkTimeout() {
+         console.log("called!");
        var now = getNow();
        if(!modalShown){
         if(now - lastActive  > delay){

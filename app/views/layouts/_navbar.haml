@@ -1,3 +1,4 @@
+.container-fluid
 #user_nav
   %nav.navbar.navbar-inverse.fixed-top
     .navbar-header
@@ -6,8 +7,14 @@
         %span.icon-bar
         %span.icon-bar
         %span.icon-bar
-      = link_to 'Somewhere', root_path, class: 'navbar-brand'
+      = link_to 'Fax Service', root_path, class: 'navbar-brand'
     .collapse.navbar-collapse#bs-example-navbar-collapse-1
-      %ul.nav.navbar-nav.navbar-right
-        - if current_user
-          %li= link_to "#{current_user.name} Sign out?", signout_path(user_id: current_user.id), id: "sign_out"
+      - if current_user
+        %ul.nav.navbar-nav.navbar-right#nav-ul
+          %li#nav-li
+            %p#nav-a
+              = current_user.name
+              %span.caret
+            %ul.dropdown#nav-ul
+              %li#nav-li
+                = link_to "Sign out", signout_path(user_id: current_user.id), id: "nav-a", class: "sub-menu"
