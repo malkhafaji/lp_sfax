@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  require 'open-uri'
+  require 'net/http'
 
   def self.from_omniauth(auth)
     user = find_by_email(auth.info.email)
