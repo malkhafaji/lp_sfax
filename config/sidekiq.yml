@@ -1,4 +1,5 @@
 :pidfile: tmp/pids/sidekiq.pid
 :queues:
   - default
+  - send_fax
   - resend_fax
