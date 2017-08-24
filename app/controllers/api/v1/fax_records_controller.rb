@@ -21,9 +21,8 @@ class Api::V1::FaxRecordsController < ApplicationController
       fax_record.updated_by_initializer = false
       fax_record.save!
       fax_record_attachment(fax_record, attachments_array)
-      FaxJob.perform_async('')
-      # initial_response = FaxServices::Fax.actual_sending(recipient_name, recipient_number, attachments, fax_record.id)
-      render json: {status: 'sucsse'}
+      FaxJob.perform_async(recipient_name, recipient_number, attachments, fax_record.id)
+      render json: {status: 'success'}
     rescue Exception => e
       NotificationMailer.sys_error(e.message).deliver
       render json: e.message.inspect
