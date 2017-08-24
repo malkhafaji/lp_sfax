@@ -1,7 +1,7 @@
 require 'fileutils'
 include Sidekiq::Worker
 
-class ResendFax
+class ResendFaxJob
 
   sidekiq_options queue: 'resend_fax'
 
