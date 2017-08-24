@@ -14,6 +14,21 @@ FAX_SERVER_URL = ENV['fax_server_url']
 module FaxServices
   class Fax
     class << self
+      def service_alive?
+        conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
+          faraday.request :multipart
+          faraday.request  :url_encoded
+          faraday.adapter Faraday.default_adapter
+        end
+        begin
+          if  conn.post.present?
+            return true
+          end
+        rescue
+          return false
+        end
+      end
+      
       # Getting TOKEN
       def get_token
         timestr = Time.now.utc.iso8601()

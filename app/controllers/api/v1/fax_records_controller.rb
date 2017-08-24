@@ -1,5 +1,4 @@
 require 'open-uri'
-include WebServices
 class Api::V1::FaxRecordsController < ApplicationController
   skip_before_action  :verify_authenticity_token
 
@@ -7,6 +6,9 @@ class Api::V1::FaxRecordsController < ApplicationController
   # Taking the fax_number,recipient_name and the attached file path and call the actual sending method to send the fax (made by the client)
   def send_fax
     begin
+      unless Rails.application.config.can_send_fax
+        Rails.application.config.can_send_fax = FaxServices::Fax.service_alive?
+      end
       Rails.logger.debug "==> request for new fax: #{params.inspect} <=="
       recipient_name = params['recipient_name']
       recipient_number = params['recipient_number']
