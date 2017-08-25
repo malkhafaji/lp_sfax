@@ -5,13 +5,13 @@ module HelperMethods
       case type
         when type = 'error'
           Rails.logger.error message
-            NotificationMailer.app_error(message).deliver
+          NotificationMailer.app_error(message).deliver
         when type = 'info'
-            Rails.logger.info message
+          Rails.logger.info message
         when type = 'debug'
-            Rails.logger.debug message
+          Rails.logger.debug message
         when type = 'warn'
-            Rails.logger.warn message
+          Rails.logger.warn message
         end
       end
     end
