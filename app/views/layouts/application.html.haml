@@ -1,13 +1,21 @@
-!!!
 %html
   %head
     %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
-    %title Fax list
+    %title Fax Service
     = csrf_meta_tags
     = stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload'
     = javascript_include_tag 'application', 'data-turbolinks-track': 'reload'
   %body.transparent-header
+    %noscript.noscript
+      #div100
+        %strong Please Use JavaScript
+        %br/
+        You need a web browser that supports JavaScript to use our site. Without it, some pages won’t work as designed.
+        To make sure JavaScript is turned on, please adjust your browser settings.
+  .container-fluid
+    %img.pic{:src=>"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTktgB1bSrttMY_Gj68ttXZXjJAMglVuPOvFXWyz-XA_YDE3R6f", width:"100%", height:"150px"}
     = render 'layouts/navbar'
+  .cont
     %div{:style => "margin:50px 0 0 500px;position:absolute;float:center"}
       - if alert.present?
         #flash_message.alert.alert-danger{:style => "text-align: center;font-size:25px;font-weight: bold; background-color:#ad5b5b;color:white"}
@@ -16,3 +24,8 @@
         #flash_message.alert.alert-danger{:style => "text-align: center;font-size:25px;font-weight: bold; background-color:#9ae2bd;color:black"}
           = notice
     = yield
+.modal-mask
+  .modal
+    %strong Your online session is about to expire
+    %br/
+    %button.modal-btn I'm still here!

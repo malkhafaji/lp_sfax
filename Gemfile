@@ -22,6 +22,7 @@ gem 'figaro'
 gem 'haml', '~> 4.0.5'
 gem 'rubyzip'
 gem 'sidekiq'
+gem 'omniauth-azure-oauth2'
 gem 'redis-namespace'
 
 group :development, :test do
