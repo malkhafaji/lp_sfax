@@ -1,14 +1,11 @@
 require 'open-uri'
-include WebServices
 class Api::V1::FaxRecordsController < ApplicationController
   skip_before_action  :verify_authenticity_token, :authenticate_user!
-
-
 
   # Taking the fax_number,recipient_name and the attached file path and call the actual sending method to send the fax (made by the client)
   def send_fax
     begin
-      Rails.logger.debug "==> request for new fax: #{params.inspect} <=="
+      HelperMethods::Logger.app_logger('info', "==> request for new fax: #{params.inspect} <==")
       recipient_name = params['recipient_name']
       recipient_number = params['recipient_number']
       callback_url = params['FaxDispositionURL']
@@ -25,9 +22,8 @@ class Api::V1::FaxRecordsController < ApplicationController
       initial_response = FaxServices::Fax.actual_sending(recipient_name, recipient_number, attachments, fax_record.id)
       render json: initial_response
     rescue Exception => e
-      NotificationMailer.sys_error(e.message).deliver
-      render json: e.message.inspect
-      Rails.logger.debug "==> error send_fax: #{e.message.inspect} <=="
+      HelperMethods::Logger.app_logger('error', e.message)
+      render json: e.message
     end
   end
 
