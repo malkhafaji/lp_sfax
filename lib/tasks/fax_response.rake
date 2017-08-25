@@ -9,8 +9,7 @@ task :check_fax_response => :environment do
         Rails.logger.debug "==>requesting response for: #{fax_requests_queue_id}<=="
         FaxServices::Fax.fax_response(fax_requests_queue_id)
       rescue Exception => e
-        HelperMethods::Logger.app_logger('error', e)
-        SendLaterJob.perform_later(ENV['GMAIL_ADMIN'])
+        HelperMethods::Logger.app_logger('error', e.message)
         fax_record = FaxRecord.find_by(send_fax_queue_id: fax_requests_queue_id)
         fax_record.update_attributes(max_fax_response_check_tries: fax_record.max_fax_response_check_tries.to_i + 1)
       end
@@ -73,8 +72,7 @@ task :sendback_final_response_to_client => :environment do
             Rails.logger.debug "==> response error: #{response} <=="
           end
         rescue Exception => e
-          HelperMethods::Logger.app_logger('error', e)
-          SendLaterJob.perform_later(ENV['GMAIL_ADMIN'])
+          HelperMethods::Logger.app_logger('error', e.message)
         end
       end
     end

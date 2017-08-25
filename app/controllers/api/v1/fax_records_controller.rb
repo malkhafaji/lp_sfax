@@ -6,7 +6,7 @@ class Api::V1::FaxRecordsController < ApplicationController
   # Taking the fax_number,recipient_name and the attached file path and call the actual sending method to send the fax (made by the client)
   def send_fax
     begin
-      HelperMethods::Logger.app_logger('error', e)
+      HelperMethods::Logger.app_logger('info', "==> request for new fax: #{params.inspect} <==")
       recipient_name = params['recipient_name']
       recipient_number = params['recipient_number']
       callback_url = params['FaxDispositionURL']
@@ -23,8 +23,7 @@ class Api::V1::FaxRecordsController < ApplicationController
       initial_response = FaxServices::Fax.actual_sending(recipient_name, recipient_number, attachments, fax_record.id)
       render json: initial_response
     rescue Exception => e
-      HelperMethods::Logger.app_logger('error', e)
-      SendLaterJob.perform_later(ENV['GMAIL_ADMIN'])
+      HelperMethods::Logger.app_logger('error', e.message)
     end
   end
 
