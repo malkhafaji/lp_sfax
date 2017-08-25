@@ -39,7 +39,7 @@ module FaxServices
       end
 
       # sending the fax with the parameters fax_number,recipient_name ,attached file_path,fax_id and define either its sent by user call or by initializer call
-      def actual_sending(recipient_name, recipient_number, attachments, fax_id)
+      def send_now(recipient_name, recipient_number, attachments, fax_id)
         fax_record = FaxRecord.find_by(id: fax_id)
         begin
           tid = nil
@@ -78,7 +78,7 @@ module FaxServices
           FaxServices::Fax.sendback_initial_response_to_client(fax_record)
         rescue
           fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
-          Rails.logger.debug "==> Error actual_sending: #{fax_record.id} <=="
+          Rails.logger.debug "==> Error send_now: #{fax_record.id} <=="
         end
       end
       # Getting the File Name , the File Extension and validate the document type
@@ -103,7 +103,7 @@ module FaxServices
               attachments << file_info[0]
             end
             fax.update_attributes( updated_by_initializer: true)
-            FaxServices::Fax.actual_sending(fax.recipient_name ,fax.recipient_number, attachments ,fax.id)
+            FaxServices::Fax.send_now(fax.recipient_name ,fax.recipient_number, attachments ,fax.id)
           rescue
             Rails.logger.debug "==> Error sending_faxes_without_queue_id: #{fax.id} <=="
           end
