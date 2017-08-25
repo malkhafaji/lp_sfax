@@ -1,4 +1,8 @@
 class FaxRecordsController < ApplicationController
+  skip_before_action :authenticate_user!, only: [:homepage]
+  def  homepage
+  end
+
   # Exporting either all fax records OR the records results from filter (filtered_fax_records)
   def export
     if (session[:search_value].nil?)
