@@ -5,7 +5,9 @@ module HelperMethods
       case type
         when type = 'error'
           Rails.logger.error message
-          NotificationMailer.app_error(message).deliver
+          if Rails.env.production?
+            NotificationMailer.app_error(message).deliver_later
+          end
         when type = 'info'
           Rails.logger.info message
         when type = 'debug'
