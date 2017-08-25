@@ -22,6 +22,7 @@ gem 'figaro'
 gem 'haml', '~> 4.0.5'
 gem 'rubyzip'
 gem 'sidekiq'
+gem 'redis-namespace'
 
 group :development, :test do
   gem 'byebug', platform: :mri
