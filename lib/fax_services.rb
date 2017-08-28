@@ -70,28 +70,71 @@ module FaxServices
             message:           response_result["message"],
             send_fax_queue_id: response_result["SendFaxQueueId"],
             max_fax_response_check_tries: 0,
-            send_confirm_date: response['date'])
+          send_confirm_date: response['date'])
           FileUtils.rm_rf Dir.glob("#{Rails.root}/tmp/fax_files/*")
           if fax_record.send_fax_queue_id.nil?
-          HelperMethods::Logger.app_logger('info', "==> error send_fax_queue_id is nil: #{response_result} <==")
+            HelperMethods::Logger.app_logger('info', "==> error send_fax_queue_id is nil: #{response_result} <==")
             fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
           end
+          FaxServices::Fax.insert_fax(fax_record)
           FaxServices::Fax.sendback_initial_response_to_client(fax_record)
         rescue
           fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
-          HelperMethods::Logger.app_logger('error', "==> Error actual_sending: #{fax_record.id} <==")
+          HelperMethods::Logger.app_logger('error', "==> Error send_now: #{fax_record.id} <==")
         end
       end
+# Add the fax in to the client DB
+      def insert_fax(fax_record)
+        begin
+          url = URI.parse(ENV['CLIENT_URL'])
+          http = Net::HTTP.new(url.host, url.port)
+          http.use_ssl = true
+          data = {
+            f_sk:1,
+            f_create_e_sk:1,
+            f_create_date: fax_record.created_at ,
+            f_modify_e_sk:1,
+            f_modify_date: fax_record.updated_at,
+            let_sk:1,
+            f_type_cd_sk:1,
+            f_sent_date: Time.now,
+            f_priority_cd_sk:1,
+            f_fax_number: fax_record.recipient_number,
+            f_page_count: 1,
+            f_transmission_id: fax_record.send_fax_queue_id,
+            f_recipient_csid: 'string',
+            f_recipient_company: 'string',
+            f_recipient_name: fax_record.recipient_name,
+            f_document_id: 'string',
+            f_status_code: 000,
+            f_status_desc: 'f_status_desc',
+            f_error_level: 1,
+            f_error_message: 'string',
+            f_completion_date: '2017-08-28 17:08:15 +0000',
+            f_duration: 0.1,
+            f_pages_sent:1,
+            f_number_of_retries: fax_record.resend,
+            f_notes: 'string',
+            f_fax_id: fax_record.id,
+          }
+          request = Net::HTTP::Post.new(url.path, {'Content-Type' => 'application/json'})
+          request.body = data.to_json
+          response = http.request(request)
+        rescue Exception => e
+          HelperMethods::Logger.app_logger('error', e.message)
+        end
+      end
+
       # Getting the File Name , the File Extension and validate the document type
       def file_specification(file_path)
         file_name = File.basename ("#{file_path}").downcase
         file_extension = File.extname (file_name).downcase
         accepted_extensions = [".tif", ".xls", ".doc", ".pdf", ".docx", ".txt", ".rtf", ".xlsx", ".ppt", ".odt", ".ods", ".odp", ".bmp", ".gif", ".jpg", ".png"]
-         if accepted_extensions.include?(file_extension)
-           return "application/#{file_extension}", file_name
-         else
+        if accepted_extensions.include?(file_extension)
+          return "application/#{file_extension}", file_name
+        else
           return false
-         end
+        end
       end
 
       # search and find all faxes without Queue_id (not sent yet) and send them by call from the initializer (when the server start)
@@ -126,9 +169,9 @@ module FaxServices
         #we should put here the client URL to send the json
 
         if fax_record.updated_by_initializer == true
-         HelperMethods::Logger.app_logger('info', "==> sendback_initial_response_to_client/updated_by_initializer: #{client_initial_response} <==")
+          HelperMethods::Logger.app_logger('info', "==> sendback_initial_response_to_client/updated_by_initializer: #{client_initial_response} <==")
         else
-        HelperMethods::Logger.app_logger('info',  "==> sendback_initial_response_to_client: #{client_initial_response} <==")
+          HelperMethods::Logger.app_logger('info',  "==> sendback_initial_response_to_client: #{client_initial_response} <==")
           client_initial_response
         end
       end
@@ -145,7 +188,7 @@ module FaxServices
             fax_record = FaxRecord.find_by_send_fax_queue_id(fax_requests_queue_id)
             parse_response = response["RecipientFaxStatusItems"][0]
             unless fax_record.resend <= ENV['MAX_RESEND'].to_i && parse_response['ResultCode'] == 6000
-             HelperMethods::Logger.app_logger('error', "==> final response: #{parse_response} <==")
+              HelperMethods::Logger.app_logger('error', "==> final response: #{parse_response} <==")
               if parse_response['ResultCode'] == 0
                 fax_duration = calculate_duration(fax_record.client_receipt_date, (Time.parse(parse_response['FaxDateUtc'])))
                 result_message = 'Success'
@@ -182,7 +225,7 @@ module FaxServices
               ResendFaxJob.perform_in((ENV['DELAY_RESEND'].to_i).minutes, fax_record.id)
             end
           else
-             HelperMethods::Logger.app_logger('info', '==>fax_response: no response found <==')
+            HelperMethods::Logger.app_logger('info', '==>fax_response: no response found <==')
           end
         rescue Exception => e
           HelperMethods::Logger.app_logger('error', "==>fax_response error: #{e.message} <==")
@@ -209,7 +252,7 @@ module FaxServices
           end
           return JSON.parse(response.body)
         rescue Exception => e
-            HelperMethods::Logger.app_logger('error', e.message)
+          HelperMethods::Logger.app_logger('error', e.message)
         end
       end
     end
