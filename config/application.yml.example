@@ -4,7 +4,6 @@ APIkey: ''
 vector: ''
 encryptionkey: ''
 fax_server_url: ''
-CLIENT_URL: ''
 
 # variables for lib/tasks/fax_response.rake
 MAX_RESPONSE_CHECK: '20'
