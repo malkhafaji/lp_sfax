@@ -9,7 +9,7 @@ gem 'therubyracer', platforms: :ruby
 gem 'ci_reporter'
 gem 'faraday'
 gem 'rails', '~> 5.0.1'
-gem 'sqlite3'
+gem 'pg'
 gem 'puma', '~> 3.0'
 gem 'sass-rails', '~> 5.0'
 gem 'uglifier', '>= 1.3.0'
@@ -22,6 +22,8 @@ gem 'figaro'
 gem 'haml', '~> 4.0.5'
 gem 'rubyzip'
 gem 'sidekiq'
+gem 'chartkick', '~> 1.2.4'
+gem 'groupdate', '~> 2.1.1'
 
 group :development, :test do
   gem 'byebug', platform: :mri

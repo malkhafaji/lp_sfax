@@ -12,7 +12,7 @@ Rails.application.routes.draw do
     end
   end
   root 'fax_records#index' # assigning the index page as the home page
-
+  get 'fax_records/report'
   namespace :api do
   	namespace :v1 do
   		resources :fax_records, only: [] do

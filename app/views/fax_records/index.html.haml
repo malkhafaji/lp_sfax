@@ -14,6 +14,7 @@
         Export the results as:
         \#{link_to 'CSV file' , export_fax_records_path(format: 'csv'), method: :post, class: 'btn btn-default btn-sm'}
         \#{link_to 'Excel file', export_fax_records_path(format: 'xls'), method: :post, class: 'btn btn-default btn-sm'}
+        \#{link_to 'Report', fax_records_report_path, class: 'btn btn-default btn-sm'}
   .row-fluid
     %table.table.table-striped.table-bordered.table-condensed.table-responsive
       %thead#fax_record_thead

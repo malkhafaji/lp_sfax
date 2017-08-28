@@ -1,0 +1,22 @@
+.row-fluid
+  .col-md-12
+    .col-md-1.pull-right
+      \#{link_to 'Home', root_path, class: 'btn btn-default btn-sm'}
+.col-xs-12
+  %h3 Fax_records Send By Day
+  = line_chart FaxRecord.group_by_day(:created_at,  format: "%B %d, %Y").count, discrete: true
+  = pie_chart FaxRecord.group_by_day(:created_at, format: "%B %d, %Y").count, discrete: true
+  = area_chart FaxRecord.group_by_day(:created_at, format: "%B %d, %Y").count
+  = bar_chart FaxRecord.group_by_day(:created_at, format: "%B %d, %Y").count, discrete: true
+  = column_chart FaxRecord.group_by_day(:created_at, format: "%B %d, %Y").count, discrete: true
+  %h3 Fax Records By Recipient Name(daily)
+  = line_chart FaxRecord.group(:recipient_name).group_by_day(:created_at).count
+  = area_chart FaxRecord.group(:recipient_name).group_by_day(:created_at).count
+  = bar_chart FaxRecord.group(:recipient_name).group_by_day(:created_at, format: "%B %d, %Y").count
+  = column_chart FaxRecord.group(:recipient_name).group_by_day(:created_at,  format: "%B %d, %Y").count
+  %h3 Fax records by status (daily)
+  = column_chart FaxRecord.group(:status).group_by_day(:created_at, format: "%B %d, %Y").count
+  = line_chart FaxRecord.group(:status).group_by_day(:created_at, format: "%B %d, %Y").count
+  = bar_chart FaxRecord.group(:status).group_by_hour(:created_at,  format: "%l %P").count, discrete: true
+  %h3 By Sender No
+  = line_chart FaxRecord.group(:sender_fax).group_by_day(:created_at, format: "%B %d, %Y").count
