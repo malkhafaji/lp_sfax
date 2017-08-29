@@ -4,7 +4,7 @@ class InsertFax
   sidekiq_options queue: 'insert_fax'
 
   def perform(fax_id)
-    fax_record = FaxRecord.find_by(id: fax_id)
+    fax_record = FaxRecord.find(fax_id)
     begin
       url = URI.parse(fax_record.callback_url)
       http = Net::HTTP.new(url.host, url.port)
@@ -44,7 +44,7 @@ class InsertFax
       HelperMethods::Logger.app_logger('error', e.message)
     end
     unless response.body == 'Fax inserted successfully'
-      InsertFax.perform_in((1.minutes, fax_record.id)
+      InsertFax.perform_in(1.minutes, fax_record.id)
     end
   end
 
