@@ -1,7 +1,10 @@
 class FaxRecord < ApplicationRecord
   has_many :attachments
+  belongs_to :callback_server
+  
   validates_format_of :recipient_number, with: /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/
-  validates_presence_of :recipient_name, :callback_url
+  validates_presence_of :recipient_name, :callback_server_id
+
   scope :desc,-> {order('fax_records.updated_at DESC')}
   scope :without_queue_id, -> { where(send_fax_queue_id: nil) }
   scope :without_response_q_ids, -> { where.not(send_fax_queue_id: nil).where(result_code: nil).where("max_fax_response_check_tries <= #{ENV['MAX_RESPONSE_CHECK'].to_i}").pluck(:send_fax_queue_id) }
