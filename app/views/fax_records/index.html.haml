@@ -13,9 +13,7 @@
       .col-md-3
         Export the results as:
         \#{link_to 'CSV file' , export_fax_records_path(format: 'csv'), method: :post, class: 'btn btn-default btn-sm'}
-        \#{link_to 'Excel file', export_fax_records_path(format: 'xls'), method: :post, class: 'btn btn-default btn-sm'}
-      .col-md-1
-        \#{link_to 'Reports', report_fax_records_path, class: 'btn btn-default btn-sm'}
+        \#{link_to 'Excel file', export_fax_records_path(format: 'xls'), method: :post, class: 'btn btn-default btn-sm'}    
   .row-fluid
     %table.table.table-striped.table-bordered.table-condensed.table-responsive
       %thead#fax_record_thead
@@ -66,4 +64,3 @@
           = link_to '<< Previous page', fax_records_path(page: @current_page - 1, search_value: @search_value), class: 'btn btn-primary btn-sm paginate'
         - unless @current_page >= @total_pages
           = link_to 'Next page >>', fax_records_path(page: @current_page + 1, search_value: @search_value), class: 'btn btn-primary btn-sm paginate'
-
