@@ -8,6 +8,7 @@ class Api::V1::FaxRecordsController < ApplicationController
       unless Rails.application.config.can_send_fax
         Rails.application.config.can_send_fax = FaxServices::Fax.service_alive?
       end
+      callback_params = {e_sk: params['e_sk'], let_sk: params['let_sk'], type_cd_sk:  params['type_cd_sk'], priority_cd_sk:  params['priority_cd_sk']}
       callback_server = CallbackServer.find_by_url(params['FaxDispositionURL'])
       Rails.logger.debug "==> request for new fax: #{params.inspect} <=="
       recipient_name = params['recipient_name']
@@ -23,7 +24,7 @@ class Api::V1::FaxRecordsController < ApplicationController
       fax_record.updated_by_initializer = false
       fax_record.save!
       fax_record_attachment(fax_record, attachments_array)
-      FaxJob.perform_async(recipient_name, recipient_number, attachments, fax_record.id)
+      FaxJob.perform_async(recipient_name, recipient_number, attachments, fax_record.id, callback_params)
       render json: {status: 'success'}
     rescue Exception => e
       HelperMethods::Logger.app_logger('error', e.message)

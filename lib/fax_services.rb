@@ -40,7 +40,7 @@ module FaxServices
       end
 
       # sending the fax with the parameters fax_number,recipient_name ,attached file_path,fax_id and define either its sent by user call or by initializer call
-      def send_now(recipient_name, recipient_number, attachments, fax_id)
+      def send_now(recipient_name, recipient_number, attachments, fax_id, callback_params)
         fax_record = FaxRecord.find_by(id: fax_id)
         begin
           tid = nil
@@ -76,7 +76,7 @@ module FaxServices
             HelperMethods::Logger.app_logger('info', "==> error send_fax_queue_id is nil: #{response_result} <==")
             fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
           end
-          InsertFax.perform_async(fax_record.id)
+          InsertFax.perform_async(fax_id, callback_params)
           FaxServices::Fax.sendback_initial_response_to_client(fax_record)
         rescue
           fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
