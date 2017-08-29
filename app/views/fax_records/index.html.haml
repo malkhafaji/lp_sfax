@@ -10,10 +10,10 @@
       .col-lg-4.pull-left
         %p
           = "Showing #{@per_page * @current_page - @per_page + 1} to #{@total_record < @per_page ? @total_record : (@fax_records.size < @per_page ? @total_record : @current_page * @per_page)} of #{@total_record} entries"
-      .col-md-4
+      .col-md-3
         Export the results as:
         \#{link_to 'CSV file' , export_fax_records_path(format: 'csv'), method: :post, class: 'btn btn-default btn-sm'}
-        \#{link_to 'Excel file', export_fax_records_path(format: 'xls'), method: :post, class: 'btn btn-default btn-sm'}
+        \#{link_to 'Excel file', export_fax_records_path(format: 'xls'), method: :post, class: 'btn btn-default btn-sm'}    
   .row-fluid
     %table.table.table-striped.table-bordered.table-condensed.table-responsive
       %thead#fax_record_thead
