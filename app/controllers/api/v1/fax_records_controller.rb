@@ -8,19 +8,18 @@ class Api::V1::FaxRecordsController < ApplicationController
       unless Rails.application.config.can_send_fax
         Rails.application.config.can_send_fax = FaxServices::Fax.service_alive?
       end
-      callback_params = {e_sk: params['e_sk'], let_sk: params['let_sk'], type_cd_sk:  params['type_cd_sk'], priority_cd_sk:  params['priority_cd_sk']}
+      callback_params = {e_sk: params['e_sk'], let_sk: params['let_sk'], type_cd_sk: params['type_cd_sk'], priority_cd_sk: params['priority_cd_sk']}
       callback_server = CallbackServer.find_by_url(params['FaxDispositionURL'])
       Rails.logger.debug "==> request for new fax: #{params.inspect} <=="
       recipient_name = params['recipient_name']
       recipient_number = params['recipient_number']
-      callback_server_id = callback_server.id
       attachments_array = params_to_array(params['Attachments'])
       attachments=  WebServices::Web.file_path(attachments_array)
       fax_record = FaxRecord.new
+      fax_record.callback_server_id = callback_server.id
       fax_record.client_receipt_date = Time.now
       fax_record.recipient_number = recipient_number
       fax_record.recipient_name = recipient_name
-      fax_record.callback_url = callback_url
       fax_record.updated_by_initializer = false
       fax_record.save!
       fax_record_attachment(fax_record, attachments_array)
