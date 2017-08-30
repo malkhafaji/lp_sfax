@@ -76,8 +76,7 @@ module FaxServices
             HelperMethods::Logger.app_logger('info', "==> error send_fax_queue_id is nil: #{response_result} <==")
             fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
           end
-          InsertFax.perform_async(fax_id, callback_params)
-          FaxServices::Fax.sendback_initial_response_to_client(fax_record)
+          FaxServices::Fax.sendback_initial_response_to_client(fax_record, callback_params)
         rescue
           fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
           HelperMethods::Logger.app_logger('error', "==> Error send_now: #{fax_record.id} <==")
@@ -114,7 +113,7 @@ module FaxServices
       end
 
       # Sending the initial response to the client after sending the fax
-      def sendback_initial_response_to_client(fax_record)
+      def sendback_initial_response_to_client(fax_record, callback_params)
         client_initial_response = {
           fax_id: fax_record.id,
           recipient_name: fax_record.recipient_name,
@@ -125,14 +124,13 @@ module FaxServices
           status: fax_record.status,
           result_message: fax_record.result_message,
         client_receipt_date: fax_record.client_receipt_date}
-        #we should put here the client URL to send the json
-
         if fax_record.updated_by_initializer == true
           HelperMethods::Logger.app_logger('info', "==> sendback_initial_response_to_client/updated_by_initializer: #{client_initial_response} <==")
         else
           HelperMethods::Logger.app_logger('info',  "==> sendback_initial_response_to_client: #{client_initial_response} <==")
           client_initial_response
         end
+        InsertFaxJob.perform_async(fax_record.id, callback_params)
       end
 
       def calculate_duration(t1,t2)
