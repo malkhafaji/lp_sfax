@@ -1,6 +1,7 @@
 require 'open-uri'
 class Api::V1::FaxRecordsController < ApplicationController
   skip_before_action  :verify_authenticity_token, :authenticate_user!
+  before_action :check_params
 
   # Taking the fax_number,recipient_name and the attached file path and call the actual sending method to send the fax (made by the client)
   def send_fax
@@ -46,4 +47,13 @@ class Api::V1::FaxRecordsController < ApplicationController
       Attachment.create(fax_record_id: fax_record.id, file_key: file_key)
     end
   end
+
+  # Check the presents of the required Parameters
+  def check_params
+    params_list = ['recipient_name', 'recipient_number', 'FaxDispositionURL', 'Attachments', 'e_sk', 'let_sk', 'type_cd_sk', 'priority_cd_sk']
+    params_list.each do |i|
+      params[i].presence || raise(ActionController::ParameterMissing.new(i))
+    end
+  end
+
 end
