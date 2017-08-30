@@ -48,11 +48,11 @@ class Api::V1::FaxRecordsController < ApplicationController
     end
   end
 
-# Check the presents of the required Parameters
+  # Check the presents of the required Parameters
   def check_params
-    unless params[:recipient_name].present? && params[:recipient_number].present? && params[:FaxDispositionURL].present? &&
-      params[:Attachments].present? && params[:e_sk].present? && params[:let_sk].present? && params[:type_cd_sk].present? && params[:priority_cd_sk].present?
-      raise 'Missing parameter'
+    params_list = ['recipient_name', 'recipient_number', 'FaxDispositionURL', 'Attachments', 'e_sk', 'let_sk', 'type_cd_sk', 'priority_cd_sk']
+    params_list.each do |i|
+      params[i].presence || raise(ActionController::ParameterMissing.new(i))
     end
   end
 
