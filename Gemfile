@@ -24,6 +24,8 @@ gem 'rubyzip'
 gem 'sidekiq'
 gem 'omniauth-azure-oauth2'
 gem 'redis-namespace'
+gem 'chartkick'
+gem 'groupdate'
 
 group :development, :test do
   gem 'byebug', platform: :mri

@@ -53,6 +53,14 @@ class FaxRecordsController < ApplicationController
       format.html
     end
   end
+
+  def report
+    @fax_records = FaxRecord.all
+
+    respond_to do |format|
+      format.html
+    end
+  end
   # private
   # # Use callbacks to share common setup or constraints between actions.
   # def set_fax_record
