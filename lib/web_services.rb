@@ -22,9 +22,8 @@ module  WebServices
       end
 
       # call to Client and change fax service status on/off
-      def fax_service_status
-        servers_list = CallbackServer.all
-        servers_list.each do |server|
+      def client_fax_service_status
+        CallbackServer.all.each do |server|
           url = URI.parse(server.url+'/faxes/change_status')
           http = Net::HTTP.new(url.host, url.port)
           http.use_ssl = true
@@ -32,7 +31,7 @@ module  WebServices
           response = http.request(request)
         end
       end
-      
+
     end
   end
 end
