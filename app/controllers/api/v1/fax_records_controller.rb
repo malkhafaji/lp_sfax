@@ -7,6 +7,7 @@ class Api::V1::FaxRecordsController < ApplicationController
   def send_fax
     begin
       unless Rails.application.config.can_send_fax
+        WebServices::Web.fax_service_status
         Rails.application.config.can_send_fax = FaxServices::Fax.service_alive?
       end
       callback_params = {e_sk: params['e_sk'], let_sk: params['let_sk'], type_cd_sk: params['type_cd_sk'], priority_cd_sk: params['priority_cd_sk']}
