@@ -20,6 +20,18 @@ module  WebServices
         Rails.logger.debug("==> Files attached to fax #{Dir["#{Rails.root}/tmp/fax_files/*"]}")
         return Dir["#{Rails.root}/tmp/fax_files/*"]
       end
+
+      # call to Client and change fax service status on/off
+      def client_fax_service_status
+        CallbackServer.all.each do |server|
+          url = URI.parse(server.url+'/faxes/change_status')
+          http = Net::HTTP.new(url.host, url.port)
+          http.use_ssl = true
+          request = Net::HTTP::Get.new(url)
+          response = http.request(request)
+        end
+      end
+
     end
   end
 end
