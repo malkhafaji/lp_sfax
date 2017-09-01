@@ -20,7 +20,7 @@ class InsertFaxJob
         f_sent_date: Time.now,
         f_priority_cd_sk: callback_params['priority_cd_sk'],
         f_fax_number: fax_record.recipient_number,
-        f_page_count: fax_record.pages,
+        f_page_count: 0,
         f_transmission_id: fax_record.send_fax_queue_id,
       }
       request = Net::HTTP::Post.new(url, {'Content-Type' => 'application/json'})
