@@ -7,11 +7,10 @@ class InsertFaxJob
     fax_record = FaxRecord.find(fax_id)
     callback_server = CallbackServer.find(fax_record.callback_server_id)
     begin
-      url = URI.parse(callback_server.url+'/faxes')
+      url = URI.parse(callback_server.url+'/sFaxService.svc/InsertFaxes')
       http = Net::HTTP.new(url.host, url.port)
       http.use_ssl = true
       data = {
-        f_sk: 1,
         f_create_e_sk: callback_params['e_sk'],
         f_create_date: fax_record.created_at ,
         f_modify_e_sk: callback_params['e_sk'],
@@ -21,7 +20,7 @@ class InsertFaxJob
         f_sent_date: Time.now,
         f_priority_cd_sk: callback_params['priority_cd_sk'],
         f_fax_number: fax_record.recipient_number,
-        f_page_count: 1,  # we receive this with the responce from sFax
+        f_page_count: fax_record.pages,
         f_transmission_id: fax_record.send_fax_queue_id,
       }
       request = Net::HTTP::Post.new(url, {'Content-Type' => 'application/json'})
