@@ -22,6 +22,7 @@ class InsertFaxJob
         f_fax_number: fax_record.recipient_number,
         f_page_count: 0,
         f_transmission_id: fax_record.send_fax_queue_id,
+        f_fax_id: fax_record.id
       }
       request = Net::HTTP::Post.new(url, {'Content-Type' => 'application/json'})
       request.body = data.to_json
