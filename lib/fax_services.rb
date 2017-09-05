@@ -40,8 +40,10 @@ module FaxServices
       end
 
       # sending the fax with the parameters fax_number,recipient_name ,attached file_path,fax_id and define either its sent by user call or by initializer call
-      def send_now(recipient_name, recipient_number, attachments, fax_id, callback_params)
-        fax_record = FaxRecord.find_by(id: fax_id)
+      def send_now(recipient_name, recipient_number, fax_id, callback_params)
+        fax_record = FaxRecord.find(fax_id)
+        attachments_keys= fax_record.attachments.pluck(:file_key)
+        attachments, file_dir=  WebServices::Web.file_path(attachments_keys)
         begin
           tid = nil
           conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
@@ -71,7 +73,7 @@ module FaxServices
             send_fax_queue_id: response_result["SendFaxQueueId"],
             max_fax_response_check_tries: 0,
           send_confirm_date: response['date'])
-          FileUtils.rm_rf Dir.glob("#{Rails.root}/tmp/fax_files/*")
+          FileUtils.rm_rf Dir.glob(file_dir)
           if fax_record.send_fax_queue_id.nil?
             HelperMethods::Logger.app_logger('info', "==> error send_fax_queue_id is nil: #{response_result} <==")
             fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
