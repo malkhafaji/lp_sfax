@@ -19,14 +19,24 @@ class Api::V1::FaxRecordsController < ApplicationController
       attachments_array = params_to_array(params['Attachments'])
       fax_record = FaxRecord.new(callback_server_id: callback_server.id, client_receipt_date: Time.now, recipient_number: params['recipient_number'], recipient_name: params['recipient_name'], updated_by_initializer: false)
       respond_to do |format|
-	      if fax_record.save
+        if fax_record.save
           fax_record_attachment(fax_record, attachments_array)
-          FaxJob.perform_async(fax_record.recipient_name, fax_record.recipient_number, fax_record.id, callback_params)
-	        format.json { head :ok }
-	      else
-	        format.json { render json: fax_record.errors, status: :unprocessable_entity }
-	      end
-	    end
+          if Rails.application.config.can_send_fax
+            pending_queue = Sidekiq::Queue.new("pending_fax")
+            pending_queue.each do |job|
+              FaxJob.perform_async(job.args[0], job.args[1], job.args[2], job.args[3])
+              job.delete if job.jid == "#{job.jid}"
+              sleep 5
+            end
+            FaxJob.perform_async(fax_record.recipient_name, fax_record.recipient_number, fax_record.id, callback_params)
+          else
+            PendingFaxJob.perform_async(fax_record.recipient_name, fax_record.recipient_number, fax_record.id, callback_params)
+          end
+          format.json { head :ok }
+        else
+          format.json { render json: fax_record.errors, status: :unprocessable_entity }
+        end
+      end
     rescue Exception => e
       HelperMethods::Logger.app_logger('error', e.message)
       render json: e.message
