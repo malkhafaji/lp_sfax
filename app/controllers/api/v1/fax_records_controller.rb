@@ -12,7 +12,10 @@ class Api::V1::FaxRecordsController < ApplicationController
       end
       callback_params = {e_sk: params['e_sk'], let_sk: params['let_sk'], type_cd_sk: params['type_cd_sk'], priority_cd_sk: params['priority_cd_sk']}
       callback_server = CallbackServer.find_by_url(params['FaxDispositionURL'])
-      Rails.logger.debug "==> request for new fax: #{params.inspect} <=="
+      unless callback_server
+        raise 'callback server does not exist'
+      end
+      HelperMethods::Logger.app_logger('info', "==> request for new fax: #{params.inspect} <==")
       recipient_name = params['recipient_name']
       recipient_number = params['recipient_number']
       attachments_array = params_to_array(params['Attachments'])
@@ -23,10 +26,15 @@ class Api::V1::FaxRecordsController < ApplicationController
       fax_record.recipient_number = recipient_number
       fax_record.recipient_name = recipient_name
       fax_record.updated_by_initializer = false
-      fax_record.save!
-      fax_record_attachment(fax_record, attachments_array)
-      FaxJob.perform_async(recipient_name, recipient_number, attachments, fax_record.id, callback_params)
-      render json: {status: 'success'}
+      respond_to do |format|
+	      if fax_record.save
+          fax_record_attachment(fax_record, attachments_array)
+          FaxJob.perform_async(recipient_name, recipient_number, attachments, fax_record.id, callback_params)
+	        format.json { head :ok }
+	      else
+	        format.json { render json: fax_record.errors, status: :unprocessable_entity }
+	      end
+	    end
     rescue Exception => e
       HelperMethods::Logger.app_logger('error', e.message)
       render json: e.message
