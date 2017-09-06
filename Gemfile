@@ -21,7 +21,8 @@ gem 'httparty', '~> 0.14.0'
 gem 'figaro'
 gem 'haml', '~> 4.0.5'
 gem 'rubyzip'
-gem 'sidekiq'
+gem 'sidekiq', '~> 5.0.4'
+gem 'redis-namespace'
 
 group :development, :test do
   gem 'byebug', platform: :mri
