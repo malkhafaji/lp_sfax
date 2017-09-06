@@ -41,11 +41,10 @@ module FaxServices
 
       # sending the fax with the parameters fax_number,recipient_name ,attached file_path,fax_id and define either its sent by user call or by initializer call
       def send_now(recipient_name, recipient_number, fax_id, callback_params)
-        fax_record = FaxRecord.find(fax_id)
-        attachments_keys= fax_record.attachments.pluck(:file_key)
-        attachments, file_dir=  WebServices::Web.file_path(attachments_keys)
         begin
-          tid = nil
+          fax_record = FaxRecord.find(fax_id)
+          attachments_keys= fax_record.attachments.pluck(:file_key)
+          attachments, file_dir=  WebServices::Web.file_path(attachments_keys)
           conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
             faraday.request :multipart
             faraday.request  :url_encoded
@@ -60,29 +59,34 @@ module FaxServices
             "RecipientName=#{recipient_name}",
           "OptionalParams=&" ]
           path = "/api/" + parts.join("&")
-          response = conn.post path do |req|
-            req.body = {}
-            attachments.each_with_index do |file, i|
-              req.body["file_name#{i}"] = Faraday::UploadIO.new("#{file}", file_specification(file)[0], file_specification(file)[1])
+          begin
+            response = conn.post path do |req|
+              req.body = {}
+              attachments.each_with_index do |file, i|
+                req.body["file_name#{i}"] = Faraday::UploadIO.new("#{file}", file_specification(file)[0], file_specification(file)[1])
+              end
             end
+            response_result = JSON.parse(response.body)
+            fax_record.update_attributes(
+              status:            response_result["isSuccess"],
+              message:           response_result["message"],
+              send_fax_queue_id: response_result["SendFaxQueueId"],
+              max_fax_response_check_tries: 0,
+            send_confirm_date: response['date'])
+            if fax_record.send_fax_queue_id.nil?
+              HelperMethods::Logger.app_logger('info', "==> error send_fax_queue_id is nil: #{response_result} <==")
+              fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
+            end
+            FaxServices::Fax.sendback_initial_response_to_client(fax_record, callback_params)
+          rescue
+            FaxJob.perform_in(1.minutes, fax_record.recipient_name, fax_record.recipient_number, fax_record.id, callback_params)
+            Rails.application.config.can_send_fax = false # need to check
           end
-          response_result = JSON.parse(response.body)
-          fax_record.update_attributes(
-            status:            response_result["isSuccess"],
-            message:           response_result["message"],
-            send_fax_queue_id: response_result["SendFaxQueueId"],
-            max_fax_response_check_tries: 0,
-          send_confirm_date: response['date'])
-          FileUtils.rm_rf Dir.glob(file_dir)
-          if fax_record.send_fax_queue_id.nil?
-            HelperMethods::Logger.app_logger('info', "==> error send_fax_queue_id is nil: #{response_result} <==")
-            fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
-          end
-          FaxServices::Fax.sendback_initial_response_to_client(fax_record, callback_params)
         rescue
           fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
           HelperMethods::Logger.app_logger('error', "==> Error send_now: #{fax_record.id} <==")
         end
+        FileUtils.rm_rf Dir.glob(file_dir)
       end
 
       # Getting the File Name , the File Extension and validate the document type
