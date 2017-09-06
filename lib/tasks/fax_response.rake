@@ -42,7 +42,7 @@ task :sendback_final_response_to_client => :environment do
         Error_code: record.error_code,
         Client_receipt_date: record.client_receipt_date,
         Send_confirm_date: record.fax_date_utc,
-        Vendor_confirm_date: record.vendor_confirm_date,
+        Vendor_confirm_date: record.send_confirm_date,
         ResultCode: record.result_code,
         fax_duration: record.fax_duration
       }
