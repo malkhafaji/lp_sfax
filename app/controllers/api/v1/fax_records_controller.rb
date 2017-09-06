@@ -1,9 +1,7 @@
 require 'open-uri'
 class Api::V1::FaxRecordsController < ApplicationController
   skip_before_action  :verify_authenticity_token, :authenticate_user!
-  # before_action :check_params
 
-  # Taking the fax_number,recipient_name and the attached file path and call the actual sending method to send the fax (made by the client)
   def send_fax
     begin
       check_params
@@ -21,17 +19,7 @@ class Api::V1::FaxRecordsController < ApplicationController
       respond_to do |format|
         if fax_record.save
           fax_record_attachment(fax_record, attachments_array)
-          if Rails.application.config.can_send_fax
-            pending_queue = Sidekiq::Queue.new("pending_fax")
-            pending_queue.each do |job|
-              FaxJob.perform_async(job.args[0], job.args[1], job.args[2], job.args[3])
-              job.delete if job.jid == "#{job.jid}"
-              sleep 5
-            end
-            FaxJob.perform_async(fax_record.recipient_name, fax_record.recipient_number, fax_record.id, callback_params)
-          else
-            PendingFaxJob.perform_async(fax_record.recipient_name, fax_record.recipient_number, fax_record.id, callback_params)
-          end
+          FaxJob.perform_async(fax_record.recipient_name, fax_record.recipient_number, fax_record.id, callback_params)
           format.json { head :ok }
         else
           format.json { render json: fax_record.errors, status: :unprocessable_entity }
