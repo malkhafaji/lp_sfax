@@ -23,7 +23,7 @@ end
 # Sending final response as array of jsons to the client for all sent faxes
 desc 'Sending final response as array of jsons to the client for all sent faxes'
 task :sendback_final_response_to_client => :environment do
-  records_groups = FaxRecord.where(sendback_final_response_to_client: 0).where.not(send_fax_queue_id: nil).group_by(&:callback_url)
+  records_groups = FaxRecord.not_send_to_client
   records_groups.each do |url, records|
     array_of_records = []
     Rails.logger.debug "==> total #{records.size} records for #{url} <=="
