@@ -55,7 +55,8 @@ class FaxRecordsController < ApplicationController
   end
 
   def report
-    @fax_records = FaxRecord.all
+    params
+    @fax_records = FaxRecord.by_month(params[:desierd_month])
 
     respond_to do |format|
       format.html
