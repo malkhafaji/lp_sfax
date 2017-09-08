@@ -79,8 +79,8 @@ module FaxServices
             end
             FaxServices::Fax.sendback_initial_response_to_client(fax_record, callback_params)
           rescue
+            HelperMethods::Logger.app_logger('error', "==> Error No connection while sending fax #{fax_record.id} <==")
             FaxJob.perform_in(1.minutes, fax_record.recipient_name, fax_record.recipient_number, fax_record.id, callback_params)
-            Rails.application.config.can_send_fax = false # need to check
           end
         rescue
           fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
@@ -213,9 +213,13 @@ module FaxServices
           response = conn.get path do |req|
             req.body = {}
           end
+          WebServices::Web.client_fax_service_status('up') if ( VendorStatus.last == nil || VendorStatus.last.service == 'down')
+          VendorStatus.create!(service:'up')
           return JSON.parse(response.body)
         rescue Exception => e
           HelperMethods::Logger.app_logger('error', e.message)
+          WebServices::Web.client_fax_service_status('down') if ( VendorStatus.last == nil || VendorStatus.last.service == 'up')
+          VendorStatus.create!(service:'down')
         end
       end
     end
