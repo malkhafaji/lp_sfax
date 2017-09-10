@@ -209,17 +209,14 @@ module FaxServices
             "ApiKey=#{CGI.escape(APIKEY)}",
           "SendFaxQueueId=#{(fax_requests_queue_id)}"]
           path = "/api/"+parts.join("&")
-
           response = conn.get path do |req|
             req.body = {}
           end
-          WebServices::Web.client_fax_service_status('up') if ( VendorStatus.last == nil || VendorStatus.last.service == 'down')
-          VendorStatus.create!(service:'up')
+          VendorStatus.create!(service:'up') if (VendorStatus.last ==nil || VendorStatus.last_state == 'down')
           return JSON.parse(response.body)
         rescue Exception => e
+          VendorStatus.create!(service:'down') if (VendorStatus.last ==nil || VendorStatus.last_state == 'up')
           HelperMethods::Logger.app_logger('error', e.message)
-          WebServices::Web.client_fax_service_status('down') if ( VendorStatus.last == nil || VendorStatus.last.service == 'up')
-          VendorStatus.create!(service:'down')
         end
       end
     end
