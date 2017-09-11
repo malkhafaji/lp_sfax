@@ -212,10 +212,10 @@ module FaxServices
           response = conn.get path do |req|
             req.body = {}
           end
-          VendorStatus.create!(service:'up') if (VendorStatus.last ==nil || VendorStatus.last_state == 'down')
+          VendorStatus.create!(service:'up') if VendorStatus.service_down?
           return JSON.parse(response.body)
         rescue Exception => e
-          VendorStatus.create!(service:'down') if (VendorStatus.last ==nil || VendorStatus.last_state == 'up')
+          VendorStatus.create!(service:'down') if VendorStatus.service_up?
           HelperMethods::Logger.app_logger('error', e.message)
         end
       end
