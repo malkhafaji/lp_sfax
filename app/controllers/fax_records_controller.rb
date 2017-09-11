@@ -53,9 +53,8 @@ class FaxRecordsController < ApplicationController
       format.html
     end
   end
-
   def report
-    @fax_records = FaxRecord.by_month(params[:desierd_month])
+     @fax_records = FaxRecord.by_month(params[:desierd_month] ||= Date.today.strftime("%m"))
 
     respond_to do |format|
       format.html
