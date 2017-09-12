@@ -22,10 +22,11 @@ end
 # Sending final response as array of jsons to the client for all sent faxes
 desc 'Sending final response as array of jsons to the client for all sent faxes'
 task :sendback_final_response_to_client => :environment do
-  records_groups = FaxRecord.where(sendback_final_response_to_client: 0).where.not(send_fax_queue_id: nil).group_by(&:callback_url)
-  records_groups.each do |url, records|
+  records_groups = FaxRecord.not_send_to_client
+  records_groups.each do |server_id, records|
+    callback_server = CallbackServer.find(server_id)
     array_of_records = []
-    HelperMethods::Logger.app_logger('info', "==> total #{records.size} records for #{url} <==")
+    HelperMethods::Logger.app_logger('info', "==> total #{records.size} records for #{callback_server.url} <==")
     records.each do |record|
       new_record= {
         Fax_ID: record.id,
@@ -53,10 +54,10 @@ task :sendback_final_response_to_client => :environment do
       array_in_batches = array_of_records.each_slice(ENV['max_records_send_to_client'].to_i).to_a
       array_in_batches.each do |batch_of_records|
         begin
-          HelperMethods::Logger.app_logger('info', "==> #{Time.now} posing #{batch_of_records.size} records to #{url} <==")
-          response = HTTParty.post(url,
-            body: batch_of_records.to_json,
-          headers: { 'Content-Type' => 'application/json' } )
+          HelperMethods::Logger.app_logger('info', "==> #{Time.now} posting #{batch_of_records.size} records to #{callback_server.url} <==")
+          url = URI(callback_server.url+'/eFaxService/OutboundDispositionService.svc/Receive')
+          url.port = 9001
+          response = HTTParty.post(url, body: batch_of_records.to_json, headers: { 'Content-Type' => 'application/json' } )
           HelperMethods::Logger.app_logger('info', "==> #{Time.now} end posting <==")
           if response.present? && response.code == 200
             result = JSON.parse(response)
@@ -69,12 +70,13 @@ task :sendback_final_response_to_client => :environment do
             end
             HelperMethods::Logger.app_logger('info', "==> successfully updated: #{success_ids} <==")
           else
-            HelperMethods::Logger.app_logger('info', "==> response error: #{response} <==")
+            HelperMethods::Logger.app_logger('error', "==> response error: #{response} <==")
           end
         rescue Exception => e
-          HelperMethods::Logger.app_logger('error', e.message)
+          HelperMethods::Logger.app_logger('error', "==> Error while posting final response: #{e.message}")
         end
       end
     end
   end
+
 end

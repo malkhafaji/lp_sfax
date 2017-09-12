@@ -39,12 +39,14 @@ module FaxServices
         return cipher
       end
 
-      # sending the fax with the parameters fax_number,recipient_name ,attached file_path,fax_id and define either its sent by user call or by initializer call
-      def send_now(recipient_name, recipient_number, fax_id, callback_params)
+      # sending the fax with the fax_record id
+      def send_now(fax_id)
         begin
           fax_record = FaxRecord.find(fax_id)
           attachments_keys= fax_record.attachments.pluck(:file_key)
           attachments, file_dir=  WebServices::Web.file_path(attachments_keys)
+          recipient_number = fax_record.recipient_number
+          recipient_name = fax_record.recipient_name
           conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
             faraday.request :multipart
             faraday.request  :url_encoded
@@ -77,10 +79,10 @@ module FaxServices
               HelperMethods::Logger.app_logger('info', "==> error send_fax_queue_id is nil: #{response_result} <==")
               fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
             end
-            FaxServices::Fax.sendback_initial_response_to_client(fax_record, callback_params)
+            FaxServices::Fax.sendback_initial_response_to_client(fax_record)
           rescue
             HelperMethods::Logger.app_logger('error', "==> Error No connection while sending fax #{fax_record.id} <==")
-            FaxJob.perform_in(1.minutes, fax_record.recipient_name, fax_record.recipient_number, fax_record.id, callback_params)
+            FaxJob.perform_in(1.minutes, fax_id)
           end
         rescue
           fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
@@ -118,8 +120,9 @@ module FaxServices
         end
       end
 
+
       # Sending the initial response to the client after sending the fax
-      def sendback_initial_response_to_client(fax_record, callback_params)
+      def sendback_initial_response_to_client(fax_record)
         client_initial_response = {
           fax_id: fax_record.id,
           recipient_name: fax_record.recipient_name,
@@ -130,13 +133,13 @@ module FaxServices
           status: fax_record.status,
           result_message: fax_record.result_message,
         client_receipt_date: fax_record.client_receipt_date}
+        InsertFaxJob.perform_async(fax_record.id)
         if fax_record.updated_by_initializer == true
           HelperMethods::Logger.app_logger('info', "==> sendback_initial_response_to_client/updated_by_initializer: #{client_initial_response} <==")
         else
           HelperMethods::Logger.app_logger('info',  "==> sendback_initial_response_to_client: #{client_initial_response} <==")
           client_initial_response
         end
-        InsertFaxJob.perform_async(fax_record.id, callback_params)
       end
 
       def calculate_duration(t1,t2)
@@ -195,7 +198,7 @@ module FaxServices
         end
       end
 
-      # Sending the Fax_Queue_Id to get the status
+# Sending the Fax_Queue_Id to get the status
       def send_fax_status(fax_requests_queue_id)
         begin
           conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }) do |faraday|

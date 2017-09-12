@@ -8,18 +8,17 @@ class Api::V1::FaxRecordsController < ApplicationController
       unless Rails.application.config.can_send_fax
         Rails.application.config.can_send_fax = FaxServices::Fax.service_alive?
       end
-      callback_params = {e_sk: params['e_sk'], let_sk: params['let_sk'], type_cd_sk: params['type_cd_sk'], priority_cd_sk: params['priority_cd_sk']}
       callback_server = CallbackServer.find_by_url(params['FaxDispositionURL'])
       unless callback_server
         raise 'callback server does not exist'
       end
       HelperMethods::Logger.app_logger('info', "==> request for new fax: #{params.inspect} <==")
       attachments_array = params_to_array(params['Attachments'])
-      fax_record = FaxRecord.new(callback_server_id: callback_server.id, client_receipt_date: Time.now, recipient_number: params['recipient_number'], recipient_name: params['recipient_name'], updated_by_initializer: false)
+      fax_record = FaxRecord.new(callback_server_id: callback_server.id, client_receipt_date: Time.now, recipient_number: params['recipient_number'], recipient_name: params['recipient_name'], let_sk: params['let_sk'], e_sk: params['e_sk'], type_cd_sk: params['type_cd_sk'], priority_cd_sk: params['priority_cd_sk'], updated_by_initializer: false)
       respond_to do |format|
         if fax_record.save
           fax_record_attachment(fax_record, attachments_array)
-          FaxJob.perform_async(fax_record.recipient_name, fax_record.recipient_number, fax_record.id, callback_params)
+          FaxJob.perform_async(fax_record.id)
           format.json { head :ok }
         else
           format.json { render json: fax_record.errors, status: :unprocessable_entity }
