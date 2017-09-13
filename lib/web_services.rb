@@ -17,7 +17,7 @@ module  WebServices
         else
           system("wget #{response.headers['location']} -P #{files_dir}")
         end
-        Rails.logger.debug("==> Files attached to fax #{Dir["#{Rails.root}/tmp/fax_files/*"]}")
+        HelperMethods::Logger.app_logger('info', "==> Files attached to fax #{Dir["#{files_dir}/*"]}")
         return Dir["#{files_dir}/*"], files_dir
       end
 

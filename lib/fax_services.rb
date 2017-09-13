@@ -45,7 +45,7 @@ module FaxServices
           fax_record = FaxRecord.find(fax_id)
           attachments_keys= fax_record.attachments.pluck(:file_key)
           attachments, file_dir=  WebServices::Web.file_path(attachments_keys)
-          conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
+          conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday| 
             faraday.request :multipart
             faraday.request  :url_encoded
             faraday.response :logger
@@ -80,11 +80,12 @@ module FaxServices
             FaxServices::Fax.sendback_initial_response_to_client(fax_record)
           rescue
             HelperMethods::Logger.app_logger('error', "==> Error No connection while sending fax #{fax_record.id} <==")
+            HelperMethods::Logger.app_logger('info', "==> Reschedule fax with ID #{fax_record.id} <==")
             FaxJob.perform_in(1.minutes, fax_id)
           end
         rescue
           fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
-          HelperMethods::Logger.app_logger('error', "==> Error send_now: #{fax_record.id} <==")
+          HelperMethods::Logger.app_logger('error', "==> Error while trying to send_now for fax id : #{fax_record.id} <==")
         end
         FileUtils.rm_rf Dir.glob(file_dir)
       end

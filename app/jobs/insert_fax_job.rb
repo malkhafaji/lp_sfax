@@ -4,6 +4,7 @@ class InsertFaxJob
   sidekiq_options queue: 'insert_fax'
 
   def perform(fax_id)
+    HelperMethods::Logger.app_logger('info', "==> inserting Fax with ID (#{fax_id}) in to client database ")
     fax_record = FaxRecord.find(fax_id)
     callback_server = CallbackServer.find(fax_record.callback_server_id)
     callback_params = fax_record.callback_param
