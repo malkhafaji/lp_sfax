@@ -4,20 +4,20 @@ class VendorStatus < ApplicationRecord
 
   private
 
-  def self.current_status
+  def self.current_state
     last.service
   end
 
   def self.service_up?
-    current_status == 'up'
+    current_state == 'up'
   end
 
   def self.service_down?
-    current_status == 'down'
+    current_state == 'down'
   end
 
   def send_status
-    WebServices::Web.client_fax_service_status(VendorStatus.current_status)
+    WebServices::Web.client_fax_service_status(VendorStatus.current_state)
   end
 
 end
