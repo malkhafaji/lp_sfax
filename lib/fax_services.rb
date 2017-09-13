@@ -45,8 +45,6 @@ module FaxServices
           fax_record = FaxRecord.find(fax_id)
           attachments_keys= fax_record.attachments.pluck(:file_key)
           attachments, file_dir=  WebServices::Web.file_path(attachments_keys)
-          recipient_number = fax_record.recipient_number
-          recipient_name = fax_record.recipient_name
           conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
             faraday.request :multipart
             faraday.request  :url_encoded
@@ -57,8 +55,8 @@ module FaxServices
           parts = ["sendfax?",
             "token=#{CGI.escape(token)}",
             "ApiKey=#{CGI.escape(APIKEY)}",
-            "RecipientFax=#{recipient_number}",
-            "RecipientName=#{recipient_name}",
+            "RecipientFax=#{fax_record.recipient_number}",
+            "RecipientName=#{fax_record.recipient_name}",
           "OptionalParams=&" ]
           path = "/api/" + parts.join("&")
           begin
