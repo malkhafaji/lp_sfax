@@ -10,7 +10,6 @@ class InsertFaxJob
     begin
       url = URI(callback_server.url+'/DataAccessServic/sFaxService.svc/InsertFaxes/')
       url.port = 9012
-      url = URI(callback_server.url+'/sFaxService.svc/InsertFaxes/')
       http = Net::HTTP.new(url.host, url.port)
       http.use_ssl = true
       data = {
