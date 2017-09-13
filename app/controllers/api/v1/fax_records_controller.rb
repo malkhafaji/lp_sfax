@@ -14,9 +14,10 @@ class Api::V1::FaxRecordsController < ApplicationController
       end
       HelperMethods::Logger.app_logger('info', "==> request for new fax: #{params.inspect} <==")
       attachments_array = params_to_array(params['Attachments'])
-      fax_record = FaxRecord.new(callback_server_id: callback_server.id, client_receipt_date: Time.now, recipient_number: params['recipient_number'], recipient_name: params['recipient_name'], let_sk: params['let_sk'], e_sk: params['e_sk'], type_cd_sk: params['type_cd_sk'], priority_cd_sk: params['priority_cd_sk'], updated_by_initializer: false)
+      fax_record = FaxRecord.new(callback_server_id: callback_server.id, client_receipt_date: Time.now, recipient_number: params['recipient_number'], recipient_name: params['recipient_name'], updated_by_initializer: false)
       respond_to do |format|
         if fax_record.save
+          CallbackParam.create(let_sk: params['let_sk'], e_sk: params['e_sk'], type_cd_sk: params['type_cd_sk'], priority_cd_sk: params['priority_cd_sk'], fax_record_id: fax_record.id)
           fax_record_attachment(fax_record, attachments_array)
           FaxJob.perform_async(fax_record.id)
           format.json { head :ok }
