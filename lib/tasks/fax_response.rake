@@ -22,7 +22,7 @@ end
 # Sending final response as array of jsons to the client for all sent faxes
 desc 'Sending final response as array of jsons to the client for all sent faxes'
 task :sendback_final_response_to_client => :environment do
-  records_groups = FaxRecord.where(sendback_final_response_to_client: 0).where.not(send_fax_queue_id: nil).group_by(&:callback_url)
+  records_groups = FaxRecord.not_send_to_client
   records_groups.each do |url, records|
     array_of_records = []
     HelperMethods::Logger.app_logger('info', "==> total #{records.size} records for #{url} <==")
@@ -41,7 +41,7 @@ task :sendback_final_response_to_client => :environment do
         Error_code: record.error_code,
         Client_receipt_date: record.client_receipt_date,
         Send_confirm_date: record.fax_date_utc,
-        Vendor_confirm_date: record.vendor_confirm_date,
+        Vendor_confirm_date: record.send_confirm_date,
         ResultCode: record.result_code,
         fax_duration: record.fax_duration
       }
