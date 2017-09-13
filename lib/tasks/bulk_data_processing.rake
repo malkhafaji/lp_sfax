@@ -8,4 +8,5 @@ namespace :bulk_data_processing do
       res_json = JSON.parse(response.body)
       a.update_attributes(file_key: res_json["unique_key"])
     end
+  end
 end
