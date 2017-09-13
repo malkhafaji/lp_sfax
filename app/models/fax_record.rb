@@ -1,5 +1,6 @@
 class FaxRecord < ApplicationRecord
   has_many :attachments
+  has_one :callback_param
   belongs_to :callback_server
 
   validates_format_of :recipient_number, with: /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/
@@ -35,7 +36,7 @@ class FaxRecord < ApplicationRecord
       end
     end
   end
-  
+
   # Paginate through pages and displaying next and back buttons
   def self.paginated_fax_record(params)
     fax_list = params[:fax_list]

@@ -39,14 +39,13 @@ module FaxServices
         return cipher
       end
 
-      # sending the fax with the parameters fax_number,recipient_name ,attached file_path,fax_id and define either its sent by user call or by initializer call
-      def send_now(recipient_name, recipient_number, fax_id, callback_params)
-        fax_record = FaxRecord.find(fax_id)
-        attachments_keys= fax_record.attachments.pluck(:file_key)
-        attachments, file_dir=  WebServices::Web.file_path(attachments_keys)
+      # sending the fax with the fax_record id
+      def send_now(fax_id)
         begin
-          tid = nil
-          conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
+          fax_record = FaxRecord.find(fax_id)
+          attachments_keys= fax_record.attachments.pluck(:file_key)
+          attachments, file_dir=  WebServices::Web.file_path(attachments_keys)
+          conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday| 
             faraday.request :multipart
             faraday.request  :url_encoded
             faraday.response :logger
@@ -56,33 +55,39 @@ module FaxServices
           parts = ["sendfax?",
             "token=#{CGI.escape(token)}",
             "ApiKey=#{CGI.escape(APIKEY)}",
-            "RecipientFax=#{recipient_number}",
-            "RecipientName=#{recipient_name}",
+            "RecipientFax=#{fax_record.recipient_number}",
+            "RecipientName=#{fax_record.recipient_name}",
           "OptionalParams=&" ]
           path = "/api/" + parts.join("&")
-          response = conn.post path do |req|
-            req.body = {}
-            attachments.each_with_index do |file, i|
-              req.body["file_name#{i}"] = Faraday::UploadIO.new("#{file}", file_specification(file)[0], file_specification(file)[1])
+          begin
+            response = conn.post path do |req|
+              req.body = {}
+              attachments.each_with_index do |file, i|
+                req.body["file_name#{i}"] = Faraday::UploadIO.new("#{file}", file_specification(file)[0], file_specification(file)[1])
+              end
             end
+            response_result = JSON.parse(response.body)
+            fax_record.update_attributes(
+              status:            response_result["isSuccess"],
+              message:           response_result["message"],
+              send_fax_queue_id: response_result["SendFaxQueueId"],
+              max_fax_response_check_tries: 0,
+            send_confirm_date: response['date'])
+            if fax_record.send_fax_queue_id.nil?
+              HelperMethods::Logger.app_logger('info', "==> error send_fax_queue_id is nil: #{response_result} <==")
+              fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
+            end
+            FaxServices::Fax.sendback_initial_response_to_client(fax_record)
+          rescue
+            HelperMethods::Logger.app_logger('error', "==> Error No connection while sending fax #{fax_record.id} <==")
+            HelperMethods::Logger.app_logger('info', "==> Reschedule fax with ID #{fax_record.id} <==")
+            FaxJob.perform_in(1.minutes, fax_id)
           end
-          response_result = JSON.parse(response.body)
-          fax_record.update_attributes(
-            status:            response_result["isSuccess"],
-            message:           response_result["message"],
-            send_fax_queue_id: response_result["SendFaxQueueId"],
-            max_fax_response_check_tries: 0,
-          send_confirm_date: response['date'])
-          FileUtils.rm_rf Dir.glob(file_dir)
-          if fax_record.send_fax_queue_id.nil?
-            HelperMethods::Logger.app_logger('info', "==> error send_fax_queue_id is nil: #{response_result} <==")
-            fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
-          end
-          FaxServices::Fax.sendback_initial_response_to_client(fax_record, callback_params)
         rescue
           fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
-          HelperMethods::Logger.app_logger('error', "==> Error send_now: #{fax_record.id} <==")
+          HelperMethods::Logger.app_logger('error', "==> Error while trying to send_now for fax id : #{fax_record.id} <==")
         end
+        FileUtils.rm_rf Dir.glob(file_dir)
       end
 
       # Getting the File Name , the File Extension and validate the document type
@@ -114,8 +119,9 @@ module FaxServices
         end
       end
 
+
       # Sending the initial response to the client after sending the fax
-      def sendback_initial_response_to_client(fax_record, callback_params)
+      def sendback_initial_response_to_client(fax_record)
         client_initial_response = {
           fax_id: fax_record.id,
           recipient_name: fax_record.recipient_name,
@@ -126,13 +132,13 @@ module FaxServices
           status: fax_record.status,
           result_message: fax_record.result_message,
         client_receipt_date: fax_record.client_receipt_date}
+        InsertFaxJob.perform_async(fax_record.id)
         if fax_record.updated_by_initializer == true
           HelperMethods::Logger.app_logger('info', "==> sendback_initial_response_to_client/updated_by_initializer: #{client_initial_response} <==")
         else
           HelperMethods::Logger.app_logger('info',  "==> sendback_initial_response_to_client: #{client_initial_response} <==")
           client_initial_response
         end
-        InsertFaxJob.perform_async(fax_record.id, callback_params)
       end
 
       def calculate_duration(t1,t2)
@@ -191,7 +197,7 @@ module FaxServices
         end
       end
 
-      # Sending the Fax_Queue_Id to get the status
+# Sending the Fax_Queue_Id to get the status
       def send_fax_status(fax_requests_queue_id)
         begin
           conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }) do |faraday|
@@ -205,12 +211,13 @@ module FaxServices
             "ApiKey=#{CGI.escape(APIKEY)}",
           "SendFaxQueueId=#{(fax_requests_queue_id)}"]
           path = "/api/"+parts.join("&")
-
           response = conn.get path do |req|
             req.body = {}
           end
+          VendorStatus.create!(service:'up') if VendorStatus.service_down?
           return JSON.parse(response.body)
         rescue Exception => e
+          VendorStatus.create!(service:'down') if VendorStatus.service_up?
           HelperMethods::Logger.app_logger('error', e.message)
         end
       end

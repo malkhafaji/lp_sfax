@@ -3,11 +3,14 @@ include Sidekiq::Worker
 class InsertFaxJob
   sidekiq_options queue: 'insert_fax'
 
-  def perform(fax_id, callback_params)
+  def perform(fax_id)
+    HelperMethods::Logger.app_logger('info', "==> inserting Fax with ID (#{fax_id}) in to client database ")
     fax_record = FaxRecord.find(fax_id)
     callback_server = CallbackServer.find(fax_record.callback_server_id)
+    callback_params = fax_record.callback_param
     begin
-      url = URI.parse(callback_server.url+'/sFaxService.svc/InsertFaxes')
+      url = URI(callback_server.url+'/DataAccessServic/sFaxService.svc/InsertFaxes/')
+      url.port = 9012
       http = Net::HTTP.new(url.host, url.port)
       http.use_ssl = true
       data = {
@@ -31,7 +34,7 @@ class InsertFaxJob
       HelperMethods::Logger.app_logger('error', e.message)
     end
     unless response.body == 'Fax inserted successfully'
-      InsertFaxJob.perform_in(1.minutes, fax_id, callback_params)
+      InsertFaxJob.perform_in(1.minutes, fax_id)
     end
   end
 
