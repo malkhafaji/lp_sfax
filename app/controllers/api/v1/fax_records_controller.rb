@@ -20,7 +20,7 @@ class Api::V1::FaxRecordsController < ApplicationController
           CallbackParam.create(let_sk: params['let_sk'], e_sk: params['e_sk'], type_cd_sk: params['type_cd_sk'], priority_cd_sk: params['priority_cd_sk'], fax_record_id: fax_record.id)
           fax_record_attachment(fax_record, attachments_array)
           FaxJob.perform_async(fax_record.id)
-          format.json { head :ok }
+          format.json { render json: { status: 0, message: 'Fax request is received' } }
         else
           format.json { render json: fax_record.errors, status: :unprocessable_entity }
         end
