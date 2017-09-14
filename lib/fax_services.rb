@@ -45,7 +45,10 @@ module FaxServices
           fax_record = FaxRecord.find(fax_id)
           attachments_keys= fax_record.attachments.pluck(:file_key)
           attachments, file_dir=  WebServices::Web.file_path(attachments_keys)
-          conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday| 
+          if attachments.size == 0
+            raise "No files found to download for fax with ID: #{fax_record.id}"
+          end
+          conn = Faraday.new(url: 'https://api.sfaxme.com', ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
             faraday.request :multipart
             faraday.request  :url_encoded
             faraday.response :logger
@@ -78,14 +81,14 @@ module FaxServices
               fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
             end
             FaxServices::Fax.sendback_initial_response_to_client(fax_record)
-          rescue
-            HelperMethods::Logger.app_logger('error', "==> Error No connection while sending fax #{fax_record.id} <==")
-            HelperMethods::Logger.app_logger('info', "==> Reschedule fax with ID #{fax_record.id} <==")
+          rescue Exception => e
+            HelperMethods::Logger.app_logger('error', "==> #{e.message} <==")
+            HelperMethods::Logger.app_logger('info', "==> Reschedule fax with ID #{fax_record.id} to be send later <==")
             FaxJob.perform_in(1.minutes, fax_id)
           end
-        rescue
+        rescue Exception => e
           fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
-          HelperMethods::Logger.app_logger('error', "==> Error while trying to send_now for fax id : #{fax_record.id} <==")
+          HelperMethods::Logger.app_logger('error', "==> #{e.message} ")
         end
         FileUtils.rm_rf Dir.glob(file_dir)
       end
