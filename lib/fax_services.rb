@@ -24,8 +24,10 @@ module FaxServices
       end
 
       # sending the fax with the parameters fax_number,recipient_name ,attached file_path,fax_id and define either its sent by user call or by initializer call
-      def actual_sending(recipient_name, recipient_number, attachments, fax_id)
+      def actual_sending(recipient_name, recipient_number, fax_id)
         fax_record = FaxRecord.find_by(id: fax_id)
+        attachments_keys = fax_record.attachments.pluck(:file_key)
+        attachments, file_dir =  WebServices::Web.file_path(attachments_keys)
         begin
           tid = nil
           conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
@@ -54,8 +56,8 @@ module FaxServices
             message:           response_result["message"],
             send_fax_queue_id: response_result["SendFaxQueueId"],
             max_fax_response_check_tries: 0,
-            send_confirm_date: response['date'])
-          FileUtils.rm_rf Dir.glob("#{Rails.root}/tmp/fax_files/*")
+          send_confirm_date: response['date'])
+          FileUtils.rm_rf Dir.glob(file_dir)
           if fax_record.send_fax_queue_id.nil?
             Rails.logger.debug "==> error send_fax_queue_id is nil: #{response_result} <=="
             fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
@@ -71,11 +73,11 @@ module FaxServices
         file_name = File.basename ("#{file_path}").downcase
         file_extension = File.extname (file_name).downcase
         accepted_extensions = [".tif", ".xls", ".doc", ".pdf", ".docx", ".txt", ".rtf", ".xlsx", ".ppt", ".odt", ".ods", ".odp", ".bmp", ".gif", ".jpg", ".png"]
-         if accepted_extensions.include?(file_extension)
-           return "application/#{file_extension}", file_name
-         else
+        if accepted_extensions.include?(file_extension)
+          return "application/#{file_extension}", file_name
+        else
           return false
-         end
+        end
       end
 
       # search and find all faxes without Queue_id (not sent yet) and send them by call from the initializer (when the server start)
@@ -88,7 +90,7 @@ module FaxServices
               attachments << file_info[0]
             end
             fax.update_attributes( updated_by_initializer: true)
-            FaxServices::Fax.actual_sending(fax.recipient_name ,fax.recipient_number, attachments ,fax.id)
+            FaxServices::Fax.actual_sending(fax.recipient_name, fax.recipient_number, fax.id)
           rescue
             Rails.logger.debug "==> Error sending_faxes_without_queue_id: #{fax.id} <=="
           end
