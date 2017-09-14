@@ -12,7 +12,6 @@ class Api::V1::FaxRecordsController < ApplicationController
       recipient_number = params['recipient_number']
       callback_url = params['FaxDispositionURL']
       attachments_array = params_to_array(params['Attachments'])
-      attachments=  WebServices::Web.file_path(attachments_array)
       fax_record = FaxRecord.new
       fax_record.client_receipt_date = Time.now
       fax_record.recipient_number = recipient_number
@@ -21,7 +20,7 @@ class Api::V1::FaxRecordsController < ApplicationController
       fax_record.updated_by_initializer = false
       fax_record.save!
       fax_record_attachment(fax_record, attachments_array)
-      initial_response = FaxServices::Fax.actual_sending(recipient_name, recipient_number, attachments, fax_record.id)
+      initial_response = FaxServices::Fax.actual_sending(recipient_name, recipient_number, fax_record.id)
       render json: initial_response
     rescue Exception => e
       NotificationMailer.sys_error(e.message).deliver

@@ -4,7 +4,7 @@ module  WebServices
     class << self
       def file_path(file_key)
         url="#{ENV['file_service_path']}/api/v1/documents/download?keys=#{file_key.join(",")}"
-        files_dir = (FileUtils.mkdir_p "#{Rails.root}/tmp/fax_files/").join(",")
+        files_dir = (FileUtils.mkdir_p "#{Rails.root}/tmp/#{SecureRandom.hex}").join(",")
         response = HTTParty.get(url,follow_redirects: false)
         if response.headers["content-type"] ==  'application/zip'
           File.open("#{files_dir}/zipped_file.zip", "wb") {|f| f.write(response.body) }
@@ -17,8 +17,8 @@ module  WebServices
         else
           system("wget #{response.headers['location']} -P #{files_dir}")
         end
-        Rails.logger.debug("==> Files attached to fax #{Dir["#{Rails.root}/tmp/fax_files/*"]}")
-        return Dir["#{Rails.root}/tmp/fax_files/*"]
+        Rails.logger.debug("==> Files attached to fax #{Dir["#{files_dir}/*"]}")
+        return Dir["#{files_dir}/*"], files_dir
       end
     end
   end
