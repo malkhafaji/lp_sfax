@@ -49,6 +49,7 @@ class Api::V1::FaxRecordsController < ApplicationController
 
   # Check the presents of the required Parameters
   def check_params
+    HelperMethods::Logger.app_logger('info', '==> checking the presence of all parameters')
     params_list = ['recipient_name', 'recipient_number', 'FaxDispositionURL', 'Attachments', 'e_sk', 'let_sk', 'type_cd_sk', 'priority_cd_sk']
     params_list.each do |i|
       params[i].presence || raise(ActionController::ParameterMissing.new(i))

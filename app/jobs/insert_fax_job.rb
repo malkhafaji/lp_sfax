@@ -31,11 +31,14 @@ class InsertFaxJob
       request.body = data.to_json
       response = http.request(request)
     rescue Exception => e
-      HelperMethods::Logger.app_logger('error', e.message)
+      HelperMethods::Logger.app_logger('error', "==> #{e.message}")
     end
-    unless response.body == 'Fax inserted successfully'
-      InsertFaxJob.perform_in(1.minutes, fax_id)
+    begin
+      unless response.body == 'Fax inserted successfully'
+        InsertFaxJob.perform_in(1.minutes, fax_id)
+      end
+    rescue Exception => e
+      HelperMethods::Logger.app_logger('error',"==> #{e.message}")
     end
   end
-
 end
