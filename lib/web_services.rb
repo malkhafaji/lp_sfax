@@ -17,10 +17,14 @@ module  WebServices
         else
           system("wget #{response.headers['location']} -P #{files_dir}")
         end
-        HelperMethods::Logger.app_logger('info', "==> Files attached to fax #{Dir["#{files_dir}/*"]}")
-        return Dir["#{files_dir}/*"], files_dir
+        if (Dir["#{files_dir}/*"]).empty?
+          HelperMethods::Logger.app_logger('error', "==> No files downloaded for keys #{file_key}")
+          return [], files_dir
+        else
+          HelperMethods::Logger.app_logger('info', "==> Files attached to fax #{Dir["#{files_dir}/*"]}")
+          return Dir["#{files_dir}/*"], files_dir
+        end
       end
-
       # call to Client and change fax service status on/off
       def client_fax_service_status(state)
         HelperMethods::Logger.app_logger('info', "==>Sending fax service status to client: #{state}")
