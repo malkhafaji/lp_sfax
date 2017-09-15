@@ -22,7 +22,8 @@ class Api::V1::FaxRecordsController < ApplicationController
           FaxJob.perform_async(fax_record.id)
           format.json { render json: { status: 'R', message: 'Fax request has been received' } }
         else
-          format.json { render json: fax_record.errors, status: :unprocessable_entity }
+          HelperMethods::Logger.app_logger('error', fax_record.errors)
+          format.json { render json: fax_record.errors, status: 'F' }
         end
       end
     rescue Exception => e
