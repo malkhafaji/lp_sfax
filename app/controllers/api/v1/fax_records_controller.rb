@@ -4,9 +4,9 @@ class Api::V1::FaxRecordsController < ApplicationController
 
   def send_fax
     begin
-      check_params
-      unless Rails.application.config.can_send_fax
-        Rails.application.config.can_send_fax = FaxServices::Fax.service_alive?
+      # check_params
+      unless params['recipient_name'] && params['recipient_number'] && params['FaxDispositionURL'] && params['Attachments'] && params['e_sk'] && params['let_sk'] && params['type_cd_sk'] && params['priority_cd_sk']
+        raise ActionController::ParameterMissing.new('required params')
       end
       callback_server = CallbackServer.find_by_url(params['FaxDispositionURL'])
       unless callback_server
@@ -20,7 +20,7 @@ class Api::V1::FaxRecordsController < ApplicationController
           CallbackParam.create(let_sk: params['let_sk'], e_sk: params['e_sk'], type_cd_sk: params['type_cd_sk'], priority_cd_sk: params['priority_cd_sk'], fax_record_id: fax_record.id)
           fax_record_attachment(fax_record, attachments_array)
           FaxJob.perform_async(fax_record.id)
-          format.json { render json: { status: 0, message: 'Fax request is received' } }
+          format.json { render json: { status: 'R', message: 'Fax request has been received' } }
         else
           format.json { render json: fax_record.errors, status: :unprocessable_entity }
         end
@@ -46,14 +46,4 @@ class Api::V1::FaxRecordsController < ApplicationController
       Attachment.create(fax_record_id: fax_record.id, file_key: file_key)
     end
   end
-
-  # Check the presents of the required Parameters
-  def check_params
-    HelperMethods::Logger.app_logger('info', '==> checking the presence of all parameters')
-    params_list = ['recipient_name', 'recipient_number', 'FaxDispositionURL', 'Attachments', 'e_sk', 'let_sk', 'type_cd_sk', 'priority_cd_sk']
-    params_list.each do |i|
-      params[i].presence || raise(ActionController::ParameterMissing.new(i))
-    end
-  end
-
 end
