@@ -17,6 +17,7 @@ class FaxRecord < ApplicationRecord
     scheduled_jobs.each do |job|
       return true if job.args[0] == self.id
     end
+    return false
   end
 
   def self.by_month(desired_month)
