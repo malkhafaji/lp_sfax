@@ -15,11 +15,7 @@ class FaxRecord < ApplicationRecord
     Rails.logger.debug("==> Checking if the fax with ID:#{self.id} is in the schedule queue ")
     scheduled_jobs = Sidekiq::ScheduledSet.new
     scheduled_jobs.each do |job|
-      if job.args[0] == self.id
-        return true
-      else
-        return false
-      end
+      return true if job.args[0] == self.id
     end
   end
 
