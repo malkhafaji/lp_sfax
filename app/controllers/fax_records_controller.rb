@@ -27,6 +27,11 @@ class FaxRecordsController < ApplicationController
 
   # Render Index page with all fax records OR the records results from filter (filtered_fax_records) with pagenation
   def index
+    respond_to do |format|
+      format.html
+      format.json { render json: FaxRecordDatatable.new(view_context) }
+    end
+    
     @zone = ActiveSupport::TimeZone.new("Central Time (US & Canada)")
     @search_value = params[:search_value]
     filter_fax_records = FaxRecord.filtered_fax_records(@search_value)
@@ -48,9 +53,9 @@ class FaxRecordsController < ApplicationController
 
     @per_page = ENV['pagination_per_page'].to_i
     @current_page = (params[:page].present? ? params[:page] : '1').to_i
-    @total_record, @fax_records, @total_pages = FaxRecord.paginated_fax_record(page: @current_page, per_page:  @per_page, fax_list: @fax_records)
-    respond_to do |format|
-      format.html
+    #@total_record, @fax_records, @total_pages = FaxRecord.paginated_fax_record(page: @current_page, per_page:  @per_page, fax_list: @fax_records)
+     respond_to do |format|
+     format.html
     end
   end
   def report
