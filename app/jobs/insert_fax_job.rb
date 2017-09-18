@@ -54,18 +54,3 @@ class InsertFaxJob
     end
   end
 end
-
-
-#   f_recipient_company: "Launch Point",
-#   f_recipient_name: "Nitor SuyogK",
-#   f_document_id: "88",
-#   f_status_code: 1,
-#   f_status_desc: "Error At Fax Response",
-#   f_error_level: 1,
-#   f_error_message: "Test Error Message",
-#   f_completion_date: "\/Date(1505461277120)\/",
-#   f_duration: 11,
-#   f_pages_sent: 4,
-#   f_number_of_retries:2,
-#   f_notes: "Fax sent successfully via postman"
-# }
