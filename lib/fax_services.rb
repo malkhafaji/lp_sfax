@@ -46,9 +46,7 @@ module FaxServices
           attachments_keys= fax_record.attachments.pluck(:file_key)
           attachments, file_dir=  WebServices::Web.file_path(attachments_keys)
           if (attachments.empty?) || (attachments.size != attachments_keys.size)
-            fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Missing Attachments', error_code: 1515102, result_code: 7002, status: false, is_success: false)
-            InsertFaxJob.perform_async(fax_record.id)
-            raise "No files found to download for fax with ID: #{fax_record.id}"
+            raise RuntimeError,"No files found to download for fax with ID: #{fax_record.id}"
           end
           conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
             faraday.request :multipart
@@ -88,8 +86,11 @@ module FaxServices
             HelperMethods::Logger.app_logger('info', "==> Reschedule fax with ID #{fax_record.id} to be send later <==")
             FaxJob.perform_in(1.minutes, fax_id)
           end
+        rescue RuntimeError => e
+          fax_record.update_attributes(message: 'Fax request is complete', result_message: 'One or more attachment is missing', error_code: 1515102, result_code: 7002, status: false, is_success: false)
+          InsertFaxJob.perform_async(fax_record.id)
         rescue Exception => e
-          fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: 1515101, result_code: 7001, status: false, is_success: false) unless fax_record.result_code == 7002
+          fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: 1515101, result_code: 7001, status: false, is_success: false)
           HelperMethods::Logger.app_logger('error', "==> #{e.message} ")
         end
         FileUtils.rm_rf Dir.glob(file_dir)
