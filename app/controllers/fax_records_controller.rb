@@ -61,6 +61,9 @@ class FaxRecordsController < ApplicationController
       format.html
     end
   end
+  def url_report
+    @fax_records_urls = FaxRecord.where(callback_url: params[:callback_url])
+  end
   # private
   # # Use callbacks to share common setup or constraints between actions.
   # def set_fax_record
