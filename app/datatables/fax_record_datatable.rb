@@ -28,8 +28,11 @@ class FaxRecordDatatable
           fax_record.result_message,
           fax_record.attempts,
           fax_record.pages,
-          fax_record.sender_fax
-
+          fax_record.sender_fax,
+          fax_record.created_at.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m %p"),
+          fax_record.client_receipt_date.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m %p"),
+          fax_record.send_confirm_date.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m %p") ,
+          fax_record.fax_duration
         ]
      end
     end
@@ -47,8 +50,8 @@ class FaxRecordDatatable
       end      
       fax_records = fax_records.page(page).per_page(per_page)
       if params[:sSearch].present?
-        fax_records = fax_records.where("id like :search", search: "%#{params[:sSearch]}%")
-      end
+      fax_records = fax_records.where("id like :search", search: "%#{params[:sSearch]}%")
+     end
       fax_records
     end
 
@@ -69,4 +72,3 @@ class FaxRecordDatatable
       params[:sSortDir_0] == "desc" ? "desc" : "asc"
     end
   end
-end

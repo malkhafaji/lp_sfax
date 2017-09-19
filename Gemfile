@@ -28,7 +28,7 @@ gem 'groupdate'
 gem 'omniauth-azure-oauth2'
 gem 'datatables-rails', '~> 1.10.7.0'
 gem 'will_paginate', '~> 3.1', '>= 3.1.6'
-
+gem 'jquery-datatables-rails'
 
 
 group :development, :test do
@@ -50,3 +50,5 @@ group :production do
 end
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+
+
