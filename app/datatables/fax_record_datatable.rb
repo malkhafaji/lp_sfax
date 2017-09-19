@@ -42,7 +42,7 @@ class FaxRecordDatatable
     end
     fax_records = fax_records.page(page).per_page(per_page)
     if params[:search].present?
-      fax_records = fax_records.where("fax_id like :search or recipient_name like :search or result_message like :search or recipient_number like :search", search: "%#{params[:search][:value]}%")
+      fax_records = fax_records.where("id like :search or recipient_name like :search or result_message like :search or recipient_number like :search", search: "%#{params[:search][:value]}%")
     end
     fax_records
   end
