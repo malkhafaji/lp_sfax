@@ -30,7 +30,7 @@ class InsertFaxJob
         f_status_code: 1,
         f_status_desc: 'Seccess',
         f_error_level: 0,
-        f_error_message: '',
+        f_error_message: fax_record.result_message.present? ? fax_record.result_message : '' ,
         f_completion_date: "\/Date(#{fax_record.updated_at.to_i})\/",
         f_duration: 0,
         f_pages_sent: 0,
