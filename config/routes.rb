@@ -15,7 +15,7 @@ Rails.application.routes.draw do
     collection do
       get 'homepage'
       get 'report'
-      get 'url_report'
+      get 'report_by_environment'
       get 'new_fax_records'
       match 'index', via: [:get, :post]
       post 'export' # Exporting the records as file

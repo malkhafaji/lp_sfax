@@ -61,7 +61,7 @@ class FaxRecordsController < ApplicationController
       format.html
     end
   end
-  def url_report
+  def report_by_environment
     @fax_records_urls = FaxRecord.where(callback_url: params[:callback_url])
   end
   # private

@@ -1,0 +1,12 @@
+.container-fluid.text-center
+  .row.content
+    .col-sm-2.sidenav
+      - fax_records_urls = FaxRecord.pluck(:callback_url).uniq
+      - fax_records_urls.each do |site|
+        %p= link_to site,  report_by_environment_fax_records_path(callback_url: site), class: " btn btn-default #{ 'btn-info' if @callback_url == site} "
+
+
+    .col-sm-10.text-left
+      .col-md-9.col-lg-offset-2
+        %center
+          %p= line_chart @fax_records_urls.group_by_day_of_month(:created_at).count
