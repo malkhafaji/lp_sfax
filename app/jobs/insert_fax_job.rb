@@ -45,12 +45,5 @@ class InsertFaxJob
     rescue Exception => e
       HelperMethods::Logger.app_logger('error', e.message)
     end
-    # begin
-    #   unless response.body == 'Fax inserted successfully'
-    #     InsertFaxJob.perform_in(1.minutes, fax_id)
-    #   end
-    # rescue Exception => e
-    #   HelperMethods::Logger.app_logger('error', e.message)
-    # end
   end
 end
