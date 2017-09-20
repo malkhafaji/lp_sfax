@@ -1,3 +1,13 @@
-# Place all the behaviors and hooks related to the matching controller here.
-# All this logic will automatically be available in application.js.
-# You can use CoffeeScript in this file: http://coffeescript.org/
+$(document).ready ->
+  $('#fax_records').dataTable
+    processing: true
+    serverSide: true
+    ajax: $('#fax_records').data('source')
+    pagingType: 'full_numbers',
+    bProcessing: true,
+    order: [[ 0, "desc" ]]
+    aoColumnDefs: [
+          { 'bSortable': false, 'aTargets': [ 3,4,5,6,7,8,9,10,11] }
+       ]
+  return
+
