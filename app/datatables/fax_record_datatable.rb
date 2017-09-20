@@ -42,7 +42,7 @@ class FaxRecordDatatable
     end
     fax_records = fax_records.page(page).per_page(per_page)
     if params[:search].present?
-      fax_records = fax_records.where("id like :search or recipient_name like :search or result_message like :search or recipient_number like :search", search: "%#{params[:search][:value]}%")
+      fax_records = fax_records.where("id like :search or recipient_name like :search  or recipient_number like :search or result_message like :search", search: "%#{params[:search][:value]}%")
     end
     fax_records
   end
@@ -52,11 +52,13 @@ class FaxRecordDatatable
   def per_page
     params[:length].to_i > 0 ? params[:length].to_i : 10
   end
-  def sort_column
-      columns = %w[id]
-      columns[params[:iSortCol_0].to_i]
-    end
-    def sort_direction
-      params[:sSortDir_0] == "desc" ? "desc" : "asc"
-    end
+
+ def sort_column
+    columns = %w[id recipient_name result_message recipient_number]
+    columns[params[:order]['0'][:column].to_i]
+  end
+
+ def sort_direction
+    params[:order]['0'][:dir] == "desc" ? "desc" : "asc"
+  end
 end
