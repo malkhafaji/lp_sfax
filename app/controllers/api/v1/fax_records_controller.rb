@@ -4,8 +4,7 @@ class Api::V1::FaxRecordsController < ApplicationController
 
   def send_fax
     begin
-      # check_params
-      unless params['recipient_name'] && params['recipient_number'] && params['FaxDispositionURL'] && params['Attachments'] && params['e_sk'] && params['let_sk'] && params['type_cd_sk'] && params['priority_cd_sk']
+      unless params['recipient_name'].present? && params['recipient_number'].present? && params['FaxDispositionURL'].present? && params['Attachments'].present? && params['e_sk'].present? && params['let_sk'].present? && params['type_cd_sk'].present? && params['priority_cd_sk'].present?
         raise ActionController::ParameterMissing.new('required params')
       end
       callback_server = CallbackServer.find_by_url(params['FaxDispositionURL'])

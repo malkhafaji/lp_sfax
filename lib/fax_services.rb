@@ -42,13 +42,13 @@ module FaxServices
       # sending the fax with the fax_record id
       def send_now(fax_id)
         begin
-          fax_record = FaxRecord.find(fax_id)
+          fax_record = FaxRecord.includes(:attachments).find(fax_id)
           attachments_keys= fax_record.attachments.pluck(:file_key)
           attachments, file_dir=  WebServices::Web.file_path(attachments_keys)
-          if attachments.size == 0
-            raise "No files found to download for fax with ID: #{fax_record.id}"
+          if (attachments.empty?) || (attachments.size != attachments_keys.size)
+            raise RuntimeError,"No files found to download for fax with ID: #{fax_record.id}"
           end
-          conn = Faraday.new(url: 'https://api.sfaxme.com', ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
+          conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
             faraday.request :multipart
             faraday.request  :url_encoded
             faraday.response :logger
@@ -78,7 +78,7 @@ module FaxServices
             send_confirm_date: response['date'])
             if fax_record.send_fax_queue_id.nil?
               HelperMethods::Logger.app_logger('info', "==> error send_fax_queue_id is nil: #{response_result} <==")
-              fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
+              fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: 1515101, result_code: 7001, status: false, is_success: false)
             end
             FaxServices::Fax.sendback_initial_response_to_client(fax_record)
           rescue Exception => e
@@ -86,8 +86,11 @@ module FaxServices
             HelperMethods::Logger.app_logger('info', "==> Reschedule fax with ID #{fax_record.id} to be send later <==")
             FaxJob.perform_in(1.minutes, fax_id)
           end
+        rescue RuntimeError => e
+          fax_record.update_attributes(message: 'Fax request is complete', result_message: 'One or more attachment is missing', error_code: 1515102, result_code: 7002, status: false, is_success: false)
+          InsertFaxJob.perform_async(fax_record.id)
         rescue Exception => e
-          fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: '1515101', result_code: '7001', status: false, is_success: false)
+          fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: 1515101, result_code: 7001, status: false, is_success: false)
           HelperMethods::Logger.app_logger('error', "==> #{e.message} ")
         end
         FileUtils.rm_rf Dir.glob(file_dir)
@@ -107,15 +110,10 @@ module FaxServices
 
       # search and find all faxes without Queue_id (not sent yet) and send them by call from the initializer (when the server start)
       def sending_faxes_without_queue_id
-        attachments= []
-        FaxRecord.where(send_fax_queue_id: nil).each do |fax|
+        FaxRecord.without_queue_id.each do |fax|
           begin
-            Attachment.where(fax_record_id:fax.id).each do |file|
-              file_info = WebServices::Web.file_path(file[:file_id],file[:checksum])
-              attachments << file_info[0]
-            end
-            fax.update_attributes( updated_by_initializer: true)
-            FaxServices::Fax.send_now(fax.recipient_name ,fax.recipient_number, attachments ,fax.id)
+            fax.update_attributes( updated_by_initializer: true )
+            FaxServices::Fax.send_now(fax.id)
           rescue
             HelperMethods::Logger.app_logger('error', "==> Error sending_faxes_without_queue_id: #{fax.id} <==")
           end
@@ -190,7 +188,7 @@ module FaxServices
             else
               HelperMethods::Logger.app_logger('info', "==> Resend fax with ID = #{fax_record.id} <==")
               fax_record.update_attributes(resend: (fax_record.resend+1))
-              ResendFaxJob.perform_in((ENV['DELAY_RESEND'].to_i).minutes, fax_record.id)
+              ResendFaxJob.perform_in((ENV['DELAY_RESEND'].to_i).minutes, fax_record.id) unless fax_record.in_schedule_queue?
             end
           else
             HelperMethods::Logger.app_logger('info', '==>fax_response: no response found <==')
@@ -200,7 +198,7 @@ module FaxServices
         end
       end
 
-# Sending the Fax_Queue_Id to get the status
+      # Sending the Fax_Queue_Id to get the status
       def send_fax_status(fax_requests_queue_id)
         begin
           conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }) do |faraday|
