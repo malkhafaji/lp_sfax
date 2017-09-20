@@ -30,6 +30,7 @@ class FaxRecordDatatable
         ]
      end
     end
+
     def fax_records
       @fax_records ||= fetch_fax_records
     end
@@ -46,15 +47,17 @@ class FaxRecordDatatable
     end
     fax_records
   end
+
   def page
     params[:start].to_i/per_page + 1
   end
+  
   def per_page
     params[:length].to_i > 0 ? params[:length].to_i : 10
   end
 
  def sort_column
-    columns = %w[id recipient_name result_message recipient_number]
+    columns = %w[id recipient_name recipient_number]
     columns[params[:order]['0'][:column].to_i]
   end
 
