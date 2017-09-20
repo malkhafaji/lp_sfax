@@ -28,7 +28,7 @@ class InsertFaxJob
         f_recipient_name: '',
         f_document_id: fax_record.id,
         f_status_code: 1,
-        f_status_desc: 'Seccess',
+        f_status_desc: 'Fax request has been sent to the queue for vendor processing.',
         f_error_level: 0,
         f_error_message: fax_record.result_message.present? ? fax_record.result_message : '' ,
         f_completion_date: "\/Date(#{fax_record.updated_at.to_i})\/",
@@ -45,12 +45,12 @@ class InsertFaxJob
     rescue Exception => e
       HelperMethods::Logger.app_logger('error', e.message)
     end
-    begin
-      unless response.body == 'Fax inserted successfully'
-        InsertFaxJob.perform_in(1.minutes, fax_id)
-      end
-    rescue Exception => e
-      HelperMethods::Logger.app_logger('error', e.message)
-    end
+    # begin
+    #   unless response.body == 'Fax inserted successfully'
+    #     InsertFaxJob.perform_in(1.minutes, fax_id)
+    #   end
+    # rescue Exception => e
+    #   HelperMethods::Logger.app_logger('error', e.message)
+    # end
   end
 end
