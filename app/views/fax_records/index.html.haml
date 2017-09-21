@@ -6,7 +6,7 @@
       .text-center
         Export the results as:
         \#{link_to 'CSV file' , export_fax_records_path(format: 'csv'), method: :post, class: 'btn btn-default btn-sm'}
-        \#{link_to 'Excel file', export_fax_records_path(format: 'xls'), method: :post, class: 'btn btn-default btn-sm'}    
+        \#{link_to 'Excel file', export_fax_records_path(format: 'xls'), method: :post, class: 'btn btn-default btn-sm'}
   .row-fluid
     %table#fax_records{"data-source" => "/fax_records/index.json"}
       %thead
