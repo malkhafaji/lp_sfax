@@ -26,14 +26,14 @@ class InsertFaxJob
       f_recipient_company: '',
       f_recipient_name: '',
       f_document_id: fax_record.id,
-      f_status_code: 1,
-      f_status_desc: 'Fax request has been sent to the queue for vendor processing.',
+      f_status_code: fax_record.status == "t" ? 4 : 2,
+      f_status_desc: fax_record.status == "t" ? 'Vendor Received' : 'Failure',
       f_error_level: 0,
       f_error_message: fax_record.result_message.present? ? fax_record.result_message : '' ,
       f_completion_date: "\/Date(#{fax_record.updated_at.to_i})\/",
       f_duration: 0,
       f_pages_sent: 0,
-      f_number_of_retries: 1,
+      f_number_of_retries: 0,
       f_notes: "This fax was sent via Fax Service API."
     }
     request = Net::HTTP::Post.new(url, {'Content-Type' => 'application/json'})

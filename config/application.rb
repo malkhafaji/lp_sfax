@@ -10,6 +10,5 @@ module Fax
   class Application < Rails::Application
     config.autoload_paths << Rails.root.join('lib')
     config.active_job.queue_adapter = :sidekiq
-    config.can_send_fax = false
   end
 end

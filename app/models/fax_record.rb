@@ -12,7 +12,7 @@ class FaxRecord < ApplicationRecord
   scope :not_send_to_client, -> { where(sendback_final_response_to_client: 0).where.not(send_fax_queue_id: nil, result_code: nil).group_by(&:callback_server_id) }
 
   def in_schedule_queue?
-    Rails.logger.debug("==> Checking if the fax with ID:#{self.id} is in the schedule queue ")
+    HelperMethods::Logger.app_logger('info', "==> Checking if the fax with ID:#{self.id} is in the schedule queue ")
     scheduled_jobs = Sidekiq::ScheduledSet.new
     scheduled_jobs.each do |job|
       return true if job.args[0] == self.id
