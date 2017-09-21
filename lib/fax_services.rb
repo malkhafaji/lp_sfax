@@ -41,58 +41,49 @@ module FaxServices
 
       # sending the fax with the fax_record id
       def send_now(fax_id)
-        begin
-          fax_record = FaxRecord.includes(:attachments).find(fax_id)
-          attachments_keys= fax_record.attachments.pluck(:file_key)
-          attachments, file_dir=  WebServices::Web.file_path(attachments_keys)
-          if (attachments.empty?) || (attachments.size != attachments_keys.size)
-            raise RuntimeError,"No files found to download for fax with ID: #{fax_record.id}"
-          end
-          conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
-            faraday.request :multipart
-            faraday.request  :url_encoded
-            faraday.response :logger
-            faraday.adapter Faraday.default_adapter
-          end
-          token = get_token()
-          parts = ["sendfax?",
-            "token=#{CGI.escape(token)}",
-            "ApiKey=#{CGI.escape(APIKEY)}",
-            "RecipientFax=#{fax_record.recipient_number}",
-            "RecipientName=#{fax_record.recipient_name}",
-          "OptionalParams=&" ]
-          path = "/api/" + parts.join("&")
-          begin
-            response = conn.post path do |req|
-              req.body = {}
-              attachments.each_with_index do |file, i|
-                req.body["file_name#{i}"] = Faraday::UploadIO.new("#{file}", file_specification(file)[0], file_specification(file)[1])
-              end
-            end
-            response_result = JSON.parse(response.body)
-            fax_record.update_attributes(
-              status:            response_result["isSuccess"],
-              message:           response_result["message"],
-              send_fax_queue_id: response_result["SendFaxQueueId"],
-              max_fax_response_check_tries: 0,
-            send_confirm_date: response['date'])
-            if fax_record.send_fax_queue_id.nil?
-              HelperMethods::Logger.app_logger('info', "==> error send_fax_queue_id is nil: #{response_result} <==")
-              fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: 1515101, result_code: 7001, status: false, is_success: false)
-            end
-            FaxServices::Fax.sendback_initial_response_to_client(fax_record)
-          rescue Exception => e
-            HelperMethods::Logger.app_logger('error', "==> #{e.message} <==")
-            HelperMethods::Logger.app_logger('info', "==> Reschedule fax with ID #{fax_record.id} to be send later <==")
-            FaxJob.perform_in(1.minutes, fax_id)
-          end
-        rescue RuntimeError => e
-          fax_record.update_attributes(message: 'Fax request is complete', result_message: 'One or more attachment is missing', error_code: 1515102, result_code: 7002, status: false, is_success: false)
+        fax_record = FaxRecord.includes(:attachments).find(fax_id)
+        attachments_keys= fax_record.attachments.pluck(:file_key)
+        attachments, file_dir=  WebServices::Web.file_path(attachments_keys, fax_id)
+        if (attachments.empty?) || (attachments.size != attachments_keys.size)
+          fax_record.update_attributes(message: 'Fax request is complete', result_message: "No files found to download for fax with ID: #{fax_id}", error_code: 1515102, result_code: 7002, status: false, is_success: false)
+          HelperMethods::Logger.app_logger('error', "==> No files found to download for fax with ID: #{fax_id}")
           InsertFaxJob.perform_async(fax_record.id)
-        rescue Exception => e
-          fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: 1515101, result_code: 7001, status: false, is_success: false)
-          HelperMethods::Logger.app_logger('error', "==> #{e.message} ")
+          FileUtils.rm_rf Dir.glob(file_dir)
+          return
         end
+        conn = Faraday.new(url: FAX_SERVER_URL, ssl: { ca_file: 'C:/Ruby200/cacert.pem' }  ) do |faraday|
+          faraday.request :multipart
+          faraday.request  :url_encoded
+          faraday.response :logger
+          faraday.adapter Faraday.default_adapter
+        end
+        token = get_token()
+        parts = ["sendfax?",
+          "token=#{CGI.escape(token)}",
+          "ApiKey=#{CGI.escape(APIKEY)}",
+          "RecipientFax=#{fax_record.recipient_number}",
+          "RecipientName=#{fax_record.recipient_name}",
+        "OptionalParams=&" ]
+        path = "/api/" + parts.join("&")
+        response = conn.post path do |req|
+          req.body = {}
+          attachments.each_with_index do |file, i|
+            req.body["file_name#{i}"] = Faraday::UploadIO.new("#{file}", file_specification(file)[0], file_specification(file)[1])
+          end
+        end
+        response_result = JSON.parse(response.body)
+        fax_record.update_attributes(
+          status:            response_result["isSuccess"],
+          message:           response_result["message"],
+          send_fax_queue_id: response_result["SendFaxQueueId"],
+          max_fax_response_check_tries: 0,
+        send_confirm_date: response['date'])
+        if fax_record.send_fax_queue_id.nil?
+          HelperMethods::Logger.app_logger('error', "==> error send_fax_queue_id is nil: #{response_result} <==")
+          fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: 1515101, result_code: 7001, status: false, is_success: false)
+          InsertFaxJob.perform_async(fax_record.id)
+        end
+        FaxServices::Fax.sendback_initial_response_to_client(fax_record)
         FileUtils.rm_rf Dir.glob(file_dir)
       end
 
