@@ -3,7 +3,7 @@
     .col-sm-2.sidenav
       - fax_records_urls = FaxRecord.pluck(:callback_url).uniq
       - fax_records_urls.each do |site|
-        %p= link_to site,  report_by_environment_fax_records_path(callback_url: site), class: " btn btn-default #{ 'btn-info' if @callback_url == site} "
+        %p= link_to site,  report_by_environment_fax_records_path(callback_url: site), class: " btn btn-default #{active_class(params[:callback_url], site)}"
 
 
     .col-sm-10.text-left
