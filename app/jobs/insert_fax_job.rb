@@ -39,11 +39,11 @@ class InsertFaxJob
     request = Net::HTTP::Post.new(url, {'Content-Type' => 'application/json'})
     request.body = data.to_json
     response = http.request(request)
-    if response.present? && response.code == 200
+    if response.present? && response.code == '200'
       HelperMethods::Logger.app_logger('info', "insert fax date: #{data.to_json}")
       HelperMethods::Logger.app_logger('info', "insert fax response: #{response.body}")
     else
-      HelperMethods::Logger.app_logger('error', response)
+      HelperMethods::Logger.app_logger('error', response.inspect)
     end
   end
 end
