@@ -35,6 +35,7 @@ class InsertFaxJob
       f_pages_sent: 0,
       f_number_of_retries: 0,
       f_notes: "This fax was sent via Fax Service API."
+      f_fax_id: fax_record.id
     }
     request = Net::HTTP::Post.new(url, {'Content-Type' => 'application/json'})
     request.body = data.to_json
