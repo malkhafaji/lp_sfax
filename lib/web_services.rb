@@ -42,7 +42,7 @@ module  WebServices
         begin
           CallbackServer.all.each do |server|
             url = URI(server.url + "/DataAccessService/sFaxService.svc/UpdateFaxServiceStatus?strFaxStatus=#{state}&modify_e_sk=0/")
-            url.port = 9012
+            url.port = server.insert_port
             http = Net::HTTP.new(url.host, url.port)
             http.use_ssl = true
             request = Net::HTTP::Put.new(url)
