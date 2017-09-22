@@ -213,6 +213,107 @@ module FaxServices
           HelperMethods::Logger.app_logger('error', e.message)
         end
       end
+
+      def final_response_to_client
+        records_groups = FaxRecord.not_send_to_client
+        records_groups.each do |server_id, records|
+          callback_server = CallbackServer.find(server_id)
+          HelperMethods::Logger.app_logger('info', "==> total #{records.size} records for #{callback_server.url} <==")
+          array_of_records =  prepare_client_date(records)
+          if array_of_records.blank?
+            HelperMethods::Logger.app_logger('info', '==> sendback_final_response_to_client: No responses for faxes found <==')
+          else
+            array_in_batches = array_of_records.each_slice(ENV['max_records_send_to_client'].to_i).to_a
+            array_in_batches.each do |batch_of_records|
+              begin
+                HelperMethods::Logger.app_logger('info', "==> #{Time.now} posting #{batch_of_records.size} records to #{callback_server.url} <==")
+                url = URI(callback_server.url+'/eFaxService/OutboundDispositionService.svc/Receive')
+                url.port = 9001
+                response = HTTParty.post(url, body: batch_of_records.to_json, headers: { 'Content-Type' => 'application/json' } )
+                HelperMethods::Logger.app_logger('info', "==> #{Time.now} end posting <==")
+                if response.present? && response.code == 200
+                  result = JSON.parse(response)
+                  success_ids = []
+                  result.each do |r|
+                    if r['Message'] == 'Success'
+                      success_ids << r['Fax_Id']
+                      FaxRecord.find(r['Fax_Id']).update_attributes(sendback_final_response_to_client: 1)
+                    end
+                  end
+                  HelperMethods::Logger.app_logger('info', "==> successfully updated: #{success_ids} <==")
+                else
+                  HelperMethods::Logger.app_logger('error', "==> response error: #{response} <==")
+                end
+              rescue Exception => e
+                HelperMethods::Logger.app_logger('error', "==> Error while posting final response: #{e.message}")
+              end
+            end
+          end
+        end
+      end
+
+      def old_sendback_final_response_to_client #remove me soon please
+        records_groups = FaxRecord.where(sendback_final_response_to_client: 0).where.not(send_fax_queue_id: nil, result_code: nil, callback_url: nil).group_by(&:callback_url)
+        records_groups.each do |url, records|
+          HelperMethods::Logger.app_logger('info', "==> total #{records.size} records for #{url} <==")
+          array_of_records =  prepare_client_date(records)
+          if array_of_records.blank?
+            HelperMethods::Logger.app_logger('info', '==> sendback_final_response_to_client: No responses for faxes found <==')
+          else
+            array_in_batches = array_of_records.each_slice(ENV['max_records_send_to_client'].to_i).to_a
+            array_in_batches.each do |batch_of_records|
+              begin
+                HelperMethods::Logger.app_logger('info', "==> #{Time.now} posing #{batch_of_records.size} records to #{url} <==")
+                response = HTTParty.post(url,
+                  body: batch_of_records.to_json,
+                headers: { 'Content-Type' => 'application/json' } )
+                HelperMethods::Logger.app_logger('info', "==> #{Time.now} end posting <==")
+                if response.present? && response.code == 200
+                  result = JSON.parse(response)
+                  success_ids = []
+                  result.each do |r|
+                    if r['Message'] == 'Success'
+                      success_ids << r['Fax_Id']
+                      FaxRecord.find(r['Fax_Id']).update_attributes(sendback_final_response_to_client: 1)
+                    end
+                  end
+                  HelperMethods::Logger.app_logger('info', "==> successfully updated: #{success_ids} <==")
+                else
+                  HelperMethods::Logger.app_logger('info', "==> response error: #{response} <==")
+                end
+              rescue Exception => e
+                HelperMethods::Logger.app_logger('error', "==> Error while posting final response: #{e.message}")
+              end
+            end
+          end
+        end
+      end
+
+      def prepare_client_date(records)
+        array_of_records = []
+        records.each do |record|
+          new_record= {
+            Fax_ID: record.id,
+            Recipient_Name: record.recipient_name,
+            Recipient_Number: record.recipient_number,
+            Attached_Fax_File: record.file_path,
+            is_success: record.is_success,
+            initial_Message: record.message,
+            Final_Message: record.result_message,
+            Sender_Number: record.sender_fax,
+            Number_of_pages: record.pages,
+            Number_of_attempts: record.attempts,
+            Error_code: record.error_code,
+            Client_receipt_date: record.client_receipt_date,
+            Send_confirm_date: record.fax_date_utc,
+            Vendor_confirm_date: record.send_confirm_date,
+            ResultCode: record.result_code,
+            fax_duration: record.fax_duration
+          }
+          array_of_records.push(new_record)
+        end
+        array_of_records
+      end
     end
   end
 end
