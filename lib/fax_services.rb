@@ -228,7 +228,6 @@ module FaxServices
               begin
                 HelperMethods::Logger.app_logger('info', "==> #{Time.now} posting #{batch_of_records.size} records to #{callback_server.url} <==")
                 url = URI(callback_server.url+'/eFaxService/OutboundDispositionService.svc/Receive')
-                url.port = 9001
                 response = HTTParty.post(url, body: batch_of_records.to_json, headers: { 'Content-Type' => 'application/json' } )
                 HelperMethods::Logger.app_logger('info', "==> #{Time.now} end posting <==")
                 if response.present? && response.code == 200
