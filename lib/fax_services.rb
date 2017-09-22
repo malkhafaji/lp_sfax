@@ -179,7 +179,7 @@ module FaxServices
             else
               HelperMethods::Logger.app_logger('info', "==> Resend fax with ID = #{fax_record.id} <==")
               fax_record.update_attributes(resend: (fax_record.resend+1))
-              ResendFaxJob.perform_in((ENV['DELAY_RESEND'].to_i).minutes, fax_record.id) unless fax_record.in_queue?
+              ResendFaxJob.perform_in((ENV['DELAY_RESEND'].to_i).minutes, fax_record.id) unless fax_record.in_any_queue?
             end
           else
             HelperMethods::Logger.app_logger('info', '==>fax_response: no response found <==')
@@ -309,7 +309,7 @@ module FaxServices
             ResultCode: record.result_code,
             fax_duration: record.fax_duration
           }
-          array_of_records.push(new_record) unless record.in_queue?
+          array_of_records.push(new_record) unless record.in_any_queue?
         end
         array_of_records
       end
