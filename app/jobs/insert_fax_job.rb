@@ -7,7 +7,7 @@ class InsertFaxJob
     HelperMethods::Logger.app_logger('info', "==> inserting Fax with ID (#{fax_id}) in to client database ")
     fax_record = FaxRecord.find(fax_id)
     url = URI(fax_record.callback_server.url+'/DataAccessService/sFaxService.svc/InsertFaxes')
-    url.port = 9012
+    url.port = fax_record.callback_server.insert_port
     http = Net::HTTP.new(url.host, url.port)
     http.use_ssl = false
     data = {

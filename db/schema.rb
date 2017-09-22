@@ -35,10 +35,12 @@ ActiveRecord::Schema.define(version: 20170913014005) do
 
   create_table "callback_servers", force: :cascade do |t|
     t.string   "name"
-    t.string   "url",        null: false
-    t.string   "update_url", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.string   "url",         null: false
+    t.string   "update_url"
+    t.integer  "insert_port"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+    t.index ["insert_port"], name: "index_callback_servers_on_insert_port"
     t.index ["update_url"], name: "index_callback_servers_on_update_url"
     t.index ["url"], name: "index_callback_servers_on_url"
   end
