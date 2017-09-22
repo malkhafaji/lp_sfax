@@ -12,21 +12,16 @@ class FaxRecord < ApplicationRecord
   scope :not_send_to_client, -> { where(sendback_final_response_to_client: 0).where.not(send_fax_queue_id: nil, result_code: nil, callback_server_id: nil).group_by(&:callback_server_id) }
 
   def in_any_queue?
-      HelperMethods::Logger.app_logger('info', "==> Checking if the fax with ID:#{self.id} is in any queue ")
-      retry_jobs = Sidekiq::RetrySet.new
-      retry_jobs.each do |job|
-        return true if job.args[0] == self.id
-      end
-      scheduled_jobs = Sidekiq::ScheduledSet.new
-      scheduled_jobs.each do |job|
-        return true if job.args[0] == self.id
-      end
-      scheduled_jobs = Sidekiq::BusySet.new
-      scheduled_jobs.each do |job|
-        return true if job.args[0] == self.id
-      end
-      return false
+    retry_jobs = Sidekiq::RetrySet.new
+    retry_jobs.each do |job|
+      return true if job.args[0] == self.id
     end
+    scheduled_jobs = Sidekiq::ScheduledSet.new
+    scheduled_jobs.each do |job|
+      return true if job.args[0] == self.id
+    end
+    return false
+  end
 
   def self.by_month(desired_month)
     self.where("cast(strftime('%m', created_at) as int) = ?", desired_month)
@@ -39,8 +34,8 @@ class FaxRecord < ApplicationRecord
 
   def self.filtered_fax_records(search_value)
     if(search_value.present?)
-    FaxRecord.where(["recipient_name LIKE ? or recipient_number LIKE ?",
-    ("%#{search_value}%"),("%#{search_value}%")])
+      FaxRecord.where(["recipient_name LIKE ? or recipient_number LIKE ?",
+      ("%#{search_value}%"),("%#{search_value}%")])
     else
       FaxRecord.all
     end
