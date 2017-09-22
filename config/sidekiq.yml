@@ -1,4 +1,8 @@
+:concurrency: 5
 :pidfile: tmp/pids/sidekiq.pid
+:logfile: ./log/sidekiq.log
 :queues:
   - default
+  - send_fax
   - resend_fax
+  - insert_fax
