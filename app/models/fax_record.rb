@@ -11,8 +11,11 @@ class FaxRecord < ApplicationRecord
   scope :without_response_q_ids, -> { where.not(send_fax_queue_id: nil).where(result_code: nil).where("max_fax_response_check_tries <= #{ENV['MAX_RESPONSE_CHECK'].to_i}").pluck(:send_fax_queue_id) }
   scope :not_send_to_client, -> { where(sendback_final_response_to_client: 0).where.not(send_fax_queue_id: nil, result_code: nil, callback_server_id: nil).group_by(&:callback_server_id) }
 
-  def in_schedule_queue?
-    HelperMethods::Logger.app_logger('info', "==> Checking if the fax with ID:#{self.id} is in the schedule queue ")
+  def in_queue?
+    retry_jobs = Sidekiq::RetrySet.new
+    retry_jobs.each do |job|
+      return true if job.args[0] == self.id
+    end
     scheduled_jobs = Sidekiq::ScheduledSet.new
     scheduled_jobs.each do |job|
       return true if job.args[0] == self.id
