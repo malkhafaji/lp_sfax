@@ -218,7 +218,7 @@ module FaxServices
         records_groups = FaxRecord.not_send_to_client
         records_groups.each do |server_id, records|
           callback_server = CallbackServer.find(server_id)
-          HelperMethods::Logger.app_logger('info', "==> total #{records.size} records for #{callback_server.url} <==")
+          HelperMethods::Logger.app_logger('info', "==> total #{records.size} records for #{callback_server.name} <==")
           array_of_records =  prepare_client_date(records)
           if array_of_records.blank?
             HelperMethods::Logger.app_logger('info', '==> sendback_final_response_to_client: No responses for faxes found <==')
@@ -226,8 +226,8 @@ module FaxServices
             array_in_batches = array_of_records.each_slice(ENV['max_records_send_to_client'].to_i).to_a
             array_in_batches.each do |batch_of_records|
               begin
-                HelperMethods::Logger.app_logger('info', "==> #{Time.now} posting #{batch_of_records.size} records to #{callback_server.url} <==")
-                url = URI(callback_server.url+'/eFaxService/OutboundDispositionService.svc/Receive')
+                HelperMethods::Logger.app_logger('info', "==> #{Time.now} posting #{batch_of_records.size} records to #{callback_server.name} <==")
+                url = URI(callback_server.update_url+'/eFaxService/OutboundDispositionService.svc/Receive')
                 response = HTTParty.post(url, body: batch_of_records.to_json, headers: { 'Content-Type' => 'application/json' } )
                 HelperMethods::Logger.app_logger('info', "==> #{Time.now} end posting <==")
                 if response.present? && response.code == 200
