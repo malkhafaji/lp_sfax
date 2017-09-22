@@ -3,7 +3,7 @@ class CreateCallbackServers < ActiveRecord::Migration[5.0]
     create_table :callback_servers do |t|
       t.string :name
       t.string :url, index: true, null: false
-
+      t.string :update_url, index: true, null: false
       t.timestamps
     end
     add_column :fax_records, :callback_server_id, :integer

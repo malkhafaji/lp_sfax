@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170829175233) do
+ActiveRecord::Schema.define(version: 20170913014005) do
 
   create_table "attachments", force: :cascade do |t|
     t.integer  "fax_record_id"
@@ -22,11 +22,24 @@ ActiveRecord::Schema.define(version: 20170829175233) do
     t.index ["file_key"], name: "index_attachments_on_file_key"
   end
 
+  create_table "callback_params", force: :cascade do |t|
+    t.integer  "fax_record_id"
+    t.integer  "let_sk"
+    t.integer  "e_sk"
+    t.integer  "type_cd_sk"
+    t.integer  "priority_cd_sk"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+    t.index ["fax_record_id"], name: "index_callback_params_on_fax_record_id"
+  end
+
   create_table "callback_servers", force: :cascade do |t|
     t.string   "name"
     t.string   "url",        null: false
+    t.string   "update_url", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["update_url"], name: "index_callback_servers_on_update_url"
     t.index ["url"], name: "index_callback_servers_on_url"
   end
 
@@ -80,6 +93,13 @@ ActiveRecord::Schema.define(version: 20170829175233) do
     t.datetime "created_at",              null: false
     t.datetime "updated_at",              null: false
     t.index ["email"], name: "index_users_on_email", unique: true
+  end
+
+  create_table "vendor_statuses", force: :cascade do |t|
+    t.string   "service",    null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["service"], name: "index_vendor_statuses_on_service"
   end
 
 end
