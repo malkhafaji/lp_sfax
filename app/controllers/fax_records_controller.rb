@@ -54,12 +54,17 @@ class FaxRecordsController < ApplicationController
   end
   
   def report
+     @current_year = Date.today.strftime("%Y")
+     @fax_records = FaxRecord.by_year(@current_year)
      @desierd_month = params[:desierd_month] ||= Date.today.strftime("%m")
      @fax_records = FaxRecord.by_month(@desierd_month)
 
     respond_to do |format|
       format.html
     end
+  end
+  def report_by_environment
+    @fax_records_urls = FaxRecord.where(callback_url: params[:callback_url])
   end
   # private
   # # Use callbacks to share common setup or constraints between actions.

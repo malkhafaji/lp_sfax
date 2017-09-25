@@ -10,7 +10,7 @@ class FaxRecord < ApplicationRecord
   scope :without_queue_id, -> { where(send_fax_queue_id: nil).where(result_code: nil) }
   scope :without_response_q_ids, -> { where.not(send_fax_queue_id: nil).where(result_code: nil).where("max_fax_response_check_tries <= #{ENV['MAX_RESPONSE_CHECK'].to_i}").pluck(:send_fax_queue_id) }
   scope :not_send_to_client, -> { where(sendback_final_response_to_client: 0).where.not(send_fax_queue_id: nil, result_code: nil, callback_server_id: nil).group_by(&:callback_server_id) }
-
+   scope :by_year, lambda { |year| where('extract(year from created_at) = ?', year) }
   def in_any_queue?
     retry_jobs = Sidekiq::RetrySet.new
     retry_jobs.each do |job|
@@ -24,7 +24,8 @@ class FaxRecord < ApplicationRecord
   end
 
   def self.by_month(desired_month)
-    self.where("cast(strftime('%m', created_at) as int) = ?", desired_month)
+    current_year = Time.now.year
+    self.where("cast(strftime('%Y', created_at) as int) = #{current_year}) AND (cast(strftime('%m', created_at) as int) = #{desired_month}")
   end
 
   def number_to_fax
