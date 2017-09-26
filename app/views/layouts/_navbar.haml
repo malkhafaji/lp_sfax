@@ -7,10 +7,10 @@
         %span.icon-bar
         %span.icon-bar
         %span.icon-bar
-      = link_to 'Fax Service', root_path, class: 'navbar-brand'
-      = link_to 'Reports', report_fax_records_path, class: 'navbar-brand' 
+      = link_to 'Fax Service', fax_records_path, class: 'navbar-brand'
     .collapse.navbar-collapse#bs-example-navbar-collapse-1
       - if current_user
+        = link_to 'Reports', report_fax_records_path, class: 'navbar-brand'
         %ul.nav.navbar-nav.navbar-right#nav-ul
           %li#nav-li
             %p#nav-a
@@ -19,3 +19,7 @@
             %ul.dropdown#nav-ul
               %li#nav-li
                 = link_to "Sign out", signout_path(user_id: current_user.id), id: "nav-a", class: "sub-menu"
+      - else
+        %ul.nav.navbar-nav.navbar-right#nav-ul
+          %li#nav-li
+            %p#nav-a= link_to "Sign in with Azure", "/auth/azure_oauth2", id: "sign_in"
