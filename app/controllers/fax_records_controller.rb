@@ -61,7 +61,7 @@ class FaxRecordsController < ApplicationController
       format.html
     end
   end
-  def url_report
+  def environment_report
       @urls = CallbackServer.all
       callback = params[:callback_server_id] ? params[:callback_server_id] : CallbackServer.first.id
       callback_server = CallbackServer.find(callback)

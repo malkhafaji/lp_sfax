@@ -1,6 +1,6 @@
 .col-sm-1.sidenav
   - @urls.each do |url|
-    %p= link_to url.name, "/fax_records/url_report/#{url.id}", class: " btn btn-default #{active_class(params[:callback_server_id], url)}"
+    %p= link_to url.name, "/fax_records/environment_report/#{url.id}", class: " btn btn-default #{'btn-info' if params[:callback_server_id] ==  url.id.to_s}"
 .col-sm-10.text-center
   .col-md-11.col-lg-offset-1
     %h3 ENV Report
