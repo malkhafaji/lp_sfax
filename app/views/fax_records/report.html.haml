@@ -1,8 +1,4 @@
 
-.col-md-12
-  .col-md-1.pull-right
-    \#{link_to 'Home', fax_records_path, class: 'btn btn-default btn-sm'}
-
 .container-fluid.text-center
   .row.content
     .col-sm-1.sidenav
@@ -20,8 +16,12 @@
       %p= link_to 'Dec', report_fax_records_path(desierd_month: 12) , class: " btn btn-default #{ 'btn-info' if @desierd_month == '12'} "
 
 
-    .col-sm-10.text-left
-      .col-md-9.col-lg-offset-2
+    .col-sm-10.text-ecnter
+      .col-md-12.col
         %center
-          %h3
-            = line_chart @fax_records.group_by_day_of_month(:created_at).count
+          %h3 Monthly Statistics
+          = line_chart @fax_records.group_by_day_of_month(:created_at).count
+
+
+    .col-sm-1.sidenav
+      %p= link_to 'Home', fax_records_path, class: 'btn btn-default btn-sm'

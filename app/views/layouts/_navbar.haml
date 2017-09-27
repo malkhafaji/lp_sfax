@@ -8,7 +8,8 @@
         %span.icon-bar
         %span.icon-bar
       = link_to 'Fax Service', root_path, class: 'navbar-brand'
-      = link_to 'Reports', report_fax_records_path, class: 'navbar-brand' 
+      = link_to 'Reports', report_fax_records_path, class: 'navbar-brand'
+      = link_to 'ENV Reports', url_report_fax_records_path, class: 'navbar-brand'  
     .collapse.navbar-collapse#bs-example-navbar-collapse-1
       - if current_user
         %ul.nav.navbar-nav.navbar-right#nav-ul
