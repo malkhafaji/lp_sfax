@@ -12,6 +12,8 @@ Rails.application.routes.draw do
 
   resources :fax_records, only: [] do
     collection do
+      get 'url_report'
+      get 'url_report/:callback_server_id', to: "fax_records#url_report"
       get 'homepage'
       get 'report'
       match 'index', via: [:get, :post]
