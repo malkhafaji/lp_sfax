@@ -24,7 +24,7 @@ class InsertFaxJob
       f_transmission_id: fax_record.send_fax_queue_id,
       f_recipient_csid: '',
       f_recipient_company: '',
-      f_recipient_name: '',
+      f_recipient_name: fax_record.recipient_name,
       f_document_id: fax_record.id,
       f_status_code: fax_record.status == "t" ? 4 : 2,
       f_status_desc: fax_record.status == "t" ? 'Vendor Received' : 'Failure',
