@@ -256,8 +256,8 @@ module FaxServices
             Vendor_confirm_date: record.send_confirm_date,
             ResultCode: record.result_code,
             fax_duration: record.fax_duration,
-            f_status_code: fax_record.status == 't' ? 1 : 2,
-            f_status_desc: fax_record.status == 't' ? 'Success' : 'Failure',
+            f_status_code: record.status == 't' ? 1 : 2,
+            f_status_desc: record.status == 't' ? 'Success' : 'Failure',
           }
           array_of_records.push(new_record) unless record.in_any_queue?
         end
