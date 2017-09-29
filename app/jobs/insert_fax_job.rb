@@ -30,7 +30,7 @@ class InsertFaxJob
       f_status_desc: fax_record.status == 't' ? 'Vendor Received' : 'Failure',
       f_error_level: 0,
       f_error_message: fax_record.result_message.present? ? fax_record.result_message : '' ,
-      f_completion_date: fax_record.send_confirm_date,
+      f_completion_date: fax_record.fax_date_utc,
       f_duration: 0,
       f_pages_sent: 0,
       f_number_of_retries: 0,
