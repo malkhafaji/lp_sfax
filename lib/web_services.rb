@@ -44,7 +44,6 @@ module  WebServices
             url = URI(server.url + "/DataAccessService/sFaxService.svc/UpdateFaxServiceStatus?strFaxStatus=#{state}&modify_e_sk=0")
             url.port = server.insert_port
             http = Net::HTTP.new(url.host, url.port)
-            http.use_ssl = false
             request = Net::HTTP::Put.new(url)
             response = http.request(request)
           rescue Exception => e

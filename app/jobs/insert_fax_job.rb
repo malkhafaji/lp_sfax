@@ -9,7 +9,6 @@ class InsertFaxJob
     url = URI(fax_record.callback_server.url+'/DataAccessService/sFaxService.svc/InsertFaxes')
     url.port = fax_record.callback_server.insert_port
     http = Net::HTTP.new(url.host, url.port)
-    http.use_ssl = false
     data = {
       f_create_e_sk: fax_record.callback_param['e_sk'],
       f_create_date: fax_record.created_at,
