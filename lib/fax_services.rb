@@ -130,7 +130,7 @@ module FaxServices
             fax_record = FaxRecord.find_by_send_fax_queue_id(fax_requests_queue_id)
             parse_response = response["RecipientFaxStatusItems"][0]
             unless fax_record.resend <= ENV['MAX_RESEND'].to_i && parse_response['ResultCode'] == 6000
-              HelperMethods::Logger.app_logger('error', "fax_response: final response: #{parse_response}")
+              HelperMethods::Logger.app_logger('info', "fax_response: #{parse_response}")
               if parse_response['ResultCode'] == 0
                 fax_duration = calculate_duration(fax_record.client_receipt_date, (Time.parse(parse_response['FaxDateUtc'])))
                 result_message = 'Success'
@@ -256,8 +256,8 @@ module FaxServices
             Vendor_confirm_date: record.send_confirm_date,
             ResultCode: record.result_code,
             fax_duration: record.fax_duration,
-            f_status_code: record.status == 't' ? 1 : 2,
-            f_status_desc: record.status == 't' ? 'Success' : 'Failure',
+            f_status_code: record.is_success == 't' ? 1 : 2,
+            f_status_desc: record.is_success == 't' ? 'Success' : 'Failure',
           }
           array_of_records.push(new_record) unless record.in_any_queue?
         end
