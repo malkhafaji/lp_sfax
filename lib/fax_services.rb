@@ -32,7 +32,7 @@ module FaxServices
         if (attachments.empty?) || (attachments.size != attachments_keys.size)
           fax_record.update_attributes(message: 'Fax request is complete', result_message: "No files found to download for fax with ID: #{fax_id}", error_code: 1515102, result_code: 7002, status: false, is_success: false)
           HelperMethods::Logger.app_logger('error', "send_now: No files found to download for fax with ID: #{fax_id}")
-          InsertFaxJob.perform_async(fax_record.id)
+          InsertFaxJob.perform_async(fax_record.id)  unless fax_record.resend > 0
           FileUtils.rm_rf Dir.glob(file_dir)
           return
         end
@@ -66,7 +66,7 @@ module FaxServices
         if fax_record.send_fax_queue_id.nil?
           HelperMethods::Logger.app_logger('error', "send_now: error send_fax_queue_id is nil: #{response_result}")
           fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: 1515101, result_code: 7001, status: false, is_success: false)
-          InsertFaxJob.perform_async(fax_record.id)
+          InsertFaxJob.perform_async(fax_record.id)  unless fax_record.resend > 0
         end
         FaxServices::Fax.sendback_initial_response_to_client(fax_record)
         FileUtils.rm_rf Dir.glob(file_dir)
@@ -109,7 +109,7 @@ module FaxServices
           status: fax_record.status,
           result_message: fax_record.result_message,
         client_receipt_date: fax_record.client_receipt_date}
-        InsertFaxJob.perform_async(fax_record.id) unless fax_record.resend > 0
+        InsertFaxJob.perform_async(fax_record.id)  unless fax_record.resend > 0
         if fax_record.updated_by_initializer == true
           HelperMethods::Logger.app_logger('info', "sendback_initial_response_to_client/updated_by_initializer: #{client_initial_response}")
         else
@@ -161,10 +161,12 @@ module FaxServices
                 result_message:      result_message,
                 fax_duration:        fax_duration
               )
-            elsif !fax_record.in_any_queue?
-              HelperMethods::Logger.app_logger('info', "fax_response: Resend fax with ID = #{fax_record.id}")
-              fax_record.update_attributes(resend: (fax_record.resend+1))
-              ResendFaxJob.perform_in((ENV['DELAY_RESEND'].to_i).minutes, fax_record.id)
+            else
+              unless fax_record.in_any_queue?
+                HelperMethods::Logger.app_logger('info', "fax_response: Resend fax with ID = #{fax_record.id}")
+                fax_record.update_attributes(resend: (fax_record.resend+1))
+                ResendFaxJob.perform_in((ENV['DELAY_RESEND'].to_i).minutes, fax_record.id)
+              end
             end
           else
             HelperMethods::Logger.app_logger('info', 'fax_response: no response found')
