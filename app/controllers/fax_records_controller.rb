@@ -32,7 +32,7 @@ class FaxRecordsController < ApplicationController
       format.html
       format.json { render json: FaxRecordDatatable.new(view_context) }
     end
-    
+
     @zone = ActiveSupport::TimeZone.new("Central Time (US & Canada)")
     @search_value = params[:search_value]
     filter_fax_records = FaxRecord.filtered_fax_records(@search_value)
@@ -52,10 +52,16 @@ class FaxRecordsController < ApplicationController
       end
     end
   end
-  
+
   def report
      @desierd_month = params[:desierd_month] ||= Date.today.strftime("%m")
      @fax_records = FaxRecord.by_month(@desierd_month)
+     @types_hash = Hash.new(0)
+     queue_not_send_ids = FaxRecord.by_month(@desierd_month).where.not(send_fax_queue_id: nil)
+     queue_not_send_ids.each do |fax_record|
+       message_type = fax_record.result_message
+       @types_hash[message_type] += 1 unless message_type == nil
+     end
 
     respond_to do |format|
       format.html

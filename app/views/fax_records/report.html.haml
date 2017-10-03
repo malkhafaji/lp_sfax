@@ -1,10 +1,5 @@
-
-.col-md-12
-  .col-md-1.pull-right
-    \#{link_to 'Home', fax_records_path, class: 'btn btn-default btn-sm'}
-
-.container-fluid.text-center
-  .row.content
+.container
+  .row
     .col-sm-1.sidenav
       %p= link_to 'Jan', report_fax_records_path(desierd_month: 1) , class: " btn btn-default #{ 'btn-info' if @desierd_month == '1'} "
       %p= link_to 'Feb', report_fax_records_path(desierd_month: 2) , class: " btn btn-default #{ 'btn-info' if @desierd_month == '2'} "
@@ -18,10 +13,36 @@
       %p= link_to 'Oct', report_fax_records_path(desierd_month: 10) , class: " btn btn-default #{ 'btn-info' if @desierd_month == '10'} "
       %p= link_to 'Nov', report_fax_records_path(desierd_month: 11) , class: " btn btn-default #{ 'btn-info' if @desierd_month == '12'} "
       %p= link_to 'Dec', report_fax_records_path(desierd_month: 12) , class: " btn btn-default #{ 'btn-info' if @desierd_month == '12'} "
+    .col-xs-3
+      %center
+        %h3 Status
+        = pie_chart @fax_records.group(:is_success).count
 
 
-    .col-sm-10.text-left
-      .col-md-9.col-lg-offset-2
-        %center
-          %h3
-            = line_chart @fax_records.group_by_day_of_month(:created_at).count
+    .col-xs-4
+      %center
+        %h3 Monthly Statistics
+        .panel.panel-info
+          .panel-heading
+            %h3.panel-title Total Fax Records for this month
+          .panel-body
+            = @fax_records.count
+        .panel.panel-info
+          .panel-heading
+            %h3.panel-title Total Fax Records Pages for this month
+          .panel-body
+            = @fax_records.map(&:pages).reduce(0, :+)
+        .panel.panel-info
+          .panel-heading
+            %h3.panel-title Total Fax Records Not send
+          .panel-body
+            = @fax_records.map(&:sendback_final_response_to_client).reduce(:+)
+    .col-xs-3
+      %center
+        %h3 Fail By Message
+        = pie_chart @types_hash
+    .col-md-1.pull-right
+      %p= link_to 'Home', fax_records_path, class: 'btn btn-default btn-sm'
+    .col-md-10
+      %center
+        = line_chart @fax_records.group_by_day_of_month(:created_at).count
