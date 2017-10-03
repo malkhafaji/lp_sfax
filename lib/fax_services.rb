@@ -109,7 +109,7 @@ module FaxServices
           status: fax_record.status,
           result_message: fax_record.result_message,
         client_receipt_date: fax_record.client_receipt_date}
-        InsertFaxJob.perform_async(fax_record.id)
+        InsertFaxJob.perform_async(fax_record.id) unless fax_record.resend > 0
         if fax_record.updated_by_initializer == true
           HelperMethods::Logger.app_logger('info', "sendback_initial_response_to_client/updated_by_initializer: #{client_initial_response}")
         else
