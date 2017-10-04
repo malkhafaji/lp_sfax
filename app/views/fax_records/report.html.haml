@@ -31,7 +31,7 @@
           .panel-heading
             %h3.panel-title Total Fax Records Pages for this month
           .panel-body
-            = @fax_records.map(&:pages).reduce(0, :+)
+            = @fax_records.map(&:pages).map(&:to_i).reduce(0, :+)
         .panel.panel-info
           .panel-heading
             %h3.panel-title Total Fax Records Not send
