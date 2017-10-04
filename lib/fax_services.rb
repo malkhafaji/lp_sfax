@@ -67,6 +67,10 @@ module FaxServices
           HelperMethods::Logger.app_logger('error', "send_now: error send_fax_queue_id is nil: #{response_result}")
           fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: 1515101, result_code: 7001, status: false, is_success: false)
           InsertFaxJob.perform_async(fax_record.id)  unless fax_record.resend > 0
+        elsif fax_record.send_fax_queue_id == '-1'
+          HelperMethods::Logger.app_logger('error', "send_now: #{response_result}")
+          fax_record.update_attributes(result_message: 'Invalid fax number', error_code: 1515102, result_code: 7002, status: false, is_success: false)
+          InsertFaxJob.perform_async(fax_record.id)  unless fax_record.resend > 0
         end
         FaxServices::Fax.sendback_initial_response_to_client(fax_record)
         FileUtils.rm_rf Dir.glob(file_dir)
