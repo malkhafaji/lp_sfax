@@ -56,11 +56,21 @@ class FaxRecordsController < ApplicationController
   def report
      @desierd_month = params[:desierd_month] ||= Date.today.strftime("%m")
      @fax_records = FaxRecord.by_month(@desierd_month)
+     @month_name = Date::MONTHNAMES[@desierd_month.to_i]
      @types_hash = Hash.new(0)
      queue_not_send_ids = FaxRecord.by_month(@desierd_month).where.not(send_fax_queue_id: nil)
      queue_not_send_ids.each do |fax_record|
        message_type = fax_record.result_message
        @types_hash[message_type] += 1 unless message_type == nil
+    end
+     @chart_display = {}
+     records = @fax_records.group(:is_success).count
+     records.each do |key, value|
+       if key == "t"
+         @chart_display["Success"] = records[key]
+       else
+         @chart_display["Fail"] = records[key]
+      end
      end
 
     respond_to do |format|

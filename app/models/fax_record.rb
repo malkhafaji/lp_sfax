@@ -2,7 +2,6 @@ class FaxRecord < ApplicationRecord
   has_many :attachments
   has_one :callback_param
   belongs_to :callback_server
-  before_save :edit_is_success
 
   validates_format_of :recipient_number, with: /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/
   validates_presence_of :recipient_name, :callback_server_id
@@ -55,8 +54,3 @@ class FaxRecord < ApplicationRecord
     end
   end
 end
-private
-
- def edit_is_success
-   self.is_success = is_success == "t" ? "Success" : "Fail"
- end

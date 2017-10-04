@@ -16,7 +16,7 @@
     .col-xs-3
       %center
         %h3 Status
-        = pie_chart @fax_records.group(:is_success).count
+        = pie_chart @chart_display, colors: ["red", "green"]
 
 
     .col-xs-4
@@ -24,12 +24,12 @@
         %h3 Monthly Statistics
         .panel.panel-info
           .panel-heading
-            %h3.panel-title Total Fax Records for this month
+            %h3.panel-title Total Fax Records for (#{@month_name})
           .panel-body
             = @fax_records.count
         .panel.panel-info
           .panel-heading
-            %h3.panel-title Total Fax Records Pages for this month
+            %h3.panel-title Total Fax Records Pages for (#{@month_name})
           .panel-body
             = @fax_records.map(&:pages).map(&:to_i).reduce(0, :+)
         .panel.panel-info
