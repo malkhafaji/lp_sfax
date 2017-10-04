@@ -23,5 +23,5 @@
     .col-sm-10.text-left
       .col-md-9.col-lg-offset-2
         %center
-          %h3
-            = line_chart @fax_records.group_by_day_of_month(:created_at).count
+          %h3 Monthly Statistics
+          = line_chart @fax_records.group_by_day_of_month(:created_at).count

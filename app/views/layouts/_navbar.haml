@@ -11,6 +11,8 @@
     .collapse.navbar-collapse#bs-example-navbar-collapse-1
       - if current_user
         = link_to 'Reports', report_fax_records_path, class: 'navbar-brand'
+        = link_to 'ENV Reports', environment_report_fax_records_path, class: 'navbar-brand' 
+
         %ul.nav.navbar-nav.navbar-right#nav-ul
           %li#nav-li
             %p#nav-a

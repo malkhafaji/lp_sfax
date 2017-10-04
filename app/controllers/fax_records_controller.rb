@@ -61,6 +61,12 @@ class FaxRecordsController < ApplicationController
       format.html
     end
   end
+  def environment_report
+      @urls = CallbackServer.all.includes(:fax_records)
+      callback = params[:callback_server] ? params[:callback_server] : @urls.first.id
+      callback_server = @urls.find(callback)
+      @fax_records = callback_server.fax_records
+  end
   # private
   # # Use callbacks to share common setup or constraints between actions.
   # def set_fax_record
