@@ -66,13 +66,11 @@ module FaxServices
         if fax_record.send_fax_queue_id.nil?
           HelperMethods::Logger.app_logger('error', "send_now: error send_fax_queue_id is nil: #{response_result}")
           fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: 1515101, result_code: 7001, status: false, is_success: false)
-          InsertFaxJob.perform_async(fax_record.id)  unless fax_record.resend > 0
         elsif fax_record.send_fax_queue_id == '-1'
           HelperMethods::Logger.app_logger('error', "send_now: #{response_result}")
           fax_record.update_attributes(result_message: 'Invalid fax number', error_code: 1515102, result_code: 7002, status: false, is_success: false)
-          InsertFaxJob.perform_async(fax_record.id)  unless fax_record.resend > 0
         end
-        FaxServices::Fax.sendback_initial_response_to_client(fax_record)
+        InsertFaxJob.perform_async(fax_record.id)  unless fax_record.resend > 0
         FileUtils.rm_rf Dir.glob(file_dir)
       end
 
@@ -99,29 +97,7 @@ module FaxServices
           end
         end
       end
-
-
-      # Sending the initial response to the client after sending the fax
-      def sendback_initial_response_to_client(fax_record)
-        client_initial_response = {
-          fax_id: fax_record.id,
-          recipient_name: fax_record.recipient_name,
-          recipient_number: fax_record.recipient_number,
-          attached_fax_file: fax_record.file_path,
-          success:  fax_record.status,
-          message: fax_record.message,
-          status: fax_record.status,
-          result_message: fax_record.result_message,
-        client_receipt_date: fax_record.client_receipt_date}
-        InsertFaxJob.perform_async(fax_record.id)  unless fax_record.resend > 0
-        if fax_record.updated_by_initializer == true
-          HelperMethods::Logger.app_logger('info', "sendback_initial_response_to_client/updated_by_initializer: #{client_initial_response}")
-        else
-          HelperMethods::Logger.app_logger('info',  "sendback_initial_response_to_client: #{client_initial_response}")
-          client_initial_response
-        end
-      end
-
+      
       def calculate_duration(t1,t2)
         return ((t2 - t1) / 60.0).round(2)
       end
