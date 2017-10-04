@@ -30,7 +30,7 @@ module FaxServices
         attachments_keys= fax_record.attachments.pluck(:file_key)
         attachments, file_dir=  WebServices::Web.file_path(attachments_keys, fax_id)
         if (attachments.empty?) || (attachments.size != attachments_keys.size)
-          fax_record.update_attributes(message: 'Fax request is complete', result_message: "No files found to download for fax with ID: #{fax_id}", error_code: 1515102, result_code: 7002, status: false, is_success: false, send_fax_queue_id: "InvalidFaxAttachment#{fax_record.id}")
+          fax_record.update_attributes(message: 'Fax request is complete', result_message: "No files found to download for fax with ID: #{fax_id}", error_code: 1515102, result_code: 7002, status: false, is_success: false, send_fax_queue_id: "InvalidFaxAttachment#{fax_record.id}", sender_fax: '1', pages: 0, attempts: 0, fax_duration: 0)
           HelperMethods::Logger.app_logger('error', "send_now: No files found to download for fax with ID: #{fax_id}")
           InsertFaxJob.perform_async(fax_record.id)  unless fax_record.resend > 0
           FileUtils.rm_rf Dir.glob(file_dir)
@@ -65,10 +65,10 @@ module FaxServices
         send_confirm_date: response['date'])
         if fax_record.send_fax_queue_id.nil?
           HelperMethods::Logger.app_logger('error', "send_now: error send_fax_queue_id is nil: #{response_result}")
-          fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: 1515101, result_code: 7001, status: false, is_success: false, send_fax_queue_id: "InvalidFaxParams#{fax_record.id}")
+          fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: 1515101, result_code: 7001, status: false, is_success: false, send_fax_queue_id: "InvalidFaxParams#{fax_record.id}", sender_fax: '1', pages: 0, attempts: 0, fax_duration: 0)
         elsif fax_record.send_fax_queue_id == '-1'
           HelperMethods::Logger.app_logger('error', "send_now: #{response_result}")
-          fax_record.update_attributes(result_message: 'Invalid fax number', error_code: 1515102, result_code: 7002, status: false, is_success: false, send_fax_queue_id: "InvalidFaxNumber#{fax_record.id}")
+          fax_record.update_attributes(result_message: 'Invalid fax number', error_code: 1515102, result_code: 7002, status: false, is_success: false, send_fax_queue_id: "InvalidFaxNumber#{fax_record.id}", sender_fax: '1', pages: 0, attempts: 0, fax_duration: 0)
         end
         InsertFaxJob.perform_async(fax_record.id)  unless fax_record.resend > 0
         FileUtils.rm_rf Dir.glob(file_dir)
