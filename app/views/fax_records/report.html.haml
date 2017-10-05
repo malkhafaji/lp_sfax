@@ -13,36 +13,58 @@
       %p= link_to 'Oct', report_fax_records_path(desierd_month: 10) , class: " btn btn-default #{ 'btn-info' if @desierd_month == '10'} "
       %p= link_to 'Nov', report_fax_records_path(desierd_month: 11) , class: " btn btn-default #{ 'btn-info' if @desierd_month == '12'} "
       %p= link_to 'Dec', report_fax_records_path(desierd_month: 12) , class: " btn btn-default #{ 'btn-info' if @desierd_month == '12'} "
-    .col-xs-3
-      %center
-        %h3 Status
-        = pie_chart @chart_display, colors: ["red", "green"]
 
-
-    .col-xs-4
+    .col-xs-10
       %center
         %h3 Monthly Statistics
         .panel.panel-info
           .panel-heading
-            %h3.panel-title Total Fax Records for (#{@month_name})
+            %h3.panel-title Total Fax Records (For #{@month_name})
           .panel-body
             = @fax_records.count
         .panel.panel-info
           .panel-heading
-            %h3.panel-title Total Fax Records Pages for (#{@month_name})
+            %h3.panel-title Total Success Fax Records Pages for (#{@month_name})
           .panel-body
-            = @fax_records.map(&:pages).map(&:to_i).reduce(0, :+)
+            = @fax_records.where(is_success: "t").map(&:pages).map(&:to_i).reduce(0, :+)
         .panel.panel-info
           .panel-heading
-            %h3.panel-title Total Fax Records Not send
+            %h3.panel-title Total Fax Records failed (For #{@month_name})
           .panel-body
-            = @fax_records.map(&:sendback_final_response_to_client).reduce(:+)
-    .col-xs-3
-      %center
-        %h3 Fail By Message
-        = pie_chart @types_hash
+            = @chart_display["Fail"]
+        .panel.panel-info
+          .panel-heading
+            %h3.panel-title Circle Chart of Fax Records (For #{@month_name})
+          .panel-body
+            = pie_chart @chart_display, colors: ["#ff3300", "#2eb82e"], library: {legend: {position: "left"}, chartArea: {left:0, width:'100%'}}
     .col-md-1.pull-right
       %p= link_to 'Home', fax_records_path, class: 'btn btn-default btn-sm'
+
+.container
+  .row
+    .col-sm-1.sidenav
+    .col-xs-10
+      %center
+        .panel.panel-info
+          .panel-heading
+            %h3.panel-title Total Fax Records failed (For #{@month_name})
+          .panel-body
+            = @chart_display["Fail"]
+        .panel.panel-info
+          .panel-heading
+            %h4 Possible reasons Fax hasn't been sent (For #{@month_name})
+          .panel-body
+            = pie_chart @types_hash, library: {legend: {position: "left"}, chartArea: {left:0, width:'100%'}}
+    .col-md-1.pull-right
+
+.container
+  .row
+    .col-sm-1.sidenav
     .col-md-10
       %center
-        = line_chart @fax_records.group_by_day_of_month(:created_at).count
+        .panel.panel-info
+          .panel-heading
+            %h3.panel-title Total Fax Records Chart (For #{@month_name})
+          .panel-body
+            = area_chart @fax_records.group_by_day_of_month(:created_at).count
+      .col-md-1.pull-right
