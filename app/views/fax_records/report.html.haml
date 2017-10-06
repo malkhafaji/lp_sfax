@@ -31,42 +31,28 @@
     .col-md-1.pull-right
       %p= link_to 'Home', fax_records_path, class: 'btn btn-default btn-sm'
       %p= link_to 'Queue', not_send_fax_queue_id_fax_records_path, class: 'btn btn-default btn-sm'
-    --
+
     .col-xs-10
       %center
         .panel.panel-info
           .panel-heading
-            %h3.panel-title Circle Chart of Fax Records (For #{@month_name})
+            %h3.panel-title Fax Records For The Month of(#{@month_name})
           .panel-body
             = pie_chart @chart_display, colors: ["#ff3300", "#2eb82e"], library: {legend: {position: "left"}, chartArea: {left:0, width:'100%'}}
-  .col-md-1.pull-right
 
-.container
-  .row
-    .col-sm-1.sidenav
+
     .col-xs-10
       %center
-        .panel.panel-info
-          .panel-heading
-            %h3.panel-title Total Fax Records failed (For #{@month_name})
-          .panel-body
-            = @chart_display["Fail"]
         .panel.panel-info
           .panel-heading
             %h4 Possible reasons Fax hasn't been sent (For #{@month_name})
           .panel-body
             = pie_chart @types_hash, library: {legend: {position: "left"}, chartArea: {left:0, width:'100%'}}, donut: true
-    .col-md-1.pull-right
 
-.container
-  .row
-    .col-sm-1.sidenav
-    .col-md-10
+    .col-md-12
       %center
         .panel.panel-info
           .panel-heading
             %h3.panel-title Fax Records (For #{@month_name})
           .panel-body
             = column_chart @fax_records.group_by_day_of_month(:created_at).count
-
-      .col-md-1.pull-right
