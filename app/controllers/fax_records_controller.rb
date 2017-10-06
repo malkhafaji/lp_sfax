@@ -53,6 +53,10 @@ class FaxRecordsController < ApplicationController
     end
   end
 
+  def not_send_fax_queue_id
+   @fax_records = FaxRecord.all
+  end
+  
   def report
     @desierd_month = params[:desierd_month] ||= Date.today.strftime("%m")
     @fax_records = FaxRecord.by_month(@desierd_month)

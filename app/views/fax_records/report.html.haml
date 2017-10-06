@@ -14,31 +14,32 @@
       %p= link_to 'Nov', report_fax_records_path(desierd_month: 11) , class: " btn btn-default #{ 'btn-info' if @desierd_month == '12'} "
       %p= link_to 'Dec', report_fax_records_path(desierd_month: 12) , class: " btn btn-default #{ 'btn-info' if @desierd_month == '12'} "
 
-    .col-xs-10
+    .col-xs-5
       %center
-        %h3 Monthly Statistics
         .panel.panel-info
           .panel-heading
             %h3.panel-title Total Fax Records (For #{@month_name})
           .panel-body
             = @fax_records.count
+    .col-xs-5
+      %center
         .panel.panel-info
           .panel-heading
-            %h3.panel-title Total Success Fax Records Pages for (#{@month_name})
+            %h3.panel-title Total Success Fax Records Pages (For #{@month_name})
           .panel-body
             = @fax_records.where(is_success: "t").map(&:pages).map(&:to_i).reduce(0, :+)
-        .panel.panel-info
-          .panel-heading
-            %h3.panel-title Total Fax Records failed (For #{@month_name})
-          .panel-body
-            = @chart_display["Fail"]
+    .col-md-1.pull-right
+      %p= link_to 'Home', fax_records_path, class: 'btn btn-default btn-sm'
+      %p= link_to 'Queue', not_send_fax_queue_id_fax_records_path, class: 'btn btn-default btn-sm'
+    --
+    .col-xs-10
+      %center
         .panel.panel-info
           .panel-heading
             %h3.panel-title Circle Chart of Fax Records (For #{@month_name})
           .panel-body
             = pie_chart @chart_display, colors: ["#ff3300", "#2eb82e"], library: {legend: {position: "left"}, chartArea: {left:0, width:'100%'}}
-    .col-md-1.pull-right
-      %p= link_to 'Home', fax_records_path, class: 'btn btn-default btn-sm'
+  .col-md-1.pull-right
 
 .container
   .row
@@ -54,7 +55,7 @@
           .panel-heading
             %h4 Possible reasons Fax hasn't been sent (For #{@month_name})
           .panel-body
-            = pie_chart @types_hash, library: {legend: {position: "left"}, chartArea: {left:0, width:'100%'}}
+            = pie_chart @types_hash, library: {legend: {position: "left"}, chartArea: {left:0, width:'100%'}}, donut: true
     .col-md-1.pull-right
 
 .container
@@ -64,7 +65,8 @@
       %center
         .panel.panel-info
           .panel-heading
-            %h3.panel-title Total Fax Records Chart (For #{@month_name})
+            %h3.panel-title Fax Records (For #{@month_name})
           .panel-body
-            = area_chart @fax_records.group_by_day_of_month(:created_at).count
+            = column_chart @fax_records.group_by_day_of_month(:created_at).count
+
       .col-md-1.pull-right

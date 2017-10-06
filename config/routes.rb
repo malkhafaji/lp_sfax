@@ -14,6 +14,7 @@ Rails.application.routes.draw do
     collection do
       get 'homepage'
       get 'report'
+      get 'not_send_fax_queue_id'
       match 'index', via: [:get, :post]
       post 'export' # Exporting the records as file
     end
