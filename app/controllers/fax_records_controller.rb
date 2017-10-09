@@ -54,20 +54,36 @@ class FaxRecordsController < ApplicationController
   end
 
   def not_send_fax_queue_id
-   @fax_records = FaxRecord.all
+    @fax_records = FaxRecord.all
   end
   def report
     @desierd_month = params[:desierd_month] ||= Date.today.strftime("%m")
-    @fax_records = FaxRecord.by_month(@desierd_month)
     @month_name = Date::MONTHNAMES[@desierd_month.to_i]
     @types_hash = Hash.new(0)
-    queue_ids_not_sent = FaxRecord.by_month(@desierd_month).where.not(send_fax_queue_id: nil)
+    queue_ids_not_sent = FaxRecord.by_month(@desierd_month).where.not(send_fax_queue_id: nil, result_message: "Success")
     queue_ids_not_sent.each do |fax_record|
       message_type = fax_record.result_message
-      @types_hash[message_type] += 1 unless  message_type == nil || message_type == 'Success'
-
+      @types_hash[message_type] += 1 unless  message_type == nil
     end
+    change_display_status
+    calculate_fax_percentage
+
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  private
+
+  def calculate_fax_percentage
+    total_reports  = @chart_display['Success'] + @chart_display['Fail']
+    @success_percentage = (@chart_display['Success']/total_reports.to_f * 100).to_i
+    @fail_percentage = 100 - @success_percentage
+  end
+
+  def change_display_status
     @chart_display = {}
+    @fax_records = FaxRecord.by_month(@desierd_month)
     records = @fax_records.group(:is_success).count
     records.each do |key, value|
       if key == 't'
@@ -76,12 +92,7 @@ class FaxRecordsController < ApplicationController
         @chart_display['Fail'] = records[key]
       end
     end
-
-    respond_to do |format|
-      format.html
-    end
   end
-  # private
   # # Use callbacks to share common setup or constraints between actions.
   # def set_fax_record
   #   @fax_record = FaxRecord.find(params[:id])

@@ -36,11 +36,9 @@
       %center
         .panel.panel-info
           .panel-heading
-            %h3.panel-title Fax Records For The Month of(#{@month_name})
+            %h3.panel-title Fax Records For The Month of(#{@month_name}) Success(#{@success_percentage} %) Fail(#{@fail_percentage} %)
           .panel-body
             = pie_chart @chart_display, colors: ["#ff3300", "#2eb82e"], library: {legend: {position: "left"}, chartArea: {left:0, width:'100%'}}
-
-
     .col-xs-10
       %center
         .panel.panel-info
@@ -55,4 +53,4 @@
           .panel-heading
             %h3.panel-title Fax Records (For #{@month_name})
           .panel-body
-            = column_chart @fax_records.group_by_day_of_month(:created_at).count
+            = column_chart @fax_records.group_by_day(:created_at).count
