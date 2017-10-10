@@ -1,0 +1,11 @@
+.col-sm-1.sidenav
+  - @urls.each do |url|
+    %p= link_to url.name, "/fax_records/environment_report/#{url.id}", class: " btn btn-default #{'btn-info' if params[:callback_server_id] ==  url.id.to_s}"
+.col-sm-10.text-center
+  .col-md-11.col-lg-offset-1
+    %h3 ENV Report
+    %center
+      %p= line_chart @fax_records.group_by_day_of_month(:created_at).count
+
+.col-sm-1.sidenav
+  %p= link_to 'Home', fax_records_path, class: 'btn btn-default btn-sm'

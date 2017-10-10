@@ -12,9 +12,9 @@ Rails.application.routes.draw do
 
   resources :fax_records, only: [] do
     collection do
+      get 'environment_report'
       get 'homepage'
       get 'report'
-      get 'not_send_fax_queue_id'
       match 'index', via: [:get, :post]
       post 'export' # Exporting the records as file
     end

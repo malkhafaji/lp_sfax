@@ -68,4 +68,11 @@ class FaxRecordsController < ApplicationController
       key == 't' ? @chart_display['Success'] = records[key] :  @chart_display['Fail'] = records[key]
     end
   end
+
+  def environment_report
+      @urls = CallbackServer.all.includes(:fax_records)
+      callback = params[:callback_server] ? params[:callback_server] : @urls.first.id
+      callback_server = @urls.find(callback)
+      @fax_records = callback_server.fax_records
+  end
 end
