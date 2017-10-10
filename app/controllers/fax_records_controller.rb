@@ -3,7 +3,6 @@ class FaxRecordsController < ApplicationController
   def  homepage
   end
 
-  # Exporting either all fax records OR the records results from filter (filtered_fax_records)
   def export
     if (session[:search_value].nil?)
       fax_records = FaxRecord.all
@@ -12,20 +11,18 @@ class FaxRecordsController < ApplicationController
     end
     respond_to do |format|
       format.csv do
-      filename = "fax_records_csv_#{Date.today.strftime('%m_%d_%Y')}.csv"
-      set_csv_streaming_headers(filename)
-      self.response_body = fax_records.to_csv
+        filename = "fax_records_csv_#{Date.today.strftime('%m_%d_%Y')}.csv"
+        set_csv_streaming_headers(filename)
+        self.response_body = fax_records.to_csv
       end
       format.xls do
-      filename = "fax_records_xls_#{Date.today.strftime('%m_%d_%Y')}.xls"
-      set_csv_streaming_headers(filename)
-      self.response_body = fax_records.to_csv(col_sep: "\t")
+        filename = "fax_records_xls_#{Date.today.strftime('%m_%d_%Y')}.xls"
+        set_csv_streaming_headers(filename)
+        self.response_body = fax_records.to_csv(col_sep: "\t")
       end
-
     end
   end
 
-  # Render Index page with all fax records OR the records results from filter (filtered_fax_records) with pagenation
   def index
     session[:search_value] = (params["search"]["value"] rescue nil)
     respond_to do |format|
