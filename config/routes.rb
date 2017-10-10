@@ -13,7 +13,6 @@ Rails.application.routes.draw do
   resources :fax_records, only: [] do
     collection do
       get 'environment_report'
-      get 'environment_report/:callback_server_id', to: "fax_records#environment_report"
       get 'homepage'
       get 'report'
       match 'index', via: [:get, :post]

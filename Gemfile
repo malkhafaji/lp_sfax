@@ -43,6 +43,7 @@ group :development do
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'listen', '~> 3.1', '>= 3.1.5'
+  gem 'faker', '~> 1.7', '>= 1.7.3'
 end
 
 group :production do

@@ -1,10 +1,5 @@
-
-.col-md-12
-  .col-md-1.pull-right
-    \#{link_to 'Home', fax_records_path, class: 'btn btn-default btn-sm'}
-
-.container-fluid.text-center
-  .row.content
+.container
+  .row
     .col-sm-1.sidenav
       %p= link_to 'Jan', report_fax_records_path(desierd_month: 1) , class: " btn btn-default #{ 'btn-info' if @desierd_month == '1'} "
       %p= link_to 'Feb', report_fax_records_path(desierd_month: 2) , class: " btn btn-default #{ 'btn-info' if @desierd_month == '2'} "
@@ -19,9 +14,32 @@
       %p= link_to 'Nov', report_fax_records_path(desierd_month: 11) , class: " btn btn-default #{ 'btn-info' if @desierd_month == '12'} "
       %p= link_to 'Dec', report_fax_records_path(desierd_month: 12) , class: " btn btn-default #{ 'btn-info' if @desierd_month == '12'} "
 
-
-    .col-sm-10.text-left
-      .col-md-9.col-lg-offset-2
-        %center
-          %h3 Monthly Statistics
-          = line_chart @fax_records.group_by_day_of_month(:created_at).count
+    .col-xs-5
+      %center
+        .panel.panel-info
+          .panel-heading
+            %h3.panel-title Total Fax Requests for #{@month_name} (#{@success}% Success!)
+          .panel-body
+            = @fax_records.count
+    .col-xs-5
+      %center
+        .panel.panel-info
+          .panel-heading
+            %h3.panel-title Total Pages Sent
+          .panel-body
+            = @fax_records.where(is_success: 't').map(&:pages).map(&:to_i).reduce(0, :+)
+    .col-xs-10
+      %center
+        .panel.panel-info
+          .panel-body
+            = pie_chart @chart_display, colors: ["#ff3300", "#2eb82e"], library: {legend: {position: "left"}, chartArea: {left:0, width:'100%'}}
+    .col-xs-10
+      %center
+        .panel.panel-info
+          .panel-body
+            = pie_chart @types_hash, library: {legend: {position: "left"}, chartArea: {left:0, width:'100%'}}
+    .col-md-12
+      %center
+        .panel.panel-info
+          .panel-body
+            = column_chart @fax_records.group_by_day(:created_at).count
