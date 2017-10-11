@@ -44,6 +44,7 @@ class InsertFaxJob
       HelperMethods::Logger.app_logger('info', "insert fax response: #{response.body}")
     else
       HelperMethods::Logger.app_logger('error', response.inspect)
+      raise response.inspect
     end
   end
 end
