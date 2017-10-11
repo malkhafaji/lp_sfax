@@ -61,7 +61,7 @@ class FaxRecordsController < ApplicationController
       @types_hash[message_type] += 1 unless  message_type == nil
     end
     total_sccess = @fax_records.where(is_success: 't')
-    @success = ((total_sccess.size.to_f / @fax_records.size) * 100).to_i
+    @success = total_sccess.present? ? ((total_sccess.size.to_f / @fax_records.size) * 100).to_i : 0
     @chart_display = {}
     records = @fax_records.group(:is_success).count
     records.each do |key, value|
@@ -70,11 +70,12 @@ class FaxRecordsController < ApplicationController
   end
 
   def environment_report
-      @urls = CallbackServer.all.includes(:fax_records)
-      callback = params[:callback_server] ? params[:callback_server] : @urls.first.id
-      callback_server = @urls.find(callback)
-      @fax_records = callback_server.fax_records
+    @urls = CallbackServer.all.includes(:fax_records)
+    callback = params[:callback_server] ? params[:callback_server] : @urls.first.id
+    callback_server = @urls.find(callback)
+    @fax_records = callback_server.fax_records
   end
+
   def issues
     @unsent_fax_records =  FaxRecord.where(sendback_final_response_to_client: 0)
   end

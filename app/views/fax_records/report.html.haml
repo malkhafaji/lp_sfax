@@ -16,30 +16,30 @@
 
     .col-xs-5
       %center
-        .panel.panel-info
+        .panel.panel-default
           .panel-heading
             %h3.panel-title Total Fax Requests for #{@month_name} (#{@success}% Success!)
           .panel-body
             = @fax_records.count
     .col-xs-5
       %center
-        .panel.panel-info
+        .panel.panel-default
           .panel-heading
             %h3.panel-title Total Pages Sent
           .panel-body
             = @fax_records.where(is_success: 't').map(&:pages).map(&:to_i).reduce(0, :+)
     .col-xs-10
       %center
-        .panel.panel-info
+        .panel.panel-default
           .panel-body
             = pie_chart @chart_display, colors: ["#ff3300", "#2eb82e"], library: {legend: {position: "left"}, chartArea: {left:0, width:'100%'}}
     .col-xs-10
       %center
-        .panel.panel-info
+        .panel.panel-default
           .panel-body
             = pie_chart @types_hash, library: {legend: {position: "left"}, chartArea: {left:0, width:'100%'}}
     .col-md-12
       %center
-        .panel.panel-info
+        .panel.panel-default
           .panel-body
             = column_chart @fax_records.group_by_day(:created_at).count
