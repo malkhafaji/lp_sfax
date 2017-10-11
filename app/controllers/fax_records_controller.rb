@@ -75,4 +75,7 @@ class FaxRecordsController < ApplicationController
       callback_server = @urls.find(callback)
       @fax_records = callback_server.fax_records
   end
+  def issues
+    @unsent_fax_records =  FaxRecord.where(sendback_final_response_to_client: 0)
+  end
 end
