@@ -28,28 +28,27 @@ module  WebServices
             system("wget #{response.headers['location']} -P #{files_dir}")
           end
           if (Dir["#{files_dir}/*"]).empty?
-            HelperMethods::Logger.app_logger('error', "==> No files downloaded for keys #{file_key}")
+            HelperMethods::Logger.app_logger('error', "No files downloaded for keys #{file_key}")
             return [],files_dir
           else
-            HelperMethods::Logger.app_logger('info', "==> Files attached to fax #{Dir["#{files_dir}/*"]}")
+            HelperMethods::Logger.app_logger('info', "Files attached to fax #{Dir["#{files_dir}/*"]}")
             return Dir["#{files_dir}/*"], files_dir
           end
         end
       end
       # call to Client and change fax service status on/off
       def client_fax_service_status(state)
-        HelperMethods::Logger.app_logger('info', "==>Sending fax service status to client: #{state}")
-        begin
-          CallbackServer.all.each do |server|
-            url = URI(server.url + "/DataAccessService/sFaxService.svc/UpdateFaxServiceStatus?strFaxStatus=#{state}&modify_e_sk=0/")
+        CallbackServer.all.each do |server|
+          HelperMethods::Logger.app_logger('info', "Sending fax service status to #{server.name}: #{state}")
+          begin
+            url = URI(server.url + "/DataAccessService/sFaxService.svc/UpdateFaxServiceStatus?strFaxStatus=#{state}&modify_e_sk=0")
             url.port = server.insert_port
             http = Net::HTTP.new(url.host, url.port)
-            http.use_ssl = true
             request = Net::HTTP::Put.new(url)
             response = http.request(request)
+          rescue Exception => e
+            HelperMethods::Logger.app_logger('error', "Fail to send fax service status to #{server.name}: #{e.message}")
           end
-        rescue Exception => e
-          HelperMethods::Logger.app_logger('error', "==>Sending fax service status to client: #{e.message}")
         end
       end
     end
