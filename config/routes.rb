@@ -12,6 +12,7 @@ Rails.application.routes.draw do
 
   resources :fax_records, only: [] do
     collection do
+      get 'issues'
       get 'environment_report'
       get 'homepage'
       get 'report'

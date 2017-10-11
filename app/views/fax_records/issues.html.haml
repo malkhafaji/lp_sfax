@@ -1,0 +1,30 @@
+
+.container-fluid
+  .row-fluid
+    %table#issu
+      %thead
+        %tr
+          %th Fax ID
+          %th Recipient name
+          %th Recipient number
+          %th Status
+          %th Confirmation Message
+          %th Environment Name
+          %th Create Date
+      %tbody
+        - @unsent_fax_records.each do |record|
+          %tr
+            %td
+              = record.id
+            %td
+              = record.recipient_name
+            %td
+              = record.recipient_number
+            %td
+              = record.status
+            %td
+              = record.result_message
+            %td
+              = record.callback_server.name
+            %td
+              = record.created_at
