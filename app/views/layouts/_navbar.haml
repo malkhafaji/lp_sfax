@@ -27,9 +27,9 @@
             %a.dropdown-toggle{ aria: { expanded: false, haspopup: true}, data: { toggle: 'dropdown', href: '#', role: 'button'}}
               = current_user.name
               %span.caret
-            %ul.dropdown-menu
-              %li
-                %a{href: "#{signout_path(user_id: current_user.id)}"} Sign out
+            %ul.dropdown-menu#logout
+              %li#nav-li
+                %a#nav-a{href: "#{signout_path(user_id: current_user.id)}"} Sign out
         - else
           %li#nav-li
             %p#nav-a= link_to 'Sign in', '/auth/azure_oauth2', id: 'sign_in'
