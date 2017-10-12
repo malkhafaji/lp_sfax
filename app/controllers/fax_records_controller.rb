@@ -50,10 +50,17 @@ class FaxRecordsController < ApplicationController
     end
   end
 
-  def report
-    @desierd_month = params[:desierd_month] ||= Date.today.strftime('%m')
-    @fax_records = FaxRecord.by_month(@desierd_month).where.not(send_fax_queue_id: nil)
-    @month_name = Date::MONTHNAMES[@desierd_month.to_i]
+  def reports
+    if params[:type] == 'monthly'
+      @desierd_month = params[:desierd_month] ||= Date.today.strftime('%m')
+      @fax_records = FaxRecord.by_month(@desierd_month).where.not(send_fax_queue_id: nil)
+      @month_name = Date::MONTHNAMES[@desierd_month.to_i]
+    elsif params[:type] == 'environments'
+      @environments = CallbackServer.all
+      e = params[:environment] ? params[:environment] : @environments.first.id
+      @environment = CallbackServer.find(e)
+      @fax_records = FaxRecord.where(callback_server: @environment).where.not(send_fax_queue_id: nil)
+    end
     @types_hash = Hash.new(0)
     failed_faxes = @fax_records.where.not(result_message: 'Success')
     failed_faxes.each do |fax_record|
@@ -67,13 +74,6 @@ class FaxRecordsController < ApplicationController
     records.each do |key, value|
       key == 't' ? @chart_display['Success'] = records[key] :  @chart_display['Fail'] = records[key]
     end
-  end
-
-  def environment_report
-    @urls = CallbackServer.all.includes(:fax_records)
-    callback = params[:callback_server] ? params[:callback_server] : @urls.first.id
-    callback_server = @urls.find(callback)
-    @fax_records = callback_server.fax_records
   end
 
   def issues
