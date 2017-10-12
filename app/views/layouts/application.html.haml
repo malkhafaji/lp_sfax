@@ -1,6 +1,6 @@
 %html
   %head
-    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %meta{content: 'text/html; charset=UTF-8', http_equiv: 'Content-Type'}
     %title Fax Service
     = csrf_meta_tags
     = stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload'
@@ -15,14 +15,13 @@
   .container-fluid
     %img.pic{src: '/images/navbar.jpg', width: '100%', height: '150px'}
     = render 'layouts/navbar'
-  .cont
-    %div{:style => "margin:50px 0 0 500px;position:absolute;float:center"}
-      - if alert.present?
-        #flash_message.alert.alert-danger{:style => "text-align: center;font-size:25px;font-weight: bold; background-color:#ad5b5b;color:white"}
-          = alert
-      - if notice.present?
-        #flash_message.alert.alert-danger{:style => "text-align: center;font-size:25px;font-weight: bold; background-color:#9ae2bd;color:black"}
-          = notice
+    .container.text-center
+      - flash.each do |key, value|
+      - alert_class = flash[:notice] ? 'success' : 'danger'
+        %div{class: "alert alert-#{alert_class}"}
+          %button.close{aria_label: 'Close', data: {dismiss: 'alert'}, type: 'button'}
+            %span{aria_hidden: 'true'} ×
+          = value
     = yield
 .modal-mask
   .modal

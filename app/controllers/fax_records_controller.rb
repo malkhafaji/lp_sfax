@@ -60,8 +60,6 @@ class FaxRecordsController < ApplicationController
       e = params[:environment] ? params[:environment] : @environments.first.id
       @environment = CallbackServer.find(e)
       @fax_records = FaxRecord.where(callback_server: @environment).where.not(send_fax_queue_id: nil)
-    else
-      redirect_to root_path
     end
     @types_hash = Hash.new(0)
     failed_faxes = @fax_records.where.not(result_message: 'Success')
