@@ -70,10 +70,23 @@ class FaxRecordsController < ApplicationController
   end
 
   def environment_report
-    @urls = CallbackServer.all.includes(:fax_records)
-    callback = params[:callback_server] ? params[:callback_server] : @urls.first.id
-    callback_server = @urls.find(callback)
-    @fax_records = callback_server.fax_records
+    @environments = CallbackServer.all
+    e = params[:environment] ? params[:environment] : @environments.first.id
+    @environment = CallbackServer.find(e)
+    @fax_records = FaxRecord.where(callback_server: @environment).where.not(send_fax_queue_id: nil)
+    @types_hash = Hash.new(0)
+    failed_faxes = @fax_records.where.not(result_message: 'Success')
+    failed_faxes.each do |fax_record|
+      message_type = fax_record.result_message
+      @types_hash[message_type] += 1 unless  message_type == nil
+    end
+    total_sccess = @fax_records.where(is_success: 't')
+    @success = total_sccess.present? ? ((total_sccess.size.to_f / @fax_records.size) * 100).to_i : 0
+    @chart_display = {}
+    records = @fax_records.group(:is_success).count
+    records.each do |key, value|
+      key == 't' ? @chart_display['Success'] = records[key] :  @chart_display['Fail'] = records[key]
+    end
   end
 
   def issues

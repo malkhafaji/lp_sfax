@@ -1,11 +1,33 @@
-.col-sm-1.sidenav
-  - @urls.each do |url|
-    %p= link_to url.name, "/fax_records/environment_report/#{url.id}", class: " btn btn-default #{'btn-info' if params[:callback_server_id] ==  url.id.to_s}"
-.col-sm-10.text-center
-  .col-md-11.col-lg-offset-1
-    %h3 ENV Report
-    %center
-      %p= line_chart @fax_records.group_by_day_of_month(:created_at).count
-
-.col-sm-1.sidenav
-  %p= link_to 'Home', fax_records_path, class: 'btn btn-default btn-sm'
+.row-floud
+  .col-md-2
+    %nav.navbar.navbar-default.navbar-pills{:role => "navigation"}
+      .container-fluid.navbar-pills-container
+        .navbar-header.collapsed{"data-target" => "#navbar-pills-collapse", "data-toggle" => "collapse"}
+          %span.icon-sort-down.toggle-icon
+          %span.navbar-title
+        #navbar-pills-collapse.collapse.navbar-collapse
+          %ul.nav.navbar-nav
+            - @environments.each do |e|
+              %li{class: "#{'active' if params[:environment] == e.name}"}
+                %a{href: "/fax_records/environment_report?environment=#{e.id}"}
+                  %strong= e.name.upcase
+  .col-md-8
+    .panel.panel-default
+      .panel-heading.text-center
+        %h3.panel-title Total Fax Requests for #{@environment.name} (#{@success}% Success!)
+      .panel-body.text-center
+        %b= @fax_records.count
+    .panel.panel-default
+      .panel-heading.text-center
+        %h3.panel-title Total Pages Sent
+      .panel-body.text-center
+        %b= @fax_records.where(is_success: 't').map(&:pages).map(&:to_i).reduce(0, :+)
+    .panel.panel-default
+      .panel-body
+        = pie_chart @chart_display, colors: ["#ff3300", "#2eb82e"], library: {legend: {position: "left"}, chartArea: {left:0, width:'100%'}}
+    .panel.panel-default
+      .panel-body
+        = pie_chart @types_hash, library: {legend: {position: "left"}, chartArea: {left:0, width:'100%'}}
+    .panel.panel-default
+      .panel-body
+        = column_chart @fax_records.group_by_day(:created_at).count
