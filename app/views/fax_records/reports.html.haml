@@ -1,0 +1,50 @@
+- if @month_name
+  .row-floud
+    .col-md-2
+      %nav.navbar.navbar-default.navbar-pills{:role => "navigation"}
+        .container-fluid.navbar-pills-container
+          .navbar-header.collapsed{"data-target" => "#navbar-pills-collapse", "data-toggle" => "collapse"}
+            %span.icon-sort-down.toggle-icon
+            %span.navbar-title
+          #navbar-pills-collapse.collapse.navbar-collapse
+            %ul.nav.navbar-nav
+              - months_of_the_year.each_with_index do |m, i|
+                - unless i+1 > Time.now.month
+                  %li{class: "#{'active' if params[:desierd_month] == (i+1).to_s}"}
+                    %a{href: "/fax_records/reports?type=monthly&desierd_month=#{i+1}"}
+                      %strong= m.upcase
+                      %span{class: 'badge pull-right hidden-xs'}= i+1
+- elsif @environments
+  .row-floud
+    .col-md-2
+      %nav.navbar.navbar-default.navbar-pills{:role => "navigation"}
+        .container-fluid.navbar-pills-container
+          .navbar-header.collapsed{"data-target" => "#navbar-pills-collapse", "data-toggle" => "collapse"}
+            %span.icon-sort-down.toggle-icon
+            %span.navbar-title
+          #navbar-pills-collapse.collapse.navbar-collapse
+            %ul.nav.navbar-nav
+              - @environments.each do |e|
+                %li{class: "#{'active' if params[:environment] == e.name}"}
+                  %a{href: "/fax_records/reports?type=environments&environment=#{e.id}"}
+                    %strong= e.name.upcase
+.col-md-8
+  .panel.panel-default
+    .panel-heading.text-center
+      %h3.panel-title Total Fax Requests for #{@environments ? @environment.name : @month_name} (#{@success}% Success!)
+    .panel-body.text-center
+      %b= @fax_records.count
+  .panel.panel-default
+    .panel-heading.text-center
+      %h3.panel-title Total Pages Sent
+    .panel-body.text-center
+      %b= @fax_records.where(is_success: 't').map(&:pages).map(&:to_i).reduce(0, :+)
+  .panel.panel-default
+    .panel-body
+      = pie_chart @chart_display, colors: ["#ff3300", "#2eb82e"], library: {legend: {position: "left"}, chartArea: {left:0, width:'100%'}}
+  .panel.panel-default
+    .panel-body
+      = pie_chart @types_hash, library: {legend: {position: "left"}, chartArea: {left:0, width:'100%'}}
+  .panel.panel-default
+    .panel-body
+      = column_chart @fax_records.group_by_day(:created_at).count

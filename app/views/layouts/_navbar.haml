@@ -17,12 +17,12 @@
               %span.caret
             %ul.dropdown-menu
               %li
-                %a{href:"#{report_fax_records_path}"} Monthly Statistics
+                %a{href: '/fax_records/reports?type=monthly'} Monthly Statistics
               %li
-                %a{href:"#{environment_report_fax_records_path}"} Environment Statistics
+                %a{href: '/fax_records/reports?type=environments'} Environment Statistics
               %li.divider{role: 'separator'}
               %li
-                %a{href:"#{issues_fax_records_path}"} Faxes with Issues
+                %a{href: "#{issues_fax_records_path}"} Faxes with Issues
           %li.dropdown
             %a.dropdown-toggle{ aria: { expanded: false, haspopup: true}, data: { toggle: 'dropdown', href: '#', role: 'button'}}
               = current_user.name
