@@ -8,10 +8,11 @@
         #navbar-pills-collapse.collapse.navbar-collapse
           %ul.nav.navbar-nav
             - months_of_the_year.each_with_index do |m, i|
-              %li{class: "#{'active' if params[:desierd_month] == (i+1).to_s}"}
-                %a{href: "/fax_records/report?desierd_month=#{i+1}"}
-                  %strong= m.upcase
-                  %span{class: 'badge pull-right hidden-xs'}= i+1
+              - unless i+1 > Time.now.month
+                %li{class: "#{'active' if params[:desierd_month] == (i+1).to_s}"}
+                  %a{href: "/fax_records/report?desierd_month=#{i+1}"}
+                    %strong= m.upcase
+                    %span{class: 'badge pull-right hidden-xs'}= i+1
   .col-md-8
     .panel.panel-default
       .panel-heading.text-center
