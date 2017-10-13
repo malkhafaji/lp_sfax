@@ -86,11 +86,17 @@ Rails.application.configure do
   config.action_mailer.delivery_method = :smtp
   # SMTP settings for gmail
   config.action_mailer.smtp_settings = {
-   :address              => "smtp.gmail.com",
-   :port                 => 587,
-   :user_name            => ENV['GMAIL_USER'],
-   :password             => ENV['GMAIL_PASSWORD'],
-   :authentication       => "plain",
-  :enable_starttls_auto => true
+    address: 'smtp.gmail.com',
+    port: 587,
+    user_name: ENV['GMAIL_USER'],
+    password:  ENV['GMAIL_PASSWORD'],
+    authentication: 'plain',
+    enable_starttls_auto: true
   }
+  Rails.application.config.middleware.use ExceptionNotification::Rack,
+    email: {
+      email_prefix: "[#{Rails.env.upcase}] ",
+      sender_address: ENV['GMAIL_USER'],
+      exception_recipients: ENV['ADMIN_LIST']
+    }
 end
