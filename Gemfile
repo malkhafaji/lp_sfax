@@ -45,6 +45,7 @@ group :development do
   gem 'listen', '~> 3.1', '>= 3.1.5'
   gem 'faker', '~> 1.7', '>= 1.7.3'
   gem 'letter_opener'
+  gem 'bullet'
 end
 
 group :production do
