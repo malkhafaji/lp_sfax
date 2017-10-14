@@ -29,7 +29,7 @@
 }
 
 .modal button {
-  background: rgba(102,204,225);
+  background: rgba(102,204,225, 1);
   border: none;
   border-radius: 2px;
   box-shadow: rgba(0,0,0,0.7) 0 2px 4px -1px;
