@@ -23,7 +23,7 @@ $(document).ready(function() {
     modalShown = getNow();
     $(document.body).append($modal);
     $modal.show();
-    $('.cont').toggleClass('modal-blur');
+    $('#main-page').toggleClass('modal-blur');
   };
 
   var checkTimeout = function checkTimeout() {
@@ -42,7 +42,7 @@ $(document).ready(function() {
   $modalBtn.on("click", function(e) {
     e.preventDefault();
     $modal.hide();
-    $('.cont').toggleClass('modal-blur');
+    $('#main-page').toggleClass('modal-blur');
     $modal.detach();
     modalShown = false;
   });
