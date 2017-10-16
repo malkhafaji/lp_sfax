@@ -6,3 +6,5 @@
   - send_fax
   - resend_fax
   - insert_fax
+  - mailers
+  - default
