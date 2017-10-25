@@ -38,7 +38,7 @@ group :development do
   gem 'listen', '~> 3.1', '>= 3.1.5'
 end
 
-group :production do
+group :production, :staging do
   gem 'whenever', '~> 0.9.4'
 end
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
