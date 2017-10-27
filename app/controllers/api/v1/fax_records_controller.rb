@@ -1,32 +1,33 @@
 require 'open-uri'
-include WebServices
 class Api::V1::FaxRecordsController < ApplicationController
-  skip_before_action  :verify_authenticity_token
+  skip_before_action  :verify_authenticity_token, :authenticate_user!
 
-
-  # Taking the fax_number,recipient_name and the attached file path and call the actual sending method to send the fax (made by the client)
   def send_fax
     begin
-      Rails.logger.debug "==> request for new fax: #{params.inspect} <=="
-      recipient_name = params['recipient_name']
-      recipient_number = params['recipient_number']
-      callback_url = params['FaxDispositionURL']
+      unless params['recipient_name'].present? && params['recipient_number'].present? && params['FaxDispositionURL'].present? && params['Attachments'].present? && params['e_sk'].present? && params['let_sk'].present? && params['type_cd_sk'].present? && params['priority_cd_sk'].present?
+        raise ActionController::ParameterMissing.new('required params')
+      end
+      callback_server = CallbackServer.find_by_url(params['FaxDispositionURL'])
+      unless callback_server
+        raise 'callback server does not exist'
+      end
+      HelperMethods::Logger.app_logger('info', "==> request for new fax: #{params.inspect} <==")
       attachments_array = params_to_array(params['Attachments'])
-      attachments=  WebServices::Web.file_path(attachments_array)
-      fax_record = FaxRecord.new
-      fax_record.client_receipt_date = Time.now
-      fax_record.recipient_number = recipient_number
-      fax_record.recipient_name = recipient_name
-      fax_record.callback_url = callback_url
-      fax_record.updated_by_initializer = false
-      fax_record.save!
-      fax_record_attachment(fax_record, attachments_array)
-      initial_response = FaxServices::Fax.actual_sending(recipient_name, recipient_number, attachments, fax_record.id)
-      render json: initial_response
+      fax_record = FaxRecord.new(callback_server_id: callback_server.id, client_receipt_date: Time.now, recipient_number: params['recipient_number'], recipient_name: params['recipient_name'], updated_by_initializer: false)
+      respond_to do |format|
+        if fax_record.save
+          CallbackParam.create(let_sk: params['let_sk'], e_sk: params['e_sk'], type_cd_sk: params['type_cd_sk'], priority_cd_sk: params['priority_cd_sk'], fax_record_id: fax_record.id)
+          fax_record_attachment(fax_record, attachments_array)
+          FaxJob.perform_async(fax_record.id)
+          format.json { render json: { status: 'R', message: 'Fax request has been received' } }
+        else
+          HelperMethods::Logger.app_logger('error', fax_record.errors)
+          format.json { render json: fax_record.errors, status: 'F' }
+        end
+      end
     rescue Exception => e
-      NotificationMailer.sys_error(e.message).deliver
-      render json: e.message.inspect
-      Rails.logger.debug "==> error send_fax: #{e.message.inspect} <=="
+      HelperMethods::Logger.app_logger('error', e.message)
+      render json: e.message
     end
   end
 

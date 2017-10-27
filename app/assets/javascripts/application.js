@@ -13,7 +13,8 @@
 //= require jquery
 //= require jquery_ujs
 //= require turbolinks
+//= require session.js
+//= require Chart.bundle
+//= require datatables/jquery_datatables
+//= require chartkick
 //= require_tree .
-
-$(document).ready(function() {
-  $('#flash_message').hide().delay(10).fadeIn(1000).delay(2000).fadeOut(1000)});

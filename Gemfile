@@ -23,6 +23,13 @@ gem 'haml', '~> 4.0.5'
 gem 'rubyzip'
 gem 'sidekiq', '~> 5.0.4'
 gem 'redis-namespace'
+gem 'chartkick'
+gem 'groupdate'
+gem 'omniauth-azure-oauth2'
+gem 'datatables-rails', '~> 1.10.7.0'
+gem 'will_paginate', '~> 3.1', '>= 3.1.6'
+
+
 
 group :development, :test do
   gem 'byebug', platform: :mri

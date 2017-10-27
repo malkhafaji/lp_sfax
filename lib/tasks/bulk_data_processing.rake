@@ -9,4 +9,12 @@ namespace :bulk_data_processing do
       a.update_attributes(file_key: res_json["unique_key"])
     end
   end
+
+  task add_callback_server_id: :environment do
+    FaxRecord.where(callback_server_id: nil).where.not(callback_url: nil).find_each do |fax|
+      callback_server = CallbackServer.find_by_update_url(fax.callback_url)
+      fax.update_attributes(callback_server_id: callback_server.id)
+      puts "Fax record #{fax.id} has been updated"
+    end
+  end
 end

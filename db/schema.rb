@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170804183140) do
+ActiveRecord::Schema.define(version: 20170927190713) do
 
   create_table "attachments", force: :cascade do |t|
     t.integer  "fax_record_id"
@@ -20,6 +20,29 @@ ActiveRecord::Schema.define(version: 20170804183140) do
     t.datetime "updated_at",    null: false
     t.string   "file_key"
     t.index ["file_key"], name: "index_attachments_on_file_key"
+  end
+
+  create_table "callback_params", force: :cascade do |t|
+    t.integer  "fax_record_id"
+    t.integer  "let_sk"
+    t.integer  "e_sk"
+    t.integer  "type_cd_sk"
+    t.integer  "priority_cd_sk"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+    t.index ["fax_record_id"], name: "index_callback_params_on_fax_record_id"
+  end
+
+  create_table "callback_servers", force: :cascade do |t|
+    t.string   "name"
+    t.string   "url",         null: false
+    t.string   "update_url"
+    t.integer  "insert_port"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+    t.index ["insert_port"], name: "index_callback_servers_on_insert_port"
+    t.index ["update_url"], name: "index_callback_servers_on_update_url"
+    t.index ["url"], name: "index_callback_servers_on_url"
   end
 
   create_table "fax_records", force: :cascade do |t|
@@ -58,7 +81,27 @@ ActiveRecord::Schema.define(version: 20170804183140) do
     t.datetime "updated_at",                                    null: false
     t.string   "callback_url"
     t.integer  "resend",                            default: 0
+    t.integer  "callback_server_id"
     t.index ["send_fax_queue_id"], name: "index_fax_records_on_send_fax_queue_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string   "email"
+    t.string   "name"
+    t.string   "refresh_token"
+    t.string   "access_token"
+    t.datetime "access_token_expires_at"
+    t.datetime "last_sign_in_at"
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+    t.index ["email"], name: "index_users_on_email", unique: true
+  end
+
+  create_table "vendor_statuses", force: :cascade do |t|
+    t.string   "service",    null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["service"], name: "index_vendor_statuses_on_service"
   end
 
 end

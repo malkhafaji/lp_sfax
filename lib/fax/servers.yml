@@ -1,7 +1,0 @@
----
-- :name: 'test_server'
-  :url: 'https://fake-dcm.herokuapp.com/'
-- :name: 'test_nitor'
-  :url: 'http://qapp1.vpc.nitor:9001/'
-- :name: 'test_nitor2'
-  :url: 'https://dhp-efax-q.discoveryhealthpartners.com/'
