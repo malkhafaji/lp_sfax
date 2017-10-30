@@ -7,4 +7,4 @@
   - resend_fax
   - insert_fax
   - refresh_token
-  - notification_mailer
+  - mailers
