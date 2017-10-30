@@ -29,7 +29,7 @@ gem 'omniauth-azure-oauth2'
 gem 'datatables-rails', '~> 1.10.7.0'
 gem 'will_paginate', '~> 3.1', '>= 3.1.6'
 gem 'exception_notification'
-
+gem 'highline'
 
 group :development, :test do
   gem 'byebug', platform: :mri
