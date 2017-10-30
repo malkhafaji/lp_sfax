@@ -22,6 +22,7 @@
 
 # Ignore application configuration
 /config/application.yml
+/config/database.yml
 lib/fax/servers.yml
 vendor/bundle/
 dump.rdb
