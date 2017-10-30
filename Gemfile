@@ -28,7 +28,7 @@ gem 'groupdate'
 gem 'omniauth-azure-oauth2'
 gem 'datatables-rails', '~> 1.10.7.0'
 gem 'will_paginate', '~> 3.1', '>= 3.1.6'
-
+gem 'exception_notification'
 
 
 group :development, :test do
@@ -43,9 +43,12 @@ group :development do
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'listen', '~> 3.1', '>= 3.1.5'
+  gem 'faker', '~> 1.7', '>= 1.7.3'
+  gem 'letter_opener'
+  gem 'bullet'
 end
 
-group :production do
+group :production, :staging do
   gem 'whenever', '~> 0.9.4'
 end
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

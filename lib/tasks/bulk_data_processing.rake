@@ -9,7 +9,6 @@ namespace :bulk_data_processing do
       a.update_attributes(file_key: res_json["unique_key"])
     end
   end
-
   task add_callback_server_id: :environment do
     h = {"https://bcbsne-efax.discoveryhealthpartners.com/eFaxService/OutboundDispositionService.svc/receive": "https://bcbsne-efax.discoveryhealthpartners.com",
     "https://humana-efax.discoveryhealthpartners.com/eFaxService/OutboundDispositionService.svc/receive": "https://humana-efax.discoveryhealthpartners.com",

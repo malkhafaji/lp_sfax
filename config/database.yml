@@ -5,8 +5,6 @@
 #   gem 'sqlite3'
 #
 
-
-
 default: &default
   adapter: sqlite3
   pool: 5
@@ -22,6 +20,10 @@ development:
 test:
   <<: *default
   database: db/test.sqlite3
+
+staging:
+  <<: *default
+  database: db/staging.sqlite3
 #
 production:
   <<: *default

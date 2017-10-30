@@ -13,7 +13,6 @@
 //= require jquery
 //= require jquery_ujs
 //= require turbolinks
-//= require session.js
 //= require Chart.bundle
 //= require datatables/jquery_datatables
 //= require chartkick
