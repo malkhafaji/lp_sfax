@@ -9,7 +9,7 @@ gem 'therubyracer', platforms: :ruby
 gem 'ci_reporter'
 gem 'faraday'
 gem 'rails', '~> 5.0.1'
-gem 'sqlite3'
+gem 'pg'
 gem 'puma', '~> 3.0'
 gem 'sass-rails', '~> 5.0'
 gem 'uglifier', '>= 1.3.0'
@@ -29,7 +29,7 @@ gem 'omniauth-azure-oauth2'
 gem 'datatables-rails', '~> 1.10.7.0'
 gem 'will_paginate', '~> 3.1', '>= 3.1.6'
 gem 'exception_notification'
-
+gem 'highline'
 
 group :development, :test do
   gem 'byebug', platform: :mri
