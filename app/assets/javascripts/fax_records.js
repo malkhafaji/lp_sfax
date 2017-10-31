@@ -1,4 +1,5 @@
 $(document).on('turbolinks:load', function() {
+  $("#issu").dataTable();
   $('#fax_records').dataTable({
     processing: true,
     serverSide: true,

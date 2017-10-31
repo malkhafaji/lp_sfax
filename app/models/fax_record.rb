@@ -1,6 +1,6 @@
 class FaxRecord < ApplicationRecord
-  has_many :attachments
-  has_one :callback_param
+  has_many :attachments,  dependent: :destroy
+  has_one :callback_param,  dependent: :destroy
   belongs_to :callback_server
 
   validates_format_of :recipient_number, with: /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/
@@ -24,7 +24,8 @@ class FaxRecord < ApplicationRecord
   end
 
   def self.by_month(desired_month)
-    self.where("cast(strftime('%m', created_at) as int) = ?", desired_month)
+    current_year = Time.now.year
+    self.where("cast(strftime('%Y', created_at) as int) = #{current_year}) AND (cast(strftime('%m', created_at) as int) = #{desired_month}")
   end
 
   def number_to_fax

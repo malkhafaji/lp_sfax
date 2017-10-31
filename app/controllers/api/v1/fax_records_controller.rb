@@ -26,7 +26,7 @@ class Api::V1::FaxRecordsController < ApplicationController
         end
       end
     rescue Exception => e
-      HelperMethods::Logger.app_logger('error', e.message)
+      HelperMethods::Logger.app_logger('error', "send_fax: #{e.message}")
       render json: e.message
     end
   end
