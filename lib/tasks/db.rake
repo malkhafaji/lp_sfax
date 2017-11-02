@@ -40,8 +40,8 @@ namespace :db do
   end
 
   desc 'use faker gem to change recipient_name and recipient_number in fax_record'
-  task de_identity: :environment do
-     FaxRecord.all.each do |t|
+  task de_identify: :environment do
+     FaxRecord.all.find_each do |t|
       t.update_attributes(recipient_name: Faker::Name.name)
       t.update_attributes(recipient_number: Faker::Number.number(10))
     end
