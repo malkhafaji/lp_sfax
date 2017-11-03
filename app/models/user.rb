@@ -39,6 +39,7 @@ class User < ApplicationRecord
     update_attributes(
     access_token: data['access_token'],
     access_token_expires_at: Time.now + (data['expires_in'].to_i).seconds)
+    true
   end
 
   def token_expired?
