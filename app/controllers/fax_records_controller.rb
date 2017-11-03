@@ -24,29 +24,10 @@ class FaxRecordsController < ApplicationController
   end
 
   def index
-    session[:search_value] = (params["search"]["value"] rescue nil)
+    session[:search_value] = (params['search']['value'] rescue nil)
     respond_to do |format|
       format.html
       format.json { render json: FaxRecordDatatable.new(view_context) }
-    end
-
-    @zone = ActiveSupport::TimeZone.new("Central Time (US & Canada)")
-    @search_value = params[:search_value]
-    filter_fax_records = FaxRecord.filtered_fax_records(@search_value)
-    #session[:search_value] = @search_value
-
-    if @search_value && @search_value.empty?
-      flash.now.alert = "Search value should not be empty !"
-      @fax_records = FaxRecord.all
-    elsif  !@search_value.blank? && !filter_fax_records.present?
-      flash.now.alert = "No results matching the search value (#{@search_value})"
-      @fax_records = FaxRecord.all
-    else
-      if !filter_fax_records.present?
-      @fax_records = FaxRecord.desc
-      else
-      @fax_records = filter_fax_records
-      end
     end
   end
 

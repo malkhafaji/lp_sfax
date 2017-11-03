@@ -34,7 +34,7 @@ class FaxRecordDatatable
     def fax_records
       @fax_records ||= fetch_fax_records
     end
-  
+
   def fetch_fax_records
     if params[:id]
       fax_records = FaxRecord.where(id: params[:id].to_i)
@@ -42,8 +42,8 @@ class FaxRecordDatatable
       fax_records = FaxRecord.order("#{sort_column} #{sort_direction}")
     end
     fax_records = fax_records.page(page).per_page(per_page)
-    if params[:search].present?
-      fax_records = fax_records.where("id like :search or recipient_name like :search  or recipient_number like :search or result_message like :search", search: "%#{params[:search][:value]}%")
+    if params[:search][:value].present?
+      fax_records = fax_records.where("id::text like :search or recipient_name like :search  or recipient_number like :search or result_message like :search", search: "%#{params[:search][:value]}%")
     end
     fax_records
   end
@@ -51,17 +51,17 @@ class FaxRecordDatatable
   def page
     params[:start].to_i/per_page + 1
   end
-  
+
   def per_page
     params[:length].to_i > 0 ? params[:length].to_i : 10
   end
 
  def sort_column
-    columns = %w[id recipient_name recipient_number]
+    columns = %w[id recipient_name recipient_number result_message]
     columns[params[:order]['0'][:column].to_i]
   end
 
- def sort_direction
-    params[:order]['0'][:dir] == "desc" ? "desc" : "asc"
+  def sort_direction
+    params[:order]['0'][:dir] == 'desc' ? 'desc' : 'asc'
   end
 end
