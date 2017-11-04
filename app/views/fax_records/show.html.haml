@@ -48,16 +48,16 @@
           %b= @fax.sendback_final_response_to_client == 0 ? 'No' : 'Yes'
         .col-md-2 Request Date
         .col-md-10
-          %b= @fax.created_at.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m:%S %p %z") if @fax.created_at
+          %b= @fax.created_at.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m:%S %p %z")
         .col-md-2 Send Confirm Date
         .col-md-10
-          %b= @fax.fax_date_iso.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m:%S %p %z") if @fax.fax_date_iso
+          %b= @fax.fax_date_iso.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m:%S %p %z")
         .col-md-2 Fax Duration
         .col-md-10
           %b= @fax.fax_duration
         .col-md-2 Last Modified Date
         .col-md-10
-          %b= @fax.updated_at.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m:%S %p %z") if @fax.updated_at
+          %b= @fax.updated_at.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m:%S %p %z") 
         .col-md-2 Fax Resend Attempts
         .col-md-10
           %b= @fax.resend

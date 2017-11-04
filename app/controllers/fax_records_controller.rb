@@ -25,6 +25,7 @@ class FaxRecordsController < ApplicationController
   end
 
   def index
+    HelperMethods::Logger.app_logger('info', 'samer')
     session[:search_value] = (params['search']['value'] rescue nil)
     respond_to do |format|
       format.html
@@ -54,13 +55,8 @@ class FaxRecordsController < ApplicationController
       message_type = fax_record.result_message
       @types_hash[message_type] += 1 unless  message_type == nil
     end
-    total_success = @fax_records.where(is_success: 't')
+    total_success = @fax_records.where(result_message: 'Success')
     @success = total_success.present? ? ((total_success.size.to_f / @fax_records.size) * 100).to_i : 0
-    @chart_display = {}
-    records = @fax_records.group(:is_success).count
-    records.each do |key, value|
-      key == 't' ? @chart_display['Success'] = records[key] :  @chart_display['Fail'] = records[key]
-    end
   end
 
   def issues
