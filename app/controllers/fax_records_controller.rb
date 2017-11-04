@@ -1,5 +1,6 @@
 class FaxRecordsController < ApplicationController
   skip_before_action :authenticate_user!, only: [:homepage]
+  @zone = ActiveSupport::TimeZone.new("Central Time (US & Canada)")
   def  homepage
   end
 
@@ -31,6 +32,11 @@ class FaxRecordsController < ApplicationController
     end
   end
 
+  def show
+    @zone = ActiveSupport::TimeZone.new("Central Time (US & Canada)")
+    @fax = FaxRecord.find(params[:id])
+  end
+
   def reports
     if params[:type] == 'monthly'
       @desierd_month = params[:desierd_month] ||= Date.today.strftime('%m')
@@ -48,8 +54,8 @@ class FaxRecordsController < ApplicationController
       message_type = fax_record.result_message
       @types_hash[message_type] += 1 unless  message_type == nil
     end
-    total_sccess = @fax_records.where(is_success: 't')
-    @success = total_sccess.present? ? ((total_sccess.size.to_f / @fax_records.size) * 100).to_i : 0
+    total_success = @fax_records.where(is_success: 't')
+    @success = total_success.present? ? ((total_success.size.to_f / @fax_records.size) * 100).to_i : 0
     @chart_display = {}
     records = @fax_records.group(:is_success).count
     records.each do |key, value|

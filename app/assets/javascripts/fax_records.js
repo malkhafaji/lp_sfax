@@ -10,7 +10,7 @@ $(document).on('turbolinks:load', function() {
     aoColumnDefs: [
       {
         'bSortable': false,
-        'aTargets': [3, 4, 5, 6, 7, 8, 9, 10, 11]
+        'aTargets': [3, 4, 5, 6, 7]
       }
     ]
   });

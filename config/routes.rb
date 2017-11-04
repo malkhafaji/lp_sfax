@@ -10,7 +10,7 @@ Rails.application.routes.draw do
 
   get 'run_tasks', to: 'application#run_tasks'
 
-  resources :fax_records, only: [] do
+  resources :fax_records, only: [:show] do
     collection do
       get 'issues'
       get 'homepage'

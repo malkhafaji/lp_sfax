@@ -13,20 +13,17 @@ class FaxRecordDatatable
   end
   private
     def data
+      @zone = ActiveSupport::TimeZone.new("Central Time (US & Canada)")
       fax_records.map do |fax_record|
         [
-          fax_record.id,
-          fax_record.recipient_name,
-          fax_record.number_to_fax,
+          link_to(fax_record.id, fax_record),
+          link_to(fax_record.recipient_name, fax_record),
+          helper.number_to_phone(fax_record.recipient_number, area_code: true),
           fax_record.message,
           fax_record.result_message,
           fax_record.attempts,
           fax_record.pages,
-          fax_record.sender_fax,
-          fax_record.created_at.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m %p"),
-          fax_record.client_receipt_date.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m %p"),
-          fax_record.send_confirm_date,
-          fax_record.fax_duration
+          fax_record.created_at.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m:%S %p")
         ]
      end
     end
@@ -63,5 +60,11 @@ class FaxRecordDatatable
 
   def sort_direction
     params[:order]['0'][:dir] == 'desc' ? 'desc' : 'asc'
+  end
+
+  def helper
+    @helper ||= Class.new do
+      include ActionView::Helpers::NumberHelper
+    end.new
   end
 end
