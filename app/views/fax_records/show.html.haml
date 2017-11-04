@@ -3,69 +3,90 @@
     .panel-heading
       %h3.panel-title SHOWING FAX #{@fax.id}
     .panel-body
-      .row
-        .col-md-2 Recipient Name
-        .col-md-10
-          %b= @fax.recipient_name
-        .col-md-2 Recipient Number
-        .col-md-10
-          %b= number_to_phone(@fax.recipient_number, area_code: true)
-        .col-md-2 Fax Initial Status
-        .col-md-10
-          %b= @fax.status == 't' ? 'Success' : 'Failed'
-        .col-md-2 Fax Message
-        .col-md-10
-          %b= @fax.message
-        .col-md-2 Fax Queue ID
-        .col-md-10
-          %b= @fax.send_fax_queue_id
-        .col-md-2 Is Success?
-        .col-md-10
-          %b= @fax.is_success  == 't' ? 'Yes' : 'No'
-        .col-md-2 Final Message
-        .col-md-10
-          %b= @fax.result_message
-        .col-md-2 Sent Fax No.
-        .col-md-10
-          %b= @fax.sender_fax
-        .col-md-2 Page Count
-        .col-md-10
-          %b= @fax.pages
-        .col-md-2 Result Code
-        .col-md-10
-          %b= @fax.result_code
-        .col-md-2 Error Code
-        .col-md-10
-          %b= @fax.error_code
-        .col-md-2 Number of Attempts
-        .col-md-10
-          %b= @fax.attempts
-        .col-md-2 Fax Pages
-        .col-md-10
-          %b= @fax.fax_pages
-        .col-md-2 Final Response Posted
-        .col-md-10
-          %b= @fax.sendback_final_response_to_client == 0 ? 'No' : 'Yes'
-        .col-md-2 Request Date
-        .col-md-10
-          %b= @fax.created_at.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m:%S %p %z")
-        .col-md-2 Send Confirm Date
-        .col-md-10
-          %b= @fax.fax_date_iso.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m:%S %p %z")
-        .col-md-2 Fax Duration
-        .col-md-10
-          %b= @fax.fax_duration
-        .col-md-2 Last Modified Date
-        .col-md-10
-          %b= @fax.updated_at.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m:%S %p %z") 
-        .col-md-2 Fax Resend Attempts
-        .col-md-10
-          %b= @fax.resend
-        .col-md-2 Environment
-        .col-md-10
-          %b= @fax.callback_server.name
-        .col-md-2 Attachments File IDs
-        .col-md-10
-          %b= @fax.attachments.pluck(:file_key) if @fax.attachments.any?
+      %table.table
+        %tr
+          %td Recipient Name
+          %td
+            %b= @fax.recipient_name
+        %tr
+          %td Recipient Number
+          %td
+            %b= number_to_phone(@fax.recipient_number, area_code: true)
+        %tr
+          %td Fax Initial Status
+          %td
+            %b= @fax.status == 't' ? 'Success' : 'Failed'
+        %tr
+          %td Fax Message
+          %td
+            %b= @fax.message
+        %tr
+          %td Fax Queue ID
+          %td
+            %b= @fax.send_fax_queue_id
+        %tr
+          %td Is Success?
+          %td
+            %b= @fax.is_success  == 't' ? 'Yes' : 'No'
+        %tr
+          %td Final Message
+          %td
+            %b= @fax.result_message
+        %tr
+          %td Sent Fax No.
+          %td
+            %b= @fax.sender_fax
+        %tr
+          %td Page Count
+          %td
+            %b= @fax.pages
+        %tr
+          %td Result Code
+          %td
+            %b= @fax.result_code
+        %tr
+          %td Error Code
+          %td
+            %b= @fax.error_code
+        %tr
+          %td Number of Attempts
+          %td
+            %b= @fax.attempts
+        %tr
+          %td Fax Pages
+          %td
+            %b= @fax.fax_pages
+        %tr
+          %td Final Response Posted
+          %td
+            %b= @fax.sendback_final_response_to_client == 0 ? 'No' : 'Yes'
+        %tr
+          %td Request Date
+          %td
+            %b= @fax.created_at.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m:%S %p %z")
+        %tr
+          %td Send Confirm Date
+          %td
+            %b= @fax.fax_date_iso.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m:%S %p %z") if @fax.fax_date_iso
+        %tr
+          %td Fax Duration
+          %td
+            %b= @fax.fax_duration
+        %tr
+          %td Last Modified Date
+          %td
+            %b= @fax.updated_at.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m:%S %p %z")
+        %tr
+          %td Fax Resend Attempts
+          %td
+            %b= @fax.resend
+        %tr
+          %td Environment
+          %td
+            %b= @fax.callback_server.name
+        %tr
+          %td Attachments File IDs
+          %td
+            %b= @fax.attachments.pluck(:file_key) if @fax.attachments.any?
 
   = link_to 'Back', fax_records_path , class: 'btn btn-default btn-lg'
