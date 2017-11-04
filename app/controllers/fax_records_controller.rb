@@ -60,6 +60,7 @@ class FaxRecordsController < ApplicationController
   end
 
   def issues
-    @unsent_fax_records =  FaxRecord.where(sendback_final_response_to_client: 0)
+    @zone = ActiveSupport::TimeZone.new("Central Time (US & Canada)")
+    @unsent_fax_records =  FaxRecord.not_send_to_client
   end
 end
