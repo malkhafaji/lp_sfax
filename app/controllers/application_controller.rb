@@ -25,7 +25,7 @@ class ApplicationController < ActionController::Base
       if current_user.token_expired?
         redirect_to signout_path(user_id: current_user.id)
       else
-        RefreshTokenJob.perform_async(current_user.id)
+        RefreshTokenJob.perform_later(current_user.id)
       end
     else
       redirect_to root_url
