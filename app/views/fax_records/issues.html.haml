@@ -1,32 +1,31 @@
 .container-fluid
-  .panel.panel-default
-    .panel-heading
-      %h3.panel-title Faxes with issues
-    .panel-body
-      %table#issu
-        %thead
-          %tr
-            %th Fax ID
-            %th Recipient name
-            %th Recipient number
-            %th Status
-            %th Confirmation Message
-            %th Environment Name
-            %th Create Date
-        %tbody
-          - @unsent_fax_records.each do |record|
+  %h2 Faxes with issues
+  - @unsent_fax_records.each do |server_id, records|
+    .panel.panel-default
+      .panel-heading
+        %h3.panel-title= CallbackServer.find(server_id).name
+      .panel-body
+        %table.table
+          %thead
             %tr
-              %td
-                = record.id
-              %td
-                = record.recipient_name
-              %td
-                = record.recipient_number
-              %td
-                = record.is_success == 't' ? 'Success' : 'Failure'
-              %td
-                = record.result_message
-              %td
-                = record.callback_server.name
-              %td
-                = record.created_at.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m %p")
+              %th Fax ID
+              %th Recipient name
+              %th Recipient number
+              %th Status
+              %th Confirmation Message
+              %th Create Date
+          %tbody
+            - records.each do |record|
+              %tr
+                %td
+                  = record.id
+                %td
+                  = record.recipient_name
+                %td
+                  = number_to_phone(record.recipient_number, area_code: true)
+                %td
+                  = record.is_success == 't' ? 'Success' : 'Failure'
+                %td
+                  = record.result_message
+                %td
+                  = record.created_at.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m:%S %p")

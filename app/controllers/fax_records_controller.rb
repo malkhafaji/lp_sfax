@@ -1,5 +1,6 @@
 class FaxRecordsController < ApplicationController
   skip_before_action :authenticate_user!, only: [:homepage]
+  @zone = ActiveSupport::TimeZone.new("Central Time (US & Canada)")
   def  homepage
   end
 
@@ -24,30 +25,17 @@ class FaxRecordsController < ApplicationController
   end
 
   def index
-    session[:search_value] = (params["search"]["value"] rescue nil)
+    HelperMethods::Logger.app_logger('info', 'samer')
+    session[:search_value] = (params['search']['value'] rescue nil)
     respond_to do |format|
       format.html
       format.json { render json: FaxRecordDatatable.new(view_context) }
     end
+  end
 
+  def show
     @zone = ActiveSupport::TimeZone.new("Central Time (US & Canada)")
-    @search_value = params[:search_value]
-    filter_fax_records = FaxRecord.filtered_fax_records(@search_value)
-    #session[:search_value] = @search_value
-
-    if @search_value && @search_value.empty?
-      flash.now.alert = "Search value should not be empty !"
-      @fax_records = FaxRecord.all
-    elsif  !@search_value.blank? && !filter_fax_records.present?
-      flash.now.alert = "No results matching the search value (#{@search_value})"
-      @fax_records = FaxRecord.all
-    else
-      if !filter_fax_records.present?
-      @fax_records = FaxRecord.desc
-      else
-      @fax_records = filter_fax_records
-      end
-    end
+    @fax = FaxRecord.find(params[:id])
   end
 
   def reports
@@ -67,16 +55,12 @@ class FaxRecordsController < ApplicationController
       message_type = fax_record.result_message
       @types_hash[message_type] += 1 unless  message_type == nil
     end
-    total_sccess = @fax_records.where(is_success: 't')
-    @success = total_sccess.present? ? ((total_sccess.size.to_f / @fax_records.size) * 100).to_i : 0
-    @chart_display = {}
-    records = @fax_records.group(:is_success).count
-    records.each do |key, value|
-      key == 't' ? @chart_display['Success'] = records[key] :  @chart_display['Fail'] = records[key]
-    end
+    total_success = @fax_records.where(result_message: 'Success')
+    @success = total_success.present? ? ((total_success.size.to_f / @fax_records.size) * 100).to_i : 0
   end
 
   def issues
-    @unsent_fax_records =  FaxRecord.where(sendback_final_response_to_client: 0)
+    @zone = ActiveSupport::TimeZone.new("Central Time (US & Canada)")
+    @unsent_fax_records =  FaxRecord.not_send_to_client
   end
 end

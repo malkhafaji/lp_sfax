@@ -61,11 +61,5 @@ Rails.application.configure do
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
-  Rails.application.config.middleware.use ExceptionNotification::Rack,
-    email: {
-      email_prefix: "[#{Rails.env.upcase}] ",
-      sender_address: ENV['GMAIL_USER'],
-      exception_recipients: ENV['ADMIN_LIST']
-    }
   config.action_mailer.delivery_method = :letter_opener
 end

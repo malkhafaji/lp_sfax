@@ -1,7 +1,4 @@
-include Sidekiq::Worker
-
-class RefreshTokenJob
-  sidekiq_options queue: 'refresh_token'
+class RefreshTokenJob < ActiveJob::Base
   def perform(user_id)
     user = User.find(user_id)
     unless user.refresh_token!

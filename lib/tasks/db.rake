@@ -43,7 +43,8 @@ namespace :db do
 
   task de_identify: :environment do
     return if Rails.env.production?
-    FaxRecord.all.find_each do |t|
+    FaxRecord.find_each do |t|
+      puts "processing fax id #{t.id}"
       t.update_attributes(recipient_name: Faker::Name.name)
       t.update_attributes(recipient_number: Faker::Number.number(10))
     end
