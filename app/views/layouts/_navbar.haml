@@ -30,5 +30,6 @@
               %li#nav-li
                 %a#nav-a{href: "#{signout_path(user_id: current_user.id)}"} Sign out
       - else
-        %li#nav-li
-          %p#nav-a= link_to 'Sign in', '/auth/azure_oauth2', id: 'sign_in'
+        %ul.nav.navbar-nav.navbar-right#nav-ul
+          %li#nav-li
+            %p#nav-a= link_to 'Sign in', '/auth/azure_oauth2', id: 'sign_in', class: 'btn btn-sm btn-default'
