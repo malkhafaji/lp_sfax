@@ -5,3 +5,4 @@
   - send_fax
   - resend_fax
   - insert_fax
+  - logger
