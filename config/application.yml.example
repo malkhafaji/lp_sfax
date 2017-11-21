@@ -13,6 +13,10 @@ MAX_RESEND: '1'
 
 file_service_path: ''
 
+# logger service url
+LOGGER_SERVICE_HOST: ''
+LOGGER_SERVICE_PORT: ''
+
 pagination_per_page: '100'
 
 GMAIL_USER: ''
