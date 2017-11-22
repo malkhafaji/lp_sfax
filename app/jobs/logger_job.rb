@@ -8,7 +8,7 @@ class LoggerJob
     url = URI(ENV['LOGGER_SERVICE_HOST'])
     url.port = ENV['LOGGER_SERVICE_PORT']
     http = Net::HTTP.new(url.host, url.port)
-    http.use_ssl = true                      # CHECK MAYBE NEED TO BE TURNED OFF OR REMOVE IT !
+    http.use_ssl = false
     request = Net::HTTP::Post.new(url, {'Content-Type' => 'application/json'})
     request.body = data.to_json
     response = http.request(request)
