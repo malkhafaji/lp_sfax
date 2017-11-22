@@ -15,20 +15,29 @@ module HelperMethods
         end
       end
 
-      def logger_service_message(id)
-        data = {source_app: 'fax',
-          is_sensitive: true,
-          action: 'create',
-          actor: 'fax_service_api',
-          actor_type: 0,
-          extended_attributes: true,
-          event: 'the message that we need to log',
-          event_type: 'info',
-          process_id: '1212121',
-          thread_id: '121234',
-          session_id: 'a3b5d555ef',
-          extended_params: {status: 'Success'},
-        entity: {entity_type: 'Fax', entity_id: 11, client_id: 12, recipient_number: '12345678912', recipient_name: 'test_name', attachments: 2}}
+      def logger_service_message(entity, actor, process_info, action_name, event)
+        fax_record = FaxRecord.find(entity[:fax_id])
+        data = {source_app: Rails.application.class.parent_name,
+          is_sensitive: true,  # TODO: WE NEED TO ADD THIS
+          action: action_name,
+          actor: actor[:actor_name],
+          actor_type: actor[:type],
+          extended_attributes: true, # TODO: WE NEED TO ADD THIS
+          event: event[:message],
+          event_type: event[:type],
+          process_id: process_info[:process_id],
+          thread_id: process_info[:thread_id],
+          session_id: process_info[:session_id],
+          extended_params: {status: 'Success'}, # TODO: WE NEED TO ADD THIS
+
+        entity: {entity_type: entity[:type],
+                entity_id: entity[:id],
+                client_id: entity[:client_id],
+                recipient_number: fax_record.recipient_number,
+                recipient_name: fax_record.recipient_name,
+                attachments: fax_record.attachments.count
+                }
+              }
       end
     end
   end
