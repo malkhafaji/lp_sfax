@@ -16,28 +16,19 @@ module HelperMethods
       end
 
       def logger_service_message(id)
-        data = {
-          client_id:'0000',
-          source_app: ['ISO', 'IQ', 'Fax'],
-          is_sensitive: ['true/fasle'],
-          action: ['create', 'update','delete', 'service'],
-          actor: ['jsmith'],
-          actor_type: [0,1,2,3],
-          extended_attributes: ['true/false'],
-          event: ['the message that we need to log'],
-          event_type: ['info', 'error', 'debug', 'warning'],
-          process_id:['optional',1212121],
-          thread_id:['optional',2121212],
-          session_id: ['a3b5d555ef'],
-          params: ['any number of attributes key => values'],
-          loggerable: {
-            type: 'Fax',
-            fax_id:01,
-            client_id:'01',
-            recipient_number:00000000000,
-            recipient_name:'test',
-          no_of_attachments:0 }
-        }
+        data = {source_app: 'fax',
+          is_sensitive: true,
+          action: 'create',
+          actor: 'fax_service_api',
+          actor_type: 0,
+          extended_attributes: true,
+          event: 'the message that we need to log',
+          event_type: 'info',
+          process_id: '1212121',
+          thread_id: '121234',
+          session_id: 'a3b5d555ef',
+          extended_params: {status: 'Success'},
+        entity: {entity_type: 'Fax', entity_id: 11, client_id: 12, recipient_number: '12345678912', recipient_name: 'test_name', attachments: 2}}
       end
     end
   end
