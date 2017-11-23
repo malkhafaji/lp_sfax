@@ -1,7 +1,7 @@
 module HelperMethods
   class Logger
     class << self
-  def app_logger(type, message)
+    def app_logger(type, message)
       case type
         when type = 'error'
           Rails.logger.error message
@@ -15,5 +15,5 @@ module HelperMethods
         end
       end
     end
-  end
+  end  
 end
