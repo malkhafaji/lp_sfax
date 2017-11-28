@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170927190713) do
+ActiveRecord::Schema.define(version: 20171127202155) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -84,6 +84,7 @@ ActiveRecord::Schema.define(version: 20170927190713) do
     t.string   "callback_url"
     t.integer  "resend",                            default: 0
     t.integer  "callback_server_id"
+    t.integer  "client_id"
     t.index ["send_fax_queue_id"], name: "index_fax_records_on_send_fax_queue_id", using: :btree
   end
 

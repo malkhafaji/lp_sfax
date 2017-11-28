@@ -22,7 +22,7 @@ Rails.application.routes.draw do
 
   namespace :api do
   	namespace :v1 do
-  		resources :fax_records, only: [] do
+  		resources :fax_records, only: [:show] do
   		  collection do
   		    post 'send_fax' # Sending Faxes with recipient name ,Number and file path
   		  end
