@@ -15,29 +15,31 @@ module HelperMethods
         end
       end
 
-      def logger_service_message(entity, actor, process_info, action_name, event)
-        fax_record = FaxRecord.find(entity[:fax_id])
-        data = {source_app: Rails.application.class.parent_name,
-          is_sensitive: true,  # TODO: WE NEED TO ADD THIS
+      def logger_service_message(entity_id, action_name, event, *extended_params)
+        fax_record = FaxRecord.find(entity_id)
+        application_name = Rails.application.class.parent_name.capitalize
+        ip = Socket.ip_address_list.detect{|intf| intf.ipv4_private?}
+        data = {source_app: application_name,
+          is_sensitive: true,
           action: action_name,
-          actor: actor[:actor_name],
-          actor_type: actor[:type],
-          extended_attributes: true, # TODO: WE NEED TO ADD THIS
+          actor: "#{application_name}_service_api",
+          actor_type: 0,
           event: event[:message],
           event_type: event[:type],
-          process_id: process_info[:process_id],
-          thread_id: process_info[:thread_id],
-          session_id: process_info[:session_id],
-          extended_params: {status: 'Success'}, # TODO: WE NEED TO ADD THIS
-
-        entity: {entity_type: entity[:type],
-                entity_id: entity[:id],
-                client_id: entity[:client_id],
-                recipient_number: fax_record.recipient_number,
-                recipient_name: fax_record.recipient_name,
-                attachments: fax_record.attachments.count
-                }
-              }
+          process_id: Process.pid,
+          thread_id: Thread.current.object_id,
+          session_id: Thread.current.object_id,
+          ip_address: ip.ip_address,
+          extended_attributes: extended_params.present? ? true : false,
+          extended_params: extended_params,
+          entity: {entity_type: application_name,
+            entity_id: entity_id,
+            client_id: 000,
+            recipient_number: fax_record.recipient_number,
+            recipient_name: fax_record.recipient_name,
+            attachments: fax_record.attachments.count
+          }
+        }
       end
     end
   end
