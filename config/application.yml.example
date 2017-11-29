@@ -1,0 +1,20 @@
+# variables for lib/fax_common_methods/module.rb
+username: ''
+APIkey: ''
+vector: ''
+encryptionkey: ''
+fax_server_url: ''
+
+# variables for lib/tasks/fax_response.rake
+MAX_RESPONSE_CHECK: '20'
+max_records_send_to_client: '25'
+MAX_RESEND: '1'
+#file service server info
+
+file_service_path: ''
+
+pagination_per_page: '100'
+
+GMAIL_USER: ''
+GMAIL_PASSWORD: ''
+ADMIN_LIST: ''

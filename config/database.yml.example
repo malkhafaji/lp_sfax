@@ -1,0 +1,12 @@
+default: &default
+  adapter: postgresql
+  encoding: UTF8
+  pool: 10
+
+production:
+  <<: *default
+  database:
+  host:
+  port: 5432
+  username:
+  password:

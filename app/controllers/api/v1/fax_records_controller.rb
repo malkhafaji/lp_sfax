@@ -8,7 +8,7 @@ class Api::V1::FaxRecordsController < ApplicationController
     if fax_records
       render json: fax_records, root: false
     else
-      render json: { "No Fax Record" => "We could not find any Fax Record with that id" }, status: 404
+      render json: { error: "We could not find any Fax Record with that id" }, status: 404
     end
   end
 
