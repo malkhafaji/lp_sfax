@@ -3,12 +3,12 @@ class Api::V1::FaxRecordsController < ApplicationController
   skip_before_action  :verify_authenticity_token, :authenticate_user!
 
   def show
-    fax_records = FaxRecord.find_by(id: params[:id])
+    fax_record = FaxRecord.find_by(id: params[:id])
 
-    if fax_records
-      render json: {id: fax_records.id, client_id: fax_records.client_id, recipient_number: fax_records.recipient_number , recipient_name: fax_records.recipient_name, attachments: fax_records.attachments.count }
+    if fax_record
+      render json: {id: fax_record.id, client_id: fax_record.client_id, recipient_number: fax_record.recipient_number , recipient_name: fax_record.recipient_name, attachments: fax_record.attachments.count }
     else
-      render json: { error: "We could not find any Fax Record with that id" }, status: 404
+      render json: { error: 'We could not find any Fax Record with that id' }, status: 404
     end
   end
 
