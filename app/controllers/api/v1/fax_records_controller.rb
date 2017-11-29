@@ -6,7 +6,7 @@ class Api::V1::FaxRecordsController < ApplicationController
     fax_records = FaxRecord.find_by(id: params[:id])
 
     if fax_records
-      render json: fax_records, root: false
+      render json: {id: fax_records.id, client_id: fax_records.client_id, recipient_number: fax_records.recipient_number , recipient_name: fax_records.recipient_name, attachments: fax_records.attachments.count }
     else
       render json: { error: "We could not find any Fax Record with that id" }, status: 404
     end

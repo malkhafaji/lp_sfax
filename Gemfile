@@ -31,7 +31,6 @@ gem 'datatables-rails', '~> 1.10.7.0'
 gem 'will_paginate', '~> 3.1', '>= 3.1.6'
 gem 'exception_notification'
 gem 'highline'
-gem 'active_model_serializers'
 
 group :development, :test do
   gem 'byebug', platform: :mri
