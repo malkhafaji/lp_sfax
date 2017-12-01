@@ -8,7 +8,6 @@ class CreateCallbackServers < ActiveRecord::Migration[5.0]
       t.timestamps
     end
     add_column :fax_records, :callback_server_id, :integer
-    Fax::Setup.callback_server
   end
 
   def down

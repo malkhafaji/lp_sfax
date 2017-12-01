@@ -9,4 +9,4 @@ production:
   host:
   port: 5432
   username:
-  password: 
+  password:

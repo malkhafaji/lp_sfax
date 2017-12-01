@@ -10,7 +10,7 @@ Rails.application.routes.draw do
 
   get 'run_tasks', to: 'application#run_tasks'
 
-  resources :fax_records, only: [] do
+  resources :fax_records, only: [:show] do
     collection do
       get 'issues'
       get 'homepage'
@@ -22,12 +22,12 @@ Rails.application.routes.draw do
 
   namespace :api do
   	namespace :v1 do
-  		resources :fax_records, only: [] do
+  		resources :fax_records, only: [:show] do
   		  collection do
   		    post 'send_fax' # Sending Faxes with recipient name ,Number and file path
   		  end
   		end
   	end
   end
-
+  devise_for :users, controllers: { omniauth_callbacks: "users/omniauth_callbacks", sessions: 'users/sessions'}
 end

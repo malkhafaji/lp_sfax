@@ -41,10 +41,7 @@
       %b= @fax_records.where(is_success: 't').map(&:pages).map(&:to_i).reduce(0, :+)
   .panel.panel-default
     .panel-body
-      = pie_chart @chart_display, colors: ["#ff3300", "#2eb82e"], library: {legend: {position: "left"}, chartArea: {left:0, width:'100%'}}
-  .panel.panel-default
-    .panel-body
-      = pie_chart @types_hash, library: {legend: {position: "left"}, chartArea: {left:0, width:'100%'}}
+      = pie_chart @types_hash, library: {legend: {position: "left"}, chartArea: {left:0, width:'100%'}}, title: 'Failed Faxes'
   .panel.panel-default
     .panel-body
       = column_chart @fax_records.group_by_day(:created_at).count

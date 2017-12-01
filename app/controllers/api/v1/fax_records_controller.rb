@@ -2,6 +2,16 @@ require 'open-uri'
 class Api::V1::FaxRecordsController < ApplicationController
   skip_before_action  :verify_authenticity_token, :authenticate_user!
 
+  def show
+    fax_record = FaxRecord.find(params[:id])
+
+    if fax_record
+      render json: {id: fax_record.id, client_id: fax_record.client_id, recipient_number: fax_record.recipient_number , recipient_name: fax_record.recipient_name, attachments: fax_record.attachments.count }, status: :ok
+    else
+      render json: { error: 'We could not find any Fax Record with that id' }, status: 404
+    end
+  end
+
   def send_fax
     begin
       unless params['recipient_name'].present? && params['recipient_number'].present? && params['FaxDispositionURL'].present? && params['Attachments'].present? && params['e_sk'].present? && params['let_sk'].present? && params['type_cd_sk'].present? && params['priority_cd_sk'].present?

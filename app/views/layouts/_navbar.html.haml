@@ -1,0 +1,38 @@
+%nav.navbar.navbar-inverse
+  .container-fluid#user_nav
+    .navbar-header
+      %button.navbar-toggle.collapsed{ type: :button, data: {toggle: :collapse, target: '#bs-example-navbar-collapse-1'}}
+        %span.sr-only Toggle Navigation
+        %span.icon-bar
+        %span.icon-bar
+        %span.icon-bar
+      = link_to 'Fax Service', fax_records_path, class: 'navbar-brand'
+    .collapse.navbar-collapse#bs-example-navbar-collapse-1
+      %ul.nav.navbar-nav.navbar-right#nav-ul
+        - if current_user
+          %ul.nav.navbar-nav#nav-ul
+            %li{class: "#{'active' if current_page?(fax_records_path)}"}= link_to 'HOME', fax_records_path
+          %ul.nav.navbar-nav.navbar-right#nav-ul
+            %li{class: "dropdown #{'active' if current_page?(reports_fax_records_path)}"}
+              %a.dropdown-toggle{aria: {expanded: false, haspopup: true}, data: { toggle: 'dropdown', href: '#', role: 'button'}}
+                Reports
+                %span.caret
+              %ul.dropdown-menu
+                %li= link_to 'Monthly Statistics', reports_fax_records_path(type: 'monthly')
+                %li= link_to 'Environment Statistics', reports_fax_records_path(type: 'environments')
+                %li.divider{role: 'separator'}
+                %li
+                  %a=link_to 'Faxes with Issues', issues_fax_records_path
+            %li.dropdown
+              %a.dropdown-toggle{ aria: { expanded: false, haspopup: true}, data: { toggle: 'dropdown', href: '#', role: 'button'}}
+                = current_user.name
+                %span.caret
+              %ul.dropdown-menu#logout
+                %li.active#nav-li= link_to 'Sign out', destroy_user_session_path, method: :delete, id: 'nav-a'
+          .modal-mask
+            .modal
+              %strong Your online session is about to expire
+              %br
+              %button.modal-btn I'm still here!
+        - else
+          %li.active#nav-li= link_to 'Sign in', user_azure_oauth2_omniauth_authorize_path

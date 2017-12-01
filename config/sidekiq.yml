@@ -2,9 +2,6 @@
 :pidfile: tmp/pids/sidekiq.pid
 :logfile: ./log/sidekiq.log
 :queues:
-  - default
   - send_fax
   - resend_fax
   - insert_fax
-  - refresh_token
-  - mailers

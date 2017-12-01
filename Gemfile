@@ -4,6 +4,7 @@ git_source(:github) do |repo_name|
   repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
   "https://github.com/#{repo_name}.git"
 end
+
 gem "execjs"
 gem 'therubyracer', platforms: :ruby
 gem 'ci_reporter'
@@ -30,6 +31,7 @@ gem 'datatables-rails', '~> 1.10.7.0'
 gem 'will_paginate', '~> 3.1', '>= 3.1.6'
 gem 'exception_notification'
 gem 'highline'
+gem 'devise'
 
 group :development, :test do
   gem 'byebug', platform: :mri

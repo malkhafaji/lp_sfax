@@ -10,45 +10,15 @@
           Export the results as:
           \#{link_to 'CSV file' , export_fax_records_path(format: 'csv'), method: :post, class: 'btn btn-default btn-sm'}
           \#{link_to 'Excel file', export_fax_records_path(format: 'xls'), method: :post, class: 'btn btn-default btn-sm'}
-      %table#fax_records{"data-source" => "/fax_records/index.json"}
+      %table#fax_records{ data: { source: fax_records_path(format: 'json')}}
         %thead
           %tr
-            %th.text-center Fax ID
-            %th.text-center Recipient name
-            %th.text-center Recipient number
-            %th.text-center Confirmation Message
-            %th.text-center Status
-            %th.text-center Attempts
-            %th.text-center Pages
-            %th.text-center Sender No.
-            %th.text-center Request Initiated
-            %th.text-center Request Sent to Vendor
-            %th.text-center Vendor Confirmation
-            %th.text-center Duration sec
+            %th Fax ID
+            %th Recipient name
+            %th Recipient number
+            %th Confirmation Message
+            %th Status
+            %th Attempts
+            %th Pages
+            %th Request Initiated
         %tbody
-          - @fax_records.each do |fax_record|
-            %tr
-              %td
-                = fax_record.id
-              %td
-                = fax_record.recipient_name
-              %td
-                = number_to_phone(fax_record.number_to_fax)
-              %td
-                = fax_record.message
-              %td
-                = fax_record.result_message
-              %td
-                = fax_record.attempts
-              %td
-                = fax_record.pages
-              %td
-                = fax_record.sender_fax
-              %td
-                = fax_record.created_at.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m %p")
-              %td
-                = fax_record.client_receipt_date.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m %p")
-              %td
-                = fax_record.send_confirm_date.in_time_zone(@zone).strftime("%m/%d/%Y %I:%m %p") if fax_record.send_confirm_date?
-              %td
-                = (fax_record.fax_duration.round(2) * 100).to_i if fax_record.fax_duration.present?
