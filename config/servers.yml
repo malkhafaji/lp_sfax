@@ -1,0 +1,4 @@
+:name: 'test_server'
+:url: 'https://fake-dcm.herokuapp.com/'
+:update_url: 'https://fake-dcm.herokuapp.com/'
+:insert_port: '8080'
