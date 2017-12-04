@@ -102,3 +102,6 @@
        text-align: center;
        padding: 200px;
    }
+.dropdown-menu#logout > .active > a, .dropdown-menu > .active > a:hover, .dropdown-menu > .active > a:focus {
+  background-color: #fff;
+}
