@@ -6,8 +6,9 @@ Rails.application.routes.draw do
   match 'signout', to: 'sessions#logout', as: 'signout', via: [:get, :post]
 
   require 'sidekiq/web'
-  mount Sidekiq::Web => '/sidekiq'
-
+  authenticate :user do
+    mount Sidekiq::Web => '/sidekiq'
+  end
   get 'run_tasks', to: 'application#run_tasks'
 
   resources :fax_records, only: [:show] do
