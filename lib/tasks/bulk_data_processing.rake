@@ -32,11 +32,11 @@ namespace :bulk_data_processing do
     FaxRecord.where(client_id: nil).find_each do |fr|
       attachment = fr.attachments.last
       if attachment.present?
-        url = "#{ENV['file_service_path']}/api/v1/documents/#{attachment.file_key}"
-        response = HTTParty.get(url)
+        uri = URI("#{ENV['file_service_path']}/api/v1/documents/#{attachment.file_key}")
+        response = Net::HTTP.get_response(uri)
         res_json = JSON.parse(response.body)
         if res_json and res_json['client_id']
-          puts "Updating fax record - #{fr.fax_id}"
+          puts "Updating fax record - #{fr.fax_id} with client id - #{res_json['client_id']}"
           fr.update_attributes(client_id: res_json['client_id'])
         else
           puts "Failed to get response for #{fr.fax_id}"
