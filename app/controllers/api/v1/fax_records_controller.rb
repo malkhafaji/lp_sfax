@@ -14,19 +14,19 @@ class Api::V1::FaxRecordsController < ApplicationController
 
   def send_fax
     begin
-      unless params['recipient_name'].present? && params['recipient_number'].present? && params['FaxDispositionURL'].present? && params['Attachments'].present? && params['e_sk'].present? && params['let_sk'].present? && params['type_cd_sk'].present? && params['priority_cd_sk'].present? && params['client_id'].present? 
+      unless params.values_at(*%i(RecipientName RecipientNumber FaxDispositionURL Attachments CreateById LetterId TransmissionTypeCodeId PriorityCodeId ClientId)).all?(&:present?)
         raise ActionController::ParameterMissing.new('required params')
       end
-      callback_server = CallbackServer.find_by_url(params['FaxDispositionURL'])
+      callback_server = CallbackServer.find_by_url(params['FaxDispositionURL']) 
       unless callback_server
         raise 'callback server does not exist'
       end
       HelperMethods::Logger.app_logger('info', "==> request for new fax: #{params.inspect} <==")
       attachments_array = params_to_array(params['Attachments'])
-      fax_record = FaxRecord.new(callback_server_id: callback_server.id, client_receipt_date: Time.now, recipient_number: params['recipient_number'], recipient_name: params['recipient_name'], updated_by_initializer: false, client_id: params['client_id'])
+      fax_record = FaxRecord.new(callback_server_id: callback_server.id, client_receipt_date: Time.now, recipient_number: params['RecipientNumber'], recipient_name: params['RecipientName'], client_id: params['ClientId'], updated_by_initializer: false)
       respond_to do |format|
         if fax_record.save
-          CallbackParam.create(let_sk: params['let_sk'], e_sk: params['e_sk'], type_cd_sk: params['type_cd_sk'], priority_cd_sk: params['priority_cd_sk'], fax_record_id: fax_record.id)
+          CallbackParam.create(let_sk: params['LetterId'], e_sk: params['CreateById'], type_cd_sk: params['TransmissionTypeCodeId'], priority_cd_sk: params['PriorityCodeId'], fax_record_id: fax_record.id)
           fax_record_attachment(fax_record, attachments_array)
           FaxJob.perform_async(fax_record.id)
           format.json { render json: { status: 'R', message: 'Fax request has been received' } }
