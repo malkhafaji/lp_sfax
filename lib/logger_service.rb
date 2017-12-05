@@ -1,7 +1,7 @@
 module LoggerService
   class Logger
     class << self
-      def logger_service_message(extended_params, *audit_trails_attributes)
+      def message(extended_params, *audit_trails_attributes)
         data = {source_app: Rails.application.class.parent_name.capitalize,
           is_sensitive: true,
           action: audit_trails_attributes[:action],
