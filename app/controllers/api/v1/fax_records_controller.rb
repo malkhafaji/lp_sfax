@@ -15,7 +15,7 @@ class Api::V1::FaxRecordsController < ApplicationController
   def send_fax
     begin
       unless params.values_at(*%i(RecipientName RecipientNumber FaxDispositionURL Attachments CreateById LetterId TransmissionTypeCodeId PriorityCodeId ClientId)).all?(&:present?)
-        raise ActionController::ParameterMissing.new('required params')
+        raise 'Missing required parameter(s)'
       end
       callback_server = CallbackServer.find_by_url(params['FaxDispositionURL']) 
       unless callback_server
