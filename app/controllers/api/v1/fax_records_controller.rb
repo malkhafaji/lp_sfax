@@ -11,7 +11,7 @@ class Api::V1::FaxRecordsController < ApplicationController
       unless callback_server
         raise 'callback server does not exist'
       end
-      HelperMethods::Logger.app_logger('info', "==> request for new fax: #{params.inspect} <==")
+      # HelperMethods::Logger.app_logger('info', "==> request for new fax: #{params.inspect} <==")
       attachments_array = params_to_array(params['Attachments'])
       fax_record = FaxRecord.new(callback_server_id: callback_server.id, client_receipt_date: Time.now, recipient_number: params['recipient_number'], recipient_name: params['recipient_name'], updated_by_initializer: false)
       respond_to do |format|
@@ -21,12 +21,12 @@ class Api::V1::FaxRecordsController < ApplicationController
           FaxJob.perform_async(fax_record.id)
           format.json { render json: { status: 'R', message: 'Fax request has been received' } }
         else
-          HelperMethods::Logger.app_logger('error', fax_record.errors)
+          # HelperMethods::Logger.app_logger('error', fax_record.errors)
           format.json { render json: fax_record.errors, status: 'F' }
         end
       end
     rescue Exception => e
-      HelperMethods::Logger.app_logger('error', "send_fax: #{e.message}")
+      # HelperMethods::Logger.app_logger('error', "send_fax: #{e.message}")
       render json: e.message
     end
   end

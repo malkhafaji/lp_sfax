@@ -4,7 +4,7 @@ class InsertFaxJob
   sidekiq_options queue: 'insert_fax'
 
   def perform(fax_id)
-    HelperMethods::Logger.app_logger('info', "==> inserting Fax with ID (#{fax_id}) in to client database ")
+    # HelperMethods::Logger.app_logger('info', "==> inserting Fax with ID (#{fax_id}) in to client database ")
     fax_record = FaxRecord.find(fax_id)
     url = URI(fax_record.callback_server.url+'/DataAccessService/sFaxService.svc/InsertFaxes')
     url.port = fax_record.callback_server.insert_port
@@ -40,10 +40,10 @@ class InsertFaxJob
     request.body = data.to_json
     response = http.request(request)
     if response.present? && response.code == '200'
-      HelperMethods::Logger.app_logger('info', "insert fax date: #{data.to_json}")
-      HelperMethods::Logger.app_logger('info', "insert fax response: #{response.body}")
+      # HelperMethods::Logger.app_logger('info', "insert fax date: #{data.to_json}")
+      # HelperMethods::Logger.app_logger('info', "insert fax response: #{response.body}")
     else
-      HelperMethods::Logger.app_logger('error', response.inspect)
+      # HelperMethods::Logger.app_logger('error', response.inspect)
       raise response.inspect
     end
   end

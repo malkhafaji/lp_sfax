@@ -1,7 +1,7 @@
 module LoggerService
   class Logger
     class << self
-      def message(extended_params, *audit_trails_attributes)
+      def message(extended_params, audit_trails_attributes)
         data = {source_app: Rails.application.class.parent_name.capitalize,
           is_sensitive: true,
           action: audit_trails_attributes[:action],
@@ -17,11 +17,20 @@ module LoggerService
         entity: create_entity(audit_trails_attributes[:entity_id])}
       end
 
-      private
+      def logger_call(data)
+        url = URI(ENV['LOGGER_SERVICE_HOST'])
+        url.port = ENV['LOGGER_SERVICE_PORT']
+        http = Net::HTTP.new(url.host, url.port)
+        request = Net::HTTP::Post.new(url, {'Content-Type' => 'application/json'})
+        request.body = data.to_json
+        return http.request(request)
+      end
+
+private
       def create_entity(entity_id)
         if entity_id.present?
           fax_record = FaxRecord.find(entity_id)
-          {entity_type: Rails.application.class.parent_name.capitalize,
+          {entity_type: 'Fax',
             entity_id: entity_id,
             client_id: fax_record.client_id,
             recipient_number: fax_record.recipient_number,
