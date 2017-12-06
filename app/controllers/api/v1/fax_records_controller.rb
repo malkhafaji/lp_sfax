@@ -44,7 +44,7 @@ class Api::V1::FaxRecordsController < ApplicationController
   private
   def params_to_array(string)
     array_of_files_key = []
-    parsed_string= string.split(/[\s,+=]/)
+    parsed_string= string.split(/\s,+=/)
     (1..parsed_string.length - 1).step(4).each do |i|
       array_of_files_key << parsed_string[i]
     end
