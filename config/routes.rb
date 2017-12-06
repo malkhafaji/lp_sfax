@@ -6,8 +6,9 @@ Rails.application.routes.draw do
   match 'signout', to: 'sessions#logout', as: 'signout', via: [:get, :post]
 
   require 'sidekiq/web'
-  mount Sidekiq::Web => '/sidekiq'
-
+  authenticate :user do
+    mount Sidekiq::Web => '/sidekiq'
+  end
   get 'run_tasks', to: 'application#run_tasks'
 
   resources :fax_records, only: [:show] do
@@ -22,12 +23,12 @@ Rails.application.routes.draw do
 
   namespace :api do
   	namespace :v1 do
-  		resources :fax_records, only: [] do
+  		resources :fax_records, only: [:show] do
   		  collection do
   		    post 'send_fax' # Sending Faxes with recipient name ,Number and file path
   		  end
   		end
   	end
   end
-
+  devise_for :users, controllers: { omniauth_callbacks: "users/omniauth_callbacks", sessions: 'users/sessions'}
 end

@@ -4,16 +4,6 @@ $(document).ready(function() {
   // Delay after displaying modal before moving to different location
   var reactionDelay = 15 * 60000;
 
-  var logoutHref = $("ul.dropdown-menu#logout>li#nav-li>#nav-a").attr("href");
-  $("#nav-ul #nav-li").on('click', function(){
-    if($("#nav-ul.dropdown-menu").is(":visible")){
-      $("#nav-ul.dropdown-menu").hide();
-    }else{
-      $("#nav-ul.dropdown-menu").show();
-    }
-  });
-  if(logoutHref == null)
-    return;
   var $modal = $('.modal-mask');
   var $modalBtn = $modal.find(".modal-btn");
   var lastActive = null;
@@ -34,7 +24,10 @@ $(document).ready(function() {
       }
     }else{
       if (now - modalShown  > reactionDelay) {
-        window.location = logoutHref;
+        $.ajax({
+           type: 'DELETE',
+           url: '/users/sign_out'
+        })
       }
     }
   };
