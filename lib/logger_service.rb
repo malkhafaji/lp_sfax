@@ -2,10 +2,10 @@ module LoggerService
   class << self
 
     def message(audit_trails_attributes, extended_params)
-      data = build_audit_trails(audit_trails_attributes).merge({
-        extended_attributes: extended_params.present? ? true : false,
-        extended_params: extended_params,
-      entity: create_entity(audit_trails_attributes[:entity_id])})
+      build_audit_trails(audit_trails_attributes).merge({
+        extended_attr: extended_params.present? ? true : false,
+        extended_attr_hash: extended_params,
+      entity: create_entity(audit_trails_attributes['entity_id'])})
     end
 
     def logger_call(data)
@@ -17,15 +17,15 @@ module LoggerService
       return http.request(request)
     end
 
-private
+    private
     def build_audit_trails(audit_trails_attributes)
       {source_app: Rails.application.class.parent_name.capitalize,
         is_sensitive: true,
-        action: audit_trails_attributes[:action],
-        actor: audit_trails_attributes[:actor],
-        actor_type: audit_trails_attributes[:actor_type],
-        event: audit_trails_attributes[:event],
-        event_type: audit_trails_attributes[:event_type],
+        action: audit_trails_attributes['action'],
+        actor: audit_trails_attributes['actor'],
+        actor_type: audit_trails_attributes['actor_type'],
+        event: audit_trails_attributes['event'],
+        event_type: audit_trails_attributes['event_type'],
         process_id: Process.pid,
         thread_id: Thread.current.object_id,
         session_id: Thread.current.object_id,
