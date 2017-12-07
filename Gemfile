@@ -36,16 +36,20 @@ gem 'devise'
 group :development, :test do
   gem 'byebug', platform: :mri
   gem 'rspec-rails', '~> 3.5'
+  gem 'faker', '~> 1.7', '>= 1.7.3'
 end
 
 group :development do
-  gem 'capistrano', '~> 3.6'
+  # gem 'capistrano', '~> 3.6'
   gem 'capistrano-rails', '~> 1.3'
+  gem 'capistrano', '~> 3.7', '>= 3.7.1'
+  # gem 'capistrano-rails', '~> 1.2'
+  gem 'capistrano-passenger', '~> 0.2.0'
+  gem 'capistrano-rbenv', '~> 2.1'
   gem 'web-console', '>= 3.3.0'
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'listen', '~> 3.1', '>= 3.1.5'
-  gem 'faker', '~> 1.7', '>= 1.7.3'
   gem 'letter_opener'
   gem 'bullet'
 end
