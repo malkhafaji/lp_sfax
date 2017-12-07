@@ -1,7 +1,7 @@
 require 'open-uri'
 class Api::V1::FaxRecordsController < ApplicationController
   skip_before_action  :verify_authenticity_token, :authenticate_user!
-  
+
   def show
     fax_record = FaxRecord.find(params[:id])
 
@@ -17,11 +17,16 @@ class Api::V1::FaxRecordsController < ApplicationController
       unless params.values_at(*%i(RecipientName RecipientNumber FaxDispositionURL Attachments CreateById LetterId TransmissionTypeCodeId PriorityCodeId ClientId)).all?(&:present?)
         raise 'Missing required parameter(s)'
       end
-      callback_server = CallbackServer.find_by_url(params['FaxDispositionURL']) 
+      callback_server = CallbackServer.find_by_url(params['FaxDispositionURL'])
       unless callback_server
         raise 'callback server does not exist'
       end
-      HelperMethods::Logger.app_logger('info', "==> request for new fax: #{params.inspect} <==")
+      # HelperMethods::Logger.app_logger('info', "==> request for new fax: #{params.inspect} <==")
+
+
+      audit_trails_attributes = {action:__method__, actor:'test', actor_type:0, event: "request for new fax: #{params.inspect}", event_type:'info',entity_id:1}
+      LoggerJob.perform_async(audit_trails_attributes,{ket1:'test_key1',key2:'test_key2'})
+
       attachments_array = params_to_array(params['Attachments'])
       fax_record = FaxRecord.new(callback_server_id: callback_server.id, client_receipt_date: Time.now, recipient_number: params['RecipientNumber'], recipient_name: params['RecipientName'], client_id: params['ClientId'], updated_by_initializer: false)
       respond_to do |format|
@@ -31,12 +36,12 @@ class Api::V1::FaxRecordsController < ApplicationController
           FaxJob.perform_async(fax_record.id)
           format.json { render json: { status: 'R', message: 'Fax request has been received' } }
         else
-          HelperMethods::Logger.app_logger('error', fax_record.errors)
+          # HelperMethods::Logger.app_logger('error', fax_record.errors)
           format.json { render json: fax_record.errors, status: 'F' }
         end
       end
     rescue Exception => e
-      HelperMethods::Logger.app_logger('error', "send_fax: #{e.message}")
+      # HelperMethods::Logger.app_logger('error', "send_fax: #{e.message}")
       render json: e.message
     end
   end

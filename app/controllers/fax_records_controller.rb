@@ -25,7 +25,7 @@ class FaxRecordsController < ApplicationController
   end
 
   def index
-    HelperMethods::Logger.app_logger('info', 'samer')
+    # HelperMethods::Logger.app_logger('info', 'samer')
     session[:search_value] = (params['search']['value'] rescue nil)
     respond_to do |format|
       format.html
