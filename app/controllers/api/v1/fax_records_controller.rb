@@ -1,7 +1,7 @@
 require 'open-uri'
 class Api::V1::FaxRecordsController < ApplicationController
   skip_before_action  :verify_authenticity_token, :authenticate_user!
-  
+
   def show
     fax_record = FaxRecord.find(params[:id])
 
@@ -14,7 +14,7 @@ class Api::V1::FaxRecordsController < ApplicationController
 
   def send_fax
     begin
-      unless params['recipient_name'].present? && params['recipient_number'].present? && params['FaxDispositionURL'].present? && params['Attachments'].present? && params['e_sk'].present? && params['let_sk'].present? && params['type_cd_sk'].present? && params['priority_cd_sk'].present? && params['client_id'].present? 
+      unless params['recipient_name'].present? && params['recipient_number'].present? && params['FaxDispositionURL'].present? && params['Attachments'].present? && params['e_sk'].present? && params['let_sk'].present? && params['type_cd_sk'].present? && params['priority_cd_sk'].present? && params['client_id'].present?
         raise ActionController::ParameterMissing.new('required params')
       end
       callback_server = CallbackServer.find_by_url(params['FaxDispositionURL'])
@@ -22,6 +22,11 @@ class Api::V1::FaxRecordsController < ApplicationController
         raise 'callback server does not exist'
       end
       # HelperMethods::Logger.app_logger('info', "==> request for new fax: #{params.inspect} <==")
+
+
+      audit_trails_attributes = {action:__method__, actor:'test', actor_type:0, event: "request for new fax: #{params.inspect}", event_type:'info',entity_id:1}
+      LoggerJob.perform_async(audit_trails_attributes,{ket1:'test_key1',key2:'test_key2'})
+
       attachments_array = params_to_array(params['Attachments'])
       fax_record = FaxRecord.new(callback_server_id: callback_server.id, client_receipt_date: Time.now, recipient_number: params['recipient_number'], recipient_name: params['recipient_name'], updated_by_initializer: false, client_id: params['client_id'])
       respond_to do |format|
