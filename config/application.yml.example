@@ -17,6 +17,12 @@ file_service_path: ''
 LOGGER_SERVICE_HOST: ''
 LOGGER_SERVICE_PORT: ''
 
+# Azure information 
+AZURE_CLIENT_ID: ''
+AZURE_CLIENT_SECRET: ''
+AZURE_TENANT_ID: ''
+
+
 pagination_per_page: '100'
 
 GMAIL_USER: ''
