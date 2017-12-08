@@ -1,17 +1,16 @@
 module LoggerService
   class << self
 
-    def message(audit_trails_attributes, extended_params)
+    def message(audit_trails_attributes, extended_params, entity_object)
       build_audit_trails(audit_trails_attributes).merge({
         extended_attr: extended_params.present? ? true : false,
         extended_attr_hash: extended_params,
-      entity: create_entity(audit_trails_attributes['entity_id'])})
+      entity: create_entity(entity_object)})
     end
 
     def logger_call(data)
-      url = URI(ENV['LOGGER_SERVICE_HOST'])
-      url.port = ENV['LOGGER_SERVICE_PORT']
-      http = Net::HTTP.new(url.host, url.port)
+      url = URI(ENV['LOGGER_SERVICE_HOST'] + '/api/v1/loggables')
+      http = Net::HTTP.new(url.host)
       request = Net::HTTP::Post.new(url, {'Content-Type' => 'application/json'})
       request.body = data.to_json
       return http.request(request)
@@ -19,7 +18,7 @@ module LoggerService
 
     private
     def build_audit_trails(audit_trails_attributes)
-      {source_app: Rails.application.class.parent_name.capitalize,
+      {source_app: Rails.application.class.parent_name,
         is_sensitive: true,
         action: audit_trails_attributes['action'],
         actor: audit_trails_attributes['actor'],
@@ -32,17 +31,17 @@ module LoggerService
       ip_address: Socket.ip_address_list[4]}
     end
 
-    def create_entity(entity_id)
-      if entity_id.present?
-        fax_record = FaxRecord.find(entity_id)
-        {entity_type: 'Fax',
-          entity_id: entity_id,
-          client_id: fax_record.client_id,
-          recipient_number: fax_record.recipient_number,
-          recipient_name: fax_record.recipient_name,
-        attachments: fax_record.attachments.count}
+    def create_entity(entity_object)
+      json_hash = JSON.parse(entity_object)
+      if entity_object
+        {entity_type: 'fax',
+          entity_id: json_hash['id'],
+          client_id: json_hash['client_id'],
+          recipient_number: json_hash['recipient_number'],
+          recipient_name: json_hash['recipient_name']
+        }
       else
-        {entity_type: 'service'}
+        {entity_type: 'Service'}
       end
     end
 
