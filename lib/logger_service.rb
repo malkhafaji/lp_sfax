@@ -32,17 +32,20 @@ module LoggerService
     end
 
     def create_entity(entity_object)
-      json_hash = JSON.parse(entity_object)
+      hash = {entity_type: 'fax'}
       if entity_object
-        {entity_type: 'fax',
-          entity_id: json_hash['id'],
-          client_id: json_hash['client_id'],
-          recipient_number: json_hash['recipient_number'],
-          recipient_name: json_hash['recipient_name']
-        }
-      else
-        {entity_type: 'Service'}
+        json_hash = JSON.parse(entity_object)
+        if json_hash['id']
+          hash.merge!({entity_id: json_hash['id'],
+            client_id: json_hash['client_id'],
+            recipient_number: json_hash['recipient_number'],
+            recipient_name: json_hash['recipient_name']
+          })
+        else
+          hash.merge!({client_id: json_hash['client_id']})
+        end
       end
+      hash
     end
 
   end
