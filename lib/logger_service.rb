@@ -10,7 +10,7 @@ module LoggerService
 
     def logger_call(data)
       url = URI(ENV['LOGGER_SERVICE_HOST'] + '/api/v1/loggables')
-      http = Net::HTTP.new(url.host)
+      http = Net::HTTP.new(url.host, url.port)
       request = Net::HTTP::Post.new(url, {'Content-Type' => 'application/json'})
       request.body = data.to_json
       return http.request(request)
