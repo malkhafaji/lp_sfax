@@ -4,7 +4,7 @@ class FaxRecord < ApplicationRecord
   belongs_to :callback_server
 
   validates_format_of :recipient_number, with: /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/
-  validates_presence_of :recipient_name, :callback_server_id
+  validates_presence_of :recipient_name, :created_by, :recipient_number, :client_id
 
   scope :desc,-> {order('fax_records.updated_at DESC')}
   scope :without_queue_id, -> { where(send_fax_queue_id: nil).where(result_code: nil) }

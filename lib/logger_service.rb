@@ -38,7 +38,8 @@ module LoggerService
           hash.merge!({entity_id: json_hash['id'],
             client_id: json_hash['client_id'],
             recipient_number: json_hash['recipient_number'],
-            recipient_name: json_hash['recipient_name']
+            recipient_name: json_hash['recipient_name'],
+            create_time: json_hash['created_at']
           })
         else
           hash.merge!({client_id: json_hash['client_id']})
