@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171127202155) do
+ActiveRecord::Schema.define(version: 20171201171717) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -85,18 +85,20 @@ ActiveRecord::Schema.define(version: 20171127202155) do
     t.integer  "resend",                            default: 0
     t.integer  "callback_server_id"
     t.integer  "client_id"
+    t.string   "created_by"
     t.index ["send_fax_queue_id"], name: "index_fax_records_on_send_fax_queue_id", using: :btree
   end
 
   create_table "users", force: :cascade do |t|
     t.string   "email"
     t.string   "name"
-    t.string   "refresh_token"
+    t.string   "encrypted_password"
     t.string   "access_token"
     t.datetime "access_token_expires_at"
     t.datetime "last_sign_in_at"
     t.datetime "created_at",              null: false
     t.datetime "updated_at",              null: false
+    t.integer  "timeout"
     t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
   end
 
