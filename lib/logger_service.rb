@@ -27,8 +27,7 @@ module LoggerService
         event_type: audit_trails_attributes['event_type'],
         process_id: Process.pid,
         thread_id: Thread.current.object_id,
-        session_id: Thread.current.object_id,
-      ip_address: Socket.ip_address_list[4]}
+        session_id: Thread.current.object_id}
     end
 
     def create_entity(entity_object)
