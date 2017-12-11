@@ -21,7 +21,7 @@ class Api::V1::FaxRecordsController < ApplicationController
       unless callback_server
         raise 'callback server does not exist'
       end
-      attachments_array = params_to_array(params['Attachments'])
+      attachments_array = params['Attachments'].split(',').map(&:strip)
       fax_record = FaxRecord.new(callback_server_id: callback_server.id, client_receipt_date: Time.now,
         recipient_number: params['RecipientNumber'], recipient_name: params['RecipientName'], client_id: params['ClientId'],
         updated_by_initializer: false, created_by: params['CreateBy'])
@@ -47,15 +47,6 @@ class Api::V1::FaxRecordsController < ApplicationController
   end
 
   private
-  def params_to_array(string)
-    array_of_files_key = []
-    parsed_string= string.split(/\s,+=/)
-    (1..parsed_string.length - 1).step(4).each do |i|
-      array_of_files_key << parsed_string[i]
-    end
-    array_of_files_key
-  end
-
   def fax_record_attachment(fax_record, attachments_array)
     attachments_array.each do |file_key|
       Attachment.create(fax_record_id: fax_record.id, file_key: file_key)
