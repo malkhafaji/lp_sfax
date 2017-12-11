@@ -1,9 +1,6 @@
 Rails.application.routes.draw do
 
-  root 'fax_records#homepage' # assigning the index page as the home page
-  match 'auth/:provider/callback', to: 'sessions#create', via: [:get, :post]
-  match 'auth/failure', to: redirect('/'), via: [:get, :post]
-  match 'signout', to: 'sessions#logout', as: 'signout', via: [:get, :post]
+  root 'fax_records#index'
 
   require 'sidekiq/web'
   authenticate :user do
