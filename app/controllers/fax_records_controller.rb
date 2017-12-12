@@ -1,7 +1,7 @@
 class FaxRecordsController < ApplicationController
   skip_before_action :authenticate_user!, only: [:homepage]
   @zone = ActiveSupport::TimeZone.new("Central Time (US & Canada)")
-  
+
   def export
     if (session[:search_value].nil?)
       fax_records = FaxRecord.all
@@ -23,7 +23,6 @@ class FaxRecordsController < ApplicationController
   end
 
   def index
-    # HelperMethods::Logger.app_logger('info', 'samer')
     session[:search_value] = (params['search']['value'] rescue nil)
     respond_to do |format|
       format.html

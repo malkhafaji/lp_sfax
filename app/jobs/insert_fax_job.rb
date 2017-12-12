@@ -4,8 +4,12 @@ class InsertFaxJob
   sidekiq_options queue: 'insert_fax'
 
   def perform(fax_id)
-    # HelperMethods::Logger.app_logger('info', "==> inserting Fax with ID (#{fax_id}) in to client database ")
     fax_record = FaxRecord.find(fax_id)
+
+    audit_trails_attributes = {action: 'InsertFaxJob', actor:fax_record.created_by, actor_type: 1, event: "inserting Fax with ID (#{fax_id}) in to client database", event_type:'info'}
+    LoggerJob.perform_async(audit_trails_attributes, {},fax_record.to_json)
+    # HelperMethods::Logger.app_logger('info', "==> inserting Fax with ID (#{fax_id}) in to client database ")
+
     url = URI(fax_record.callback_server.url+'/DataAccessService/sFaxService.svc/InsertFaxes')
     url.port = fax_record.callback_server.insert_port
     http = Net::HTTP.new(url.host, url.port)
@@ -40,9 +44,13 @@ class InsertFaxJob
     request.body = data.to_json
     response = http.request(request)
     if response.present? && response.code == '200'
+      audit_trails_attributes = {action: 'InsertFaxJob', actor:fax_record.created_by, actor_type: 1, event: "insert fax date: #{data.to_json}", event_type:'info'}
+      LoggerJob.perform_async(audit_trails_attributes, {},fax_record.to_json)
       # HelperMethods::Logger.app_logger('info', "insert fax date: #{data.to_json}")
       # HelperMethods::Logger.app_logger('info', "insert fax response: #{response.body}")
     else
+      audit_trails_attributes = {action: 'InsertFaxJob', actor:fax_record.created_by, actor_type: 1, event: response.inspect, event_type:'error'}
+      LoggerJob.perform_async(audit_trails_attributes, {error: response.inspect},fax_record.to_json)
       # HelperMethods::Logger.app_logger('error', response.inspect)
       raise response.inspect
     end
