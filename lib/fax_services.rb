@@ -208,7 +208,7 @@ module FaxServices
           return JSON.parse(response.body)
         rescue Exception => e
 
-          audit_trails_attributes = {action: 'update', actor:  Etc.getlogin, actor_type: 0, event: "send_fax_status: #{e.message}", event_type:'error'}
+          audit_trails_attributes = {action: 'workflow', actor:  Etc.getlogin, actor_type: 0, event: "send_fax_status: #{e.message}", event_type:'error'}
           LoggerJob.perform_async(audit_trails_attributes, {error: e.message, status: 'F'})
           # HelperMethods::Logger.app_logger('error', "send_fax_status: #{e.message}")
 
