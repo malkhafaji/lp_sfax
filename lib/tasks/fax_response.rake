@@ -5,21 +5,21 @@ task check_fax_response: :environment do
     fax_requests_queue_ids = FaxRecord.without_response_q_ids
     if fax_requests_queue_ids.any?
 
-      audit_trails_attributes = {action: 'check_fax_response', actor: Etc.getlogin, actor_type: 0, event: "checking response for #{fax_requests_queue_ids}", event_type:'info'}
+      audit_trails_attributes = {action: 'workflow', actor: Etc.getlogin, actor_type: 0, event: "checking response for #{fax_requests_queue_ids}", event_type:'info'}
       LoggerJob.perform_async(audit_trails_attributes, {fax_requests_queue_ids: fax_requests_queue_ids})
       # HelperMethods::Logger.app_logger('info', "check_fax_response: checking response for #{fax_requests_queue_ids}")
-      
+
       fax_requests_queue_ids.each do |fax_requests_queue_id|
         begin
 
-          audit_trails_attributes = {action: 'check_fax_response', actor: Etc.getlogin, actor_type: 0, event: "requesting response for #{fax_requests_queue_id}", event_type:'info'}
+          audit_trails_attributes = {action: 'workflow', actor: Etc.getlogin, actor_type: 0, event: "requesting response for #{fax_requests_queue_id}", event_type:'info'}
           LoggerJob.perform_async(audit_trails_attributes, {fax_requests_queue_id: fax_requests_queue_id})
           # HelperMethods::Logger.app_logger('info', "check_fax_response: requesting response for #{fax_requests_queue_id}")
 
           FaxServices::Fax.fax_response(fax_requests_queue_id)
         rescue Exception => e
 
-          audit_trails_attributes = {action: 'check_fax_response', actor: Etc.getlogin, actor_type: 0, event: "requesting response for #{fax_requests_queue_id}", event_type:'error'}
+          audit_trails_attributes = {action: 'workflow', actor: Etc.getlogin, actor_type: 0, event: "requesting response for #{fax_requests_queue_id}", event_type:'error'}
           LoggerJob.perform_async(audit_trails_attributes, {error: e.message})
           # HelperMethods::Logger.app_logger('error', "check_fax_response: #{e.message}")
 
@@ -29,7 +29,7 @@ task check_fax_response: :environment do
       end
     else
 
-      audit_trails_attributes = {action: 'check_fax_response', actor: Etc.getlogin, actor_type: 0, event: 'No changes sicne last task!', event_type:'info'}
+      audit_trails_attributes = {action: 'workflow', actor: Etc.getlogin, actor_type: 0, event: 'No changes sicne last task!', event_type:'info'}
       LoggerJob.perform_async(audit_trails_attributes, {})
       # HelperMethods::Logger.app_logger('info', 'check_fax_response: No changes sicne last task!')
 
