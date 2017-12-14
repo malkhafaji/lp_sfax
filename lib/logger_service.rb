@@ -20,7 +20,7 @@ module LoggerService
     def build_audit_trails(audit_trails_attributes)
       {source_app: Rails.application.class.parent_name,
         is_sensitive: true,
-        action: audit_trails_attributes['action'],
+        action_name: audit_trails_attributes['action'],
         actor: audit_trails_attributes['actor'],
         actor_type: audit_trails_attributes['actor_type'],
         event: audit_trails_attributes['event'],
