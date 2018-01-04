@@ -1,4 +1,4 @@
-module LoggerService
+module FaxLoggerService
   class << self
 
     def message(audit_trails_attributes, extended_params, entity_object)

@@ -31,17 +31,17 @@ class Api::V1::FaxRecordsController < ApplicationController
           fax_record_attachment(fax_record, attachments_array)
           FaxJob.perform_async(fax_record.id)
           audit_trails_attributes = {action: 'create', actor: fax_record.created_by, actor_type: 1, event: "new fax request: #{params.inspect}", event_type:'info'}
-          LoggerJob.perform_async(audit_trails_attributes, { status: 'R', message: 'Fax request has been received' }, fax_record.to_json)
+          FaxLoggerJob.perform_async(audit_trails_attributes, { status: 'R', message: 'Fax request has been received' }, fax_record.to_json)
           format.json { render json: { status: 'R', message: 'Fax request has been received' }, status: :ok }
         else
           audit_trails_attributes = {action: 'workflow', actor: fax_record.created_by, actor_type: 1, event: "new fax request: #{params.inspect}", event_type:'error'}
-          LoggerJob.perform_async(audit_trails_attributes, {error: fax_record.errors.full_messages, status: 'F'}, fax_record.to_json)
+          FaxLoggerJob.perform_async(audit_trails_attributes, {error: fax_record.errors.full_messages, status: 'F'}, fax_record.to_json)
           format.json { render json: {error: fax_record.errors.full_messages, status: 'F'} , status: :unprocessable_entity}
         end
       end
     rescue Exception => e
       audit_trails_attributes = {action: 'workflow', actor: Etc.getlogin, actor_type: 0, event: "new fax request: #{params.inspect}", event_type:'error'}
-      LoggerJob.perform_async(audit_trails_attributes, {error: e.message})
+      FaxLoggerJob.perform_async(audit_trails_attributes, {error: e.message})
       render json: {error: e.message}, status: :unprocessable_entity
     end
   end
