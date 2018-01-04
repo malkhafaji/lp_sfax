@@ -49,8 +49,8 @@ class InsertFaxJob
       # HelperMethods::Logger.app_logger('info', "insert fax date: #{data.to_json}")
       # HelperMethods::Logger.app_logger('info', "insert fax response: #{response.body}")
     else
-      audit_trails_attributes = {action: 'workflow', actor:fax_record.created_by, actor_type: 1, event: response.inspect, event_type:'error'}
-      FaxLoggerJob.perform_async(audit_trails_attributes, {error: response.inspect},fax_record.to_json)
+# audit_trails_attributes = {action: 'workflow', actor:fax_record.created_by, actor_type: 1, event: response.inspect, event_type:'error'}
+# FaxLoggerJob.perform_async(audit_trails_attributes, {error: response.inspect},fax_record.to_json)
       # HelperMethods::Logger.app_logger('error', response.inspect)
       raise response.inspect
     end
