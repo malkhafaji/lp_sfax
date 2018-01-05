@@ -33,7 +33,7 @@ module FaxServices
           fax_record.update_attributes(message: 'Fax request is complete', result_message: "No files found to download for fax with ID: #{fax_id}", error_code: 1515102, result_code: 7002, status: false, is_success: false, send_fax_queue_id: "InvalidFaxAttachment#{fax_record.id}", sender_fax: '1', pages: 0, attempts: 0, fax_duration: 0)
 
           audit_trails_attributes = {action: 'workflow', actor: fax_record.created_by, actor_type: 1, event: "send_now: No files found to download for fax with ID: #{fax_id}", event_type:'error'}
-          LoggerJob.perform_async(audit_trails_attributes, {error: "No files found to download for fax with ID: #{fax_id}", status: 'F'}, fax_record.to_json)
+          FaxLoggerJob.perform_async(audit_trails_attributes, {error: "No files found to download for fax with ID: #{fax_id}", status: 'F'}, fax_record.to_json)
           # HelperMethods::Logger.app_logger('error', "send_now: No files found to download for fax with ID: #{fax_id}")
 
           InsertFaxJob.perform_async(fax_record.id)  unless fax_record.resend > 0
@@ -70,14 +70,14 @@ module FaxServices
         if fax_record.send_fax_queue_id.nil?
 
           audit_trails_attributes = {action: 'workflow', actor: fax_record.created_by, actor_type: 1, event: "send_now: error send_fax_queue_id is nil: #{response_result}", event_type:'error'}
-          LoggerJob.perform_async(audit_trails_attributes, {error: "send_now: error send_fax_queue_id is nil: #{response_result}", status: 'F'}, fax_record.to_json)
+          FaxLoggerJob.perform_async(audit_trails_attributes, {error: "send_now: error send_fax_queue_id is nil: #{response_result}", status: 'F'}, fax_record.to_json)
           # HelperMethods::Logger.app_logger('error', "send_now: error send_fax_queue_id is nil: #{response_result}")
 
           fax_record.update_attributes(message: 'Fax request is complete', result_message: 'Transmission not completed', error_code: 1515101, result_code: 7001, status: false, is_success: false, send_fax_queue_id: "InvalidFaxParams#{fax_record.id}", sender_fax: '1', pages: 0, attempts: 0, fax_duration: 0)
         elsif fax_record.send_fax_queue_id == '-1'
 
           audit_trails_attributes = {action: 'workflow', actor: fax_record.created_by, actor_type: 1, event: "send_now: #{response_result}", event_type:'error'}
-          LoggerJob.perform_async(audit_trails_attributes, {error: "send_now: #{response_result}", status: 'F'}, fax_record.to_json)
+          FaxLoggerJob.perform_async(audit_trails_attributes, {error: "send_now: #{response_result}", status: 'F'}, fax_record.to_json)
           # HelperMethods::Logger.app_logger('error', "send_now: #{response_result}")
 
           fax_record.update_attributes(result_message: 'Invalid fax number', error_code: 1515102, result_code: 7002, status: false, is_success: false, send_fax_queue_id: "InvalidFaxNumber#{fax_record.id}", sender_fax: '1', pages: 0, attempts: 0, fax_duration: 0)
@@ -107,7 +107,7 @@ module FaxServices
           rescue
 
             audit_trails_attributes = {action: 'workflow', actor: fax.created_by, actor_type: 1, event: "Error sending_faxes_without_queue_id: #{fax.id}", event_type:'error'}
-            LoggerJob.perform_async(audit_trails_attributes, {error: "Error sending_faxes_without_queue_id: #{fax.id}", status: 'F'}, fax.to_json)
+            FaxLoggerJob.perform_async(audit_trails_attributes, {error: "Error sending_faxes_without_queue_id: #{fax.id}", status: 'F'}, fax.to_json)
             # HelperMethods::Logger.app_logger('error', "sending_faxes_without_queue_id: Error sending_faxes_without_queue_id: #{fax.id}")
 
           end
@@ -128,7 +128,7 @@ module FaxServices
             unless parse_response['ResultCode'] == 6000 && fax_record.resend <= ENV['MAX_RESEND'].to_i
 
               audit_trails_attributes = {action: 'update', actor: fax_record.created_by, actor_type: 1, event: "fax_response: #{parse_response}", event_type:'info'}
-              LoggerJob.perform_async(audit_trails_attributes, {response: parse_response}, fax_record.to_json)
+              FaxLoggerJob.perform_async(audit_trails_attributes, {response: parse_response}, fax_record.to_json)
               # HelperMethods::Logger.app_logger('info', "fax_response: #{parse_response}")
 
               if parse_response['ResultCode'] == 0
@@ -165,7 +165,7 @@ module FaxServices
               unless fax_record.in_any_queue?
 
               audit_trails_attributes = {action: 'workflow', actor: fax_record.created_by, actor_type: 1, event: "fax_response: Resend fax with ID = #{fax_record.id}", event_type:'info'}
-                LoggerJob.perform_async(audit_trails_attributes, {}, fax_record.to_json)
+                FaxLoggerJob.perform_async(audit_trails_attributes, {}, fax_record.to_json)
                 # HelperMethods::Logger.app_logger('info', "fax_response: Resend fax with ID = #{fax_record.id}")
 
                 fax_record.update_attributes(resend: (fax_record.resend+1))
@@ -175,14 +175,14 @@ module FaxServices
           else
 
             audit_trails_attributes = {action: 'workflow', actor: fax_record.created_by, actor_type: 1, event: 'fax_response: no response found', event_type:'info'}
-            LoggerJob.perform_async(audit_trails_attributes, {}, fax_record.to_json)
+            FaxLoggerJob.perform_async(audit_trails_attributes, {}, fax_record.to_json)
             # HelperMethods::Logger.app_logger('info', 'fax_response: no response found')
 
           end
         rescue Exception => e
 
           audit_trails_attributes = {action: 'workflow', actor:  Etc.getlogin, actor_type: 0, event: "fax_response: #{e.message}", event_type:'error'}
-          LoggerJob.perform_async(audit_trails_attributes, {error: e.message, status: 'F'})
+          FaxLoggerJob.perform_async(audit_trails_attributes, {error: e.message, status: 'F'})
           # HelperMethods::Logger.app_logger('error', "fax_response: #{e.message}")
 
         end
@@ -209,7 +209,7 @@ module FaxServices
         rescue Exception => e
 
           audit_trails_attributes = {action: 'workflow', actor:  Etc.getlogin, actor_type: 0, event: "send_fax_status: #{e.message}", event_type:'error'}
-          LoggerJob.perform_async(audit_trails_attributes, {error: e.message, status: 'F'})
+          FaxLoggerJob.perform_async(audit_trails_attributes, {error: e.message, status: 'F'})
           # HelperMethods::Logger.app_logger('error', "send_fax_status: #{e.message}")
 
           service_alive?
@@ -223,14 +223,14 @@ module FaxServices
           callback_server = CallbackServer.find(server_id)
 
           audit_trails_attributes = {action: 'workflow', actor: Etc.getlogin, actor_type: 0, event: "total #{records.size} records for #{callback_server.name}", event_type:'info'}
-          LoggerJob.perform_async(audit_trails_attributes, {})
+          FaxLoggerJob.perform_async(audit_trails_attributes, {})
           # HelperMethods::Logger.app_logger('info', "total #{records.size} records for #{callback_server.name}")
 
           array_of_records =  prepare_client_date(records)
           if array_of_records.blank?
 
             audit_trails_attributes = {action: 'workflow', actor: Etc.getlogin, actor_type: 0, event: 'No responses for faxes found', event_type:'info'}
-            LoggerJob.perform_async(audit_trails_attributes, {})
+            FaxLoggerJob.perform_async(audit_trails_attributes, {})
             # HelperMethods::Logger.app_logger('info', 'sendback_final_response_to_client: No responses for faxes found')
 
           else
@@ -239,14 +239,14 @@ module FaxServices
               begin
 
                 audit_trails_attributes = {action: 'workflow', actor: Etc.getlogin, actor_type: 0, event: "#{Time.now} posting #{batch_of_records.size} records to #{callback_server.name}", event_type:'info'}
-                LoggerJob.perform_async(audit_trails_attributes, {})
+                FaxLoggerJob.perform_async(audit_trails_attributes, {})
                 # HelperMethods::Logger.app_logger('info', "#{Time.now} posting #{batch_of_records.size} records to #{callback_server.name}")
 
                 url = URI(callback_server.update_url+'/eFaxService/OutboundDispositionService.svc/Receive')
                 response = HTTParty.post(url, body: batch_of_records.to_json, headers: { 'Content-Type' => 'application/json' } )
 
                 audit_trails_attributes = {action: 'workflow', actor: Etc.getlogin, actor_type: 0, event: "#{Time.now} end posting", event_type:'info'}
-                LoggerJob.perform_async(audit_trails_attributes, {})
+                FaxLoggerJob.perform_async(audit_trails_attributes, {})
                 # HelperMethods::Logger.app_logger('info', "#{Time.now} end posting")
 
                 if response.present? && response.code == 200
@@ -260,20 +260,20 @@ module FaxServices
                   end
 
                   audit_trails_attributes = {action: 'workflow', actor: Etc.getlogin, actor_type: 0, event: "successfully updated: #{success_ids}", event_type:'info'}
-                  LoggerJob.perform_async(audit_trails_attributes, {})
+                  FaxLoggerJob.perform_async(audit_trails_attributes, {})
                   # HelperMethods::Logger.app_logger('info', "successfully updated: #{success_ids}")
 
                 else
 
                   audit_trails_attributes = {action: 'workflow', actor:  Etc.getlogin, actor_type: 0, event: "response error(#{response})", event_type:'error'}
-                  LoggerJob.perform_async(audit_trails_attributes, {})
+                  FaxLoggerJob.perform_async(audit_trails_attributes, {})
                   # HelperMethods::Logger.app_logger('error', "final_response_to_client: response error(#{response})")
 
                 end
               rescue Exception => e
 
                 audit_trails_attributes = {action: 'workflow', actor:  Etc.getlogin, actor_type: 0, event: "Error while posting final response(#{e.message})", event_type:'error'}
-                LoggerJob.perform_async(audit_trails_attributes, {error: e.message, status: 'F'})
+                FaxLoggerJob.perform_async(audit_trails_attributes, {error: e.message, status: 'F'})
                 # HelperMethods::Logger.app_logger('error', "final_response_to_client: Error while posting final response(#{e.message})")
 
               end
@@ -326,7 +326,7 @@ module FaxServices
           return true
         rescue Exception => e
           audit_trails_attributes = {action: 'workflow', actor: Etc.getlogin, actor_type: 0, event: "fax_vendor_up?: #{e.message}", event_type:'error'}
-          LoggerJob.perform_async(audit_trails_attributes, {error: e.message})
+          FaxLoggerJob.perform_async(audit_trails_attributes, {error: e.message})
           # HelperMethods::Logger.app_logger('error', "fax_vendor_up?: #{e.message}")
           return false
         end
@@ -336,7 +336,7 @@ module FaxServices
         if fax_vendor_up?
           unless VendorStatus.service_up?
             audit_trails_attributes = {action: 'workflow', actor: Etc.getlogin, actor_type: 0, event: "FaxService is up #{Time.now}", event_type:'info'}
-            LoggerJob.perform_async(audit_trails_attributes, {})
+            FaxLoggerJob.perform_async(audit_trails_attributes, {})
             # HelperMethods::Logger.app_logger('info', "FaxService is up #{Time.now}")
             VendorStatus.create!(service: 'up')
           end
@@ -344,7 +344,7 @@ module FaxServices
         else
           unless VendorStatus.service_down?
             audit_trails_attributes = {action: 'workflow', actor: Etc.getlogin, actor_type: 0, event: "FaxService is down #{Time.now}", event_type:'info'}
-            LoggerJob.perform_async(audit_trails_attributes, {})
+            FaxLoggerJob.perform_async(audit_trails_attributes, {})
             # HelperMethods::Logger.app_logger('info', "FaxService is down #{Time.now}")
             VendorStatus.create!(service: 'down')
           end
