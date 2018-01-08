@@ -29,7 +29,7 @@ task check_fax_response: :environment do
       end
     else
 
-      audit_trails_attributes = {action: 'workflow', actor: Etc.getlogin, actor_type: 0, event: 'No changes sicne last task!', event_type:'info'}
+      audit_trails_attributes = {action: 'workflow', actor: Etc.getlogin, actor_type: 0, event: 'No changes since last task!', event_type:'info'}
       FaxLoggerJob.perform_async(audit_trails_attributes, {})
       # HelperMethods::Logger.app_logger('info', 'check_fax_response: No changes sicne last task!')
 
