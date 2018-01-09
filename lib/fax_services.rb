@@ -146,7 +146,6 @@ module FaxServices
                 recipient_fax:       parse_response['RecipientFax'],
                 tracking_code:       parse_response['TrackingCode'],
                 fax_date_utc:        parse_response['FaxDateUtc'],
-                fax_id:              parse_response['FaxId'],
                 pages:               parse_response['Pages'],
                 attempts:            parse_response['Attempts'],
                 sender_fax:          parse_response['SenderFax'],
