@@ -24,7 +24,7 @@ class Api::V1::FaxRecordsController < ApplicationController
       attachments_array = params['Attachments'].split(',').map(&:strip)
       fax_record = FaxRecord.new(callback_server_id: callback_server.id, client_receipt_date: Time.now,
         recipient_number: params['RecipientNumber'], recipient_name: params['RecipientName'], client_id: params['ClientId'],
-        updated_by_initializer: false, created_by: params['CreateBy'], fax_id: SecureRandom.uuid)
+        updated_by_initializer: false, created_by: params['CreateBy'])
       respond_to do |format|
         if fax_record.save
           CallbackParam.create(let_sk: params['LetterId'], e_sk: params['CreateById'], type_cd_sk: params['TransmissionTypeCodeId'], priority_cd_sk: params['PriorityCodeId'], fax_record_id: fax_record.id)

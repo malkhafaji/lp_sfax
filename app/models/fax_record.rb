@@ -2,6 +2,7 @@ class FaxRecord < ApplicationRecord
   has_many :attachments,  dependent: :destroy
   has_one :callback_param,  dependent: :destroy
   belongs_to :callback_server
+  after_validation :generate_fax_id,  on: :create
 
   validates_format_of :recipient_number, with: /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/
   validates_presence_of :recipient_name, :created_by, :recipient_number, :client_id
@@ -40,6 +41,10 @@ class FaxRecord < ApplicationRecord
     else
       FaxRecord.all
     end
+  end
+  
+  def generate_fax_id
+    self.fax_id = "#{SecureRandom.uuid}"
   end
 
   # Generating CSV file either for all records OR the records results from filter
